@@ -98,20 +98,20 @@ services:
       - qa-network
     restart: unless-stopped
 
-  # PostgreSQL - Base de datos para n8n + SQL Testing
+  # PostgreSQL - Base de datos para Testing QA
   postgres:
     image: postgres:15-alpine
-    container_name: epidata-postgres
+    container_name: sigma-postgres
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=n8n
-      - POSTGRES_PASSWORD=n8n
-      - POSTGRES_DB=n8n
+      - POSTGRES_USER=sigma_qa
+      - POSTGRES_PASSWORD=sigma_qa_2024
+      - POSTGRES_DB=sigma_test
       - TZ=America/Argentina/Buenos_Aires
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./docker/postgres/init-qa-testing-db.sql:/docker-entrypoint-initdb.d/init-qa-testing-db.sql
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - qa-network
     restart: unless-stopped
