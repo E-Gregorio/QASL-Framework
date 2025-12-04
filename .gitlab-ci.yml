@@ -19,7 +19,7 @@ cache:
 install:
   stage: build
   script:
-    - npm ci
+    - npm install
     - npx playwright install --with-deps chromium
   artifacts:
     paths:
