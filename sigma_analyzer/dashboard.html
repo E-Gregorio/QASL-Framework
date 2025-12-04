@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMA QA Dashboard - Pruebas Estaticas</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            font-size: 16px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #0088ff;
+        }
+
+        .header-left {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .project-subtitle {
+            font-size: 16px;
+            color: #b3d9ff;
+            margin-top: 8px;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .client-name {
+            font-size: 22px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .team-info {
+            font-size: 14px;
+            color: #b3d9ff;
+            margin-top: 8px;
+            line-height: 1.6;
+        }
+
+        .date-info {
+            font-size: 13px;
+            color: #80bfff;
+            margin-top: 5px;
+        }
+
+        .standards-banner {
+            background: linear-gradient(90deg, #1a1a2e 0%, #16213e 100%);
+            padding: 15px 40px;
+            border-bottom: 1px solid #333;
+        }
+
+        .standards-title {
+            font-size: 14px;
+            color: #0088ff;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .standards-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .standard-badge {
+            background: rgba(0, 136, 255, 0.15);
+            border: 1px solid #0066cc;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #b3d9ff;
+        }
+
+        .standard-badge strong {
+            color: #0088ff;
+        }
+
+        .container {
+            padding: 35px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #0088ff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .kpi-card {
+            background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: #0066cc;
+        }
+
+        .kpi-value {
+            font-size: 52px;
+            font-weight: bold;
+            color: #0088ff;
+            margin-bottom: 8px;
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .kpi-description {
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .kpi-card.success .kpi-value {
+            color: #00cc66;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 35px;
+        }
+
+        .chart-panel {
+            background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0088ff;
+            margin-bottom: 8px;
+        }
+
+        .chart-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        .full-width .chart-container {
+            height: 320px;
+        }
+
+        .table-panel {
+            background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 35px;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0088ff;
+            margin-bottom: 8px;
+        }
+
+        .table-subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #1a1a1a;
+            color: #0088ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 1px;
+        }
+
+        tr:hover {
+            background-color: #1a1a2e;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: rgba(0, 204, 102, 0.2);
+            color: #00cc66;
+        }
+
+        .badge-primary {
+            background-color: rgba(0, 136, 255, 0.2);
+            color: #0088ff;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #0088ff;
+            text-decoration: none;
+        }
+
+        .footer-standards {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #555;
+        }
+
+        @media (max-width: 1200px) {
+            .kpi-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .header-right {
+                margin-top: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <div class="project-name">SIGMA QA Platform</div>
+            <div class="project-subtitle">PRUEBAS ESTATICAS - SHIFT LEFT TESTING</div>
+        </div>
+        <div class="header-right">
+            <div class="client-name">Cliente: AGIP</div>
+            <div class="team-info">
+                <strong>Elyer Maldonado</strong> - Lider Tecnico QA<br>
+                <strong>Kelly Ybarra</strong> - Analista QA
+            </div>
+            <div class="date-info">Generado: 29/11/2025</div>
+        </div>
+    </header>
+
+    <div class="standards-banner">
+        <div class="standards-title">NORMAS Y ESTANDARES APLICADOS</div>
+        <div class="standards-list">
+            <div class="standard-badge"><strong>ISTQB CTFL v4.0</strong> - Cap. 3: Static Testing</div>
+            <div class="standard-badge"><strong>IEEE 829</strong> - Test Documentation</div>
+            <div class="standard-badge"><strong>IEEE 830</strong> - Software Requirements</div>
+            <div class="standard-badge"><strong>ISO/IEC 27001</strong> - Information Security</div>
+            <div class="standard-badge"><strong>ISO 9001</strong> - Quality Management</div>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="section-title">INDICADORES CLAVE DE RENDIMIENTO (KPIs)</div>
+
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value">7</div>
+                <div class="kpi-label">Historias de Usuario</div>
+                <div class="kpi-description">HUs analizadas en Fase 2</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">28</div>
+                <div class="kpi-label">Test Suites</div>
+                <div class="kpi-description">Agrupaciones de Test Cases</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">28</div>
+                <div class="kpi-label">Precondiciones</div>
+                <div class="kpi-description">Condiciones previas definidas</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">83</div>
+                <div class="kpi-label">Casos de Prueba</div>
+                <div class="kpi-description">Test Cases generados</div>
+            </div>
+            <div class="kpi-card success">
+                <div class="kpi-value">100%</div>
+                <div class="kpi-label">Cobertura BR</div>
+                <div class="kpi-description">Reglas de Negocio cubiertas</div>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-panel">
+                <div class="chart-title">Distribucion de Test Cases por Tipo de Prueba</div>
+                <div class="chart-subtitle">Mide: Cantidad de TCs clasificados segun su categoria (Funcional, Seguridad, Integracion)</div>
+                <div class="chart-container">
+                    <canvas id="chartTipo"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-panel">
+                <div class="chart-title">Distribucion de Test Cases por Prioridad</div>
+                <div class="chart-subtitle">Mide: Cantidad de TCs segun su nivel de criticidad (Alta, Media, Baja)</div>
+                <div class="chart-container">
+                    <canvas id="chartPrioridad"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-panel">
+                <div class="chart-title">Test Cases por Epica del Proyecto</div>
+                <div class="chart-subtitle">Mide: Cantidad total de TCs generados para cada Epica del proyecto SIGMA</div>
+                <div class="chart-container">
+                    <canvas id="chartEpica"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-panel">
+                <div class="chart-title">Gaps de Cobertura Identificados y Resueltos</div>
+                <div class="chart-subtitle">Mide: Escenarios faltantes detectados durante el analisis estatico (Total: 85 gaps)</div>
+                <div class="chart-container">
+                    <canvas id="chartGaps"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-panel full-width">
+                <div class="chart-title">Evolucion de Cobertura de Reglas de Negocio por HU</div>
+                <div class="chart-subtitle">Mide: Porcentaje de BRs cubiertas ANTES del analisis vs DESPUES del analisis Shift-Left</div>
+                <div class="chart-container">
+                    <canvas id="chartCobertura"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-panel full-width">
+                <div class="chart-title">Cantidad de Test Cases por Historia de Usuario</div>
+                <div class="chart-subtitle">Mide: Numero de TCs generados para cada HU (datos reales del CSV 4_Test_Cases.csv)</div>
+                <div class="chart-container">
+                    <canvas id="chartHU"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-title">Detalle de Analisis por Historia de Usuario</div>
+            <div class="table-subtitle">Datos extraidos de los CSVs de trazabilidad y HUs actualizadas</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>HU ID</th>
+                        <th>Epica</th>
+                        <th>Test Cases</th>
+                        <th>Escenarios</th>
+                        <th>Reglas Negocio</th>
+                        <th>Cobertura Inicial</th>
+                        <th>Cobertura Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>HU_SGINC_02</td>
+                        <td>EP_SIGMA_01</td>
+                        <td>8</td>
+                        <td>7</td>
+                        <td>4</td>
+                        <td>37.5%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                    <tr>
+                        <td>HU_SGINC_03</td>
+                        <td>EP_SIGMA_01</td>
+                        <td>11</td>
+                        <td>11</td>
+                        <td>5</td>
+                        <td>50.0%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                    <tr>
+                        <td>HU_SGINC_04</td>
+                        <td>EP_SIGMA_01</td>
+                        <td>10</td>
+                        <td>10</td>
+                        <td>6</td>
+                        <td>41.7%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                    <tr>
+                        <td>HU_SGINC_05</td>
+                        <td>EP_SIGMA_01</td>
+                        <td>8</td>
+                        <td>8</td>
+                        <td>4</td>
+                        <td>50.0%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                    <tr>
+                        <td>HU_SGINC_06</td>
+                        <td>EP_SIGMA_01</td>
+                        <td>7</td>
+                        <td>7</td>
+                        <td>4</td>
+                        <td>37.5%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                    <tr>
+                        <td>HU_SGPP_01</td>
+                        <td>EP_SGPP</td>
+                        <td>27</td>
+                        <td>27</td>
+                        <td>14</td>
+                        <td>14.3%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                    <tr>
+                        <td>HU_SGPP_02</td>
+                        <td>EP_SGPP</td>
+                        <td>12</td>
+                        <td>12</td>
+                        <td>7</td>
+                        <td>28.6%</td>
+                        <td><span class="badge badge-success">100%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-panel">
+            <div class="table-title">Matriz de Trazabilidad</div>
+            <div class="table-subtitle">Estructura: EPIC -> HU -> TS -> PRC -> TC</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nivel</th>
+                        <th>Cantidad</th>
+                        <th>Rango de IDs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Epicas</td>
+                        <td>2</td>
+                        <td><span class="badge badge-primary">EP_SIGMA_01, EP_SGPP</span></td>
+                    </tr>
+                    <tr>
+                        <td>Historias de Usuario</td>
+                        <td>7</td>
+                        <td><span class="badge badge-primary">HU_SGINC_02-06, HU_SGPP_01-02</span></td>
+                    </tr>
+                    <tr>
+                        <td>Test Suites</td>
+                        <td>28</td>
+                        <td><span class="badge badge-primary">TS-001 a TS-028</span></td>
+                    </tr>
+                    <tr>
+                        <td>Precondiciones</td>
+                        <td>28</td>
+                        <td><span class="badge badge-primary">PRC-001 a PRC-028</span></td>
+                    </tr>
+                    <tr>
+                        <td>Casos de Prueba</td>
+                        <td>83</td>
+                        <td><span class="badge badge-primary">TC-001 a TC-083</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p>SIGMA QA Platform v3.0 | Metodologia Shift-Left Testing</p>
+        <p>Desarrollado por <a href="#">Epidata</a> para AGIP</p>
+        <p class="footer-standards">
+            Basado en: ISTQB CTFL v4.0 (Cap. 3 Static Testing) | IEEE 829/830 | ISO/IEC 27001 | ISO 9001
+        </p>
+    </footer>
+
+    <script>
+        Chart.defaults.color = '#aaa';
+        Chart.defaults.borderColor = '#333';
+        Chart.defaults.font.size = 13;
+
+        const epidataBlue = '#0088ff';
+
+        const colors = {
+            blue: 'rgba(0, 136, 255, 0.8)',
+            green: 'rgba(0, 204, 102, 0.8)',
+            orange: 'rgba(255, 159, 64, 0.8)',
+            red: 'rgba(255, 99, 132, 0.8)',
+            purple: 'rgba(153, 102, 255, 0.8)',
+            cyan: 'rgba(0, 188, 212, 0.8)',
+            yellow: 'rgba(255, 205, 86, 0.8)'
+        };
+
+        // Grafico: Distribucion de TCs por Tipo
+        new Chart(document.getElementById('chartTipo'), {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Funcional (61 TCs)',
+                    'Seguridad (17 TCs)',
+                    'Integracion (5 TCs)'
+                ],
+                datasets: [{
+                    data: [61, 17, 5],
+                    backgroundColor: [colors.blue, colors.orange, colors.green],
+                    borderColor: '#0a0a0a',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15 }
+                    }
+                }
+            }
+        });
+
+        // Grafico: Distribucion de TCs por Prioridad
+        new Chart(document.getElementById('chartPrioridad'), {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Alta (63 TCs)',
+                    'Media (20 TCs)',
+                    'Baja (0 TCs)'
+                ],
+                datasets: [{
+                    data: [63, 20, 0],
+                    backgroundColor: [colors.red, colors.yellow, colors.green],
+                    borderColor: '#0a0a0a',
+                    borderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 15 }
+                    }
+                }
+            }
+        });
+
+        // Grafico: TCs por Epica
+        new Chart(document.getElementById('chartEpica'), {
+            type: 'bar',
+            data: {
+                labels: [
+                    'EP_SIGMA_01\n(44 TCs)',
+                    'EP_SGPP\n(39 TCs)'
+                ],
+                datasets: [{
+                    label: 'Test Cases',
+                    data: [44, 39],
+                    backgroundColor: [colors.blue, colors.cyan],
+                    borderColor: [epidataBlue, 'rgba(0, 188, 212, 1)'],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#222' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Grafico: Gaps Resueltos
+        new Chart(document.getElementById('chartGaps'), {
+            type: 'polarArea',
+            data: {
+                labels: [
+                    'Escenarios Negativos (45)',
+                    'Escenarios Positivos (25)',
+                    'BRs Sin Cobertura (15)'
+                ],
+                datasets: [{
+                    data: [45, 25, 15],
+                    backgroundColor: [
+                        'rgba(153, 102, 255, 0.7)',
+                        'rgba(0, 188, 212, 0.7)',
+                        'rgba(255, 159, 64, 0.7)'
+                    ],
+                    borderColor: '#0a0a0a',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 12 }
+                    }
+                },
+                scales: {
+                    r: {
+                        grid: { color: '#333' },
+                        ticks: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Grafico: Cobertura Antes/Despues
+        new Chart(document.getElementById('chartCobertura'), {
+            type: 'bar',
+            data: {
+                labels: ['HU_SGINC_02', 'HU_SGINC_03', 'HU_SGINC_04', 'HU_SGINC_05', 'HU_SGINC_06', 'HU_SGPP_01', 'HU_SGPP_02'],
+                datasets: [
+                    {
+                        label: 'Cobertura ANTES del Analisis (%)',
+                        data: [37.5, 50.0, 41.7, 50.0, 37.5, 14.3, 28.6],
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Cobertura DESPUES del Analisis (%)',
+                        data: [100, 100, 100, 100, 100, 100, 100],
+                        backgroundColor: 'rgba(0, 204, 102, 0.7)',
+                        borderColor: 'rgba(0, 204, 102, 1)',
+                        borderWidth: 2,
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { padding: 15 }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: { color: '#222' },
+                        ticks: {
+                            callback: function(value) { return value + '%'; }
+                        }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Grafico: TCs por HU (horizontal bar con datos reales)
+        new Chart(document.getElementById('chartHU'), {
+            type: 'bar',
+            data: {
+                labels: ['HU_SGPP_01', 'HU_SGPP_02', 'HU_SGINC_03', 'HU_SGINC_04', 'HU_SGINC_02', 'HU_SGINC_05', 'HU_SGINC_06'],
+                datasets: [{
+                    label: 'Test Cases',
+                    data: [27, 12, 11, 10, 8, 8, 7],
+                    backgroundColor: colors.blue,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: '#222' }
+                    },
+                    y: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

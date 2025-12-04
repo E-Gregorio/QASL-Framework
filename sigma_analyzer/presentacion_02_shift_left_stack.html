@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift-Left Testing y Stack Tecnologico - SIGMA QA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .slide {
+            min-height: 100vh;
+            padding: 60px 80px;
+            display: none;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0088ff;
+        }
+
+        .header-right {
+            text-align: right;
+            color: #888;
+            font-size: 16px;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 30px;
+            right: 50px;
+            font-size: 18px;
+            color: #444;
+        }
+
+        /* NAVIGATION BUTTONS */
+        .nav-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
+            color: white;
+            border: none;
+            padding: 20px 15px;
+            font-size: 24px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            opacity: 0.7;
+        }
+
+        .nav-btn:hover {
+            background: linear-gradient(135deg, #00a0ff 0%, #0088ff 100%);
+            opacity: 1;
+        }
+
+        .nav-btn:disabled {
+            background: #333;
+            cursor: not-allowed;
+            opacity: 0.3;
+        }
+
+        .nav-btn#prevBtn {
+            left: 15px;
+        }
+
+        .nav-btn#nextBtn {
+            right: 15px;
+        }
+
+        h1 {
+            font-size: 56px;
+            color: #0088ff;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 44px;
+            color: #0088ff;
+            margin-bottom: 40px;
+        }
+
+        h3 {
+            font-size: 32px;
+            color: #00d4ff;
+            margin-bottom: 25px;
+        }
+
+        .subtitle {
+            font-size: 28px;
+            color: #aaa;
+            margin-bottom: 50px;
+        }
+
+        p {
+            font-size: 24px;
+            line-height: 1.8;
+            color: #ddd;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        li {
+            font-size: 24px;
+            padding: 15px 0;
+            padding-left: 40px;
+            position: relative;
+            color: #ddd;
+        }
+
+        li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: #0088ff;
+            font-weight: bold;
+            font-size: 28px;
+        }
+
+        .highlight {
+            color: #0088ff;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #51cf66;
+        }
+
+        .warning {
+            color: #ff6b6b;
+        }
+
+        .box {
+            background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+            border: 2px solid #0088ff;
+            border-radius: 16px;
+            padding: 40px;
+            margin: 25px 0;
+        }
+
+        .box-success {
+            border-color: #51cf66;
+        }
+
+        .box-warning {
+            border-color: #ff6b6b;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin: 40px 0;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 40px;
+            margin: 40px 0;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            border: 3px solid #0088ff;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 72px;
+            font-weight: bold;
+            color: #0088ff;
+        }
+
+        .metric-label {
+            font-size: 20px;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            font-size: 20px;
+        }
+
+        th, td {
+            padding: 20px;
+            text-align: left;
+            border: 1px solid #333;
+        }
+
+        th {
+            background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 136, 255, 0.1);
+        }
+
+        .standards-banner {
+            background: linear-gradient(90deg, #0a0a0a, #1a1a2e);
+            border: 2px solid #0088ff;
+            border-radius: 12px;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+
+        .standard-item {
+            font-size: 18px;
+            color: #0088ff;
+            font-weight: bold;
+        }
+
+        .team-section {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 60px;
+        }
+
+        .team-card {
+            background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+            border: 2px solid #0088ff;
+            border-radius: 12px;
+            padding: 30px 50px;
+            text-align: center;
+        }
+
+        .team-role {
+            color: #0088ff;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+
+        .team-name {
+            font-size: 26px;
+            color: #fff;
+        }
+
+        .flow-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
+            padding: 20px 30px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .flow-step-alt {
+            background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);
+        }
+
+        .flow-step-warn {
+            background: linear-gradient(135deg, #ffd93d 0%, #f0c929 100%);
+            color: #333;
+        }
+
+        .flow-arrow {
+            font-size: 36px;
+            color: #0088ff;
+        }
+
+        .center-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .big-text {
+            font-size: 120px;
+            color: #0088ff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+            margin: 30px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #0088ff, #00d4ff, #51cf66);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 25px 0;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -38px;
+            top: 32px;
+            width: 20px;
+            height: 20px;
+            background: #0088ff;
+            border-radius: 50%;
+            border: 4px solid #00d4ff;
+        }
+
+        .phase-title {
+            font-size: 26px;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .phase-desc {
+            font-size: 20px;
+            color: #aaa;
+        }
+
+        .tool-card {
+            background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tool-card:hover {
+            border-color: #0088ff;
+        }
+
+        .tool-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #0088ff;
+            margin-bottom: 10px;
+        }
+
+        .tool-purpose {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .vcr-box {
+            background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+            border: 3px solid #0088ff;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .formula {
+            font-size: 36px;
+            font-family: 'Consolas', monospace;
+            color: #00d4ff;
+            margin: 20px 0;
+        }
+
+        .pipeline-step {
+            background: linear-gradient(135deg, #111 0%, #1a1a2e 100%);
+            border: 2px solid #0088ff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .pipeline-step-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0088ff;
+        }
+
+        .pipeline-step-tool {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION BUTTONS -->
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()">&larr;</button>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">&rarr;</button>
+
+    <!-- SLIDE 1: PORTADA -->
+    <div class="slide active" data-slide="1">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">
+                Cliente: AGIP<br>
+                Proyecto: SIGMA
+            </div>
+        </div>
+        <div class="center-content">
+            <h1>Shift-Left Testing</h1>
+            <p class="subtitle">Metodologia y Stack Tecnologico para QA</p>
+            <div class="standards-banner">
+                <span class="standard-item">ISTQB CTFL v4.0</span>
+                <span class="standard-item">IEEE 829</span>
+                <span class="standard-item">IEEE 830</span>
+                <span class="standard-item">ISO/IEC 27001</span>
+                <span class="standard-item">ISO 9001</span>
+            </div>
+            <div class="team-section">
+                <div class="team-card">
+                    <div class="team-role">Lider Tecnico QA</div>
+                    <div class="team-name">Elyer Maldonado</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-role">QA Analyst</div>
+                    <div class="team-name">Kelly Ybarra</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">1 / 12</div>
+    </div>
+
+    <!-- SLIDE 2: QUE ES SHIFT-LEFT -->
+    <div class="slide" data-slide="2">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Shift-Left Testing</div>
+        </div>
+        <h2>Que es Shift-Left Testing?</h2>
+        <div class="box">
+            <p style="font-size: 28px;">
+                <span class="highlight">Definicion:</span> Practica de mover las actividades de prueba hacia etapas
+                <strong>mas tempranas</strong> del ciclo de desarrollo. "Hacia la izquierda" en la linea de tiempo.
+            </p>
+        </div>
+        <div class="two-columns" style="margin-top: 50px;">
+            <div class="box box-warning">
+                <h3 class="warning">Enfoque Tradicional</h3>
+                <ul>
+                    <li>Pruebas al final del desarrollo</li>
+                    <li>Defectos encontrados tarde</li>
+                    <li>Costo de correccion alto</li>
+                    <li>Retrasos en entregas</li>
+                </ul>
+            </div>
+            <div class="box box-success">
+                <h3 class="success">Enfoque Shift-Left</h3>
+                <ul>
+                    <li>Pruebas desde requisitos</li>
+                    <li>Defectos encontrados temprano</li>
+                    <li>Costo de correccion minimo</li>
+                    <li>Entregas predecibles</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-number">2 / 12</div>
+    </div>
+
+    <!-- SLIDE 3: FLUJO COMPLETO -->
+    <div class="slide" data-slide="3">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Flujo de Trabajo</div>
+        </div>
+        <h2>Flujo Completo de Trabajo QA</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="phase-title">FASE 1: Pruebas Estaticas</div>
+                <div class="phase-desc">Analisis de HUs → Identificacion de BRs → Generacion de TCs → CSVs de Trazabilidad</div>
+            </div>
+            <div class="timeline-item">
+                <div class="phase-title">FASE 2: Deploy del SUT</div>
+                <div class="phase-desc">Sistema Bajo Prueba desplegado → Ambiente de Test preparado</div>
+            </div>
+            <div class="timeline-item">
+                <div class="phase-title">FASE 3: Pruebas Exploratorias</div>
+                <div class="phase-desc">Ejecucion basada en TCs → Refinamiento de HUs → Deteccion de defectos</div>
+            </div>
+            <div class="timeline-item">
+                <div class="phase-title">FASE 4: Backlog y Planning Poker</div>
+                <div class="phase-desc">HUs al backlog → Estimacion VCR → Votacion del equipo</div>
+            </div>
+            <div class="timeline-item">
+                <div class="phase-title">FASE 5: Automatizacion (VCR >= 9)</div>
+                <div class="phase-desc">E2E con Playwright → API con Postman/Newman → Performance con K6 → Seguridad con OWASP ZAP</div>
+            </div>
+        </div>
+        <div class="slide-number">3 / 12</div>
+    </div>
+
+    <!-- SLIDE 4: VCR Y PLANNING POKER -->
+    <div class="slide" data-slide="4">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Priorizacion</div>
+        </div>
+        <h2>Priorizacion: VCR y Planning Poker</h2>
+        <div class="vcr-box">
+            <h3>Formula VCR</h3>
+            <div class="formula">VCR = Valor + Costo + Riesgo</div>
+            <p style="color: #888; font-size: 20px;">Escala: 1 (bajo) a 3 (alto) por cada dimension | Rango: 3 a 9</p>
+        </div>
+        <div class="three-columns">
+            <div class="box">
+                <h3 style="text-align: center;">Valor</h3>
+                <p style="text-align: center; font-size: 20px;">Impacto para el negocio y el usuario final</p>
+            </div>
+            <div class="box">
+                <h3 style="text-align: center;">Costo</h3>
+                <p style="text-align: center; font-size: 20px;">Esfuerzo de desarrollo y pruebas</p>
+            </div>
+            <div class="box">
+                <h3 style="text-align: center;">Riesgo</h3>
+                <p style="text-align: center; font-size: 20px;">Probabilidad e impacto de fallo</p>
+            </div>
+        </div>
+        <div class="box box-success" style="margin-top: 30px;">
+            <p style="text-align: center; font-size: 26px;">
+                Si la votacion es <span class="success" style="font-size: 32px;">VCR >= 9</span> →
+                Candidata a <span class="highlight">automatizacion</span> y se convierte en <span class="highlight">deuda tecnica</span>
+            </p>
+        </div>
+        <div class="slide-number">4 / 12</div>
+    </div>
+
+    <!-- SLIDE 5: STACK E2E -->
+    <div class="slide" data-slide="5">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Stack Tecnologico</div>
+        </div>
+        <h2>Pruebas E2E (End-to-End)</h2>
+        <div class="two-columns">
+            <div>
+                <div class="tool-card" style="margin-bottom: 30px; border-color: #0088ff;">
+                    <div class="tool-name" style="font-size: 32px;">Playwright</div>
+                    <div class="tool-purpose" style="font-size: 20px;">Framework de automatizacion E2E</div>
+                </div>
+                <div class="box">
+                    <h3>Caracteristicas</h3>
+                    <ul>
+                        <li>TypeScript nativo</li>
+                        <li>Multi-navegador (Chrome, Firefox, Safari)</li>
+                        <li>Captura de APIs automatica</li>
+                        <li>Screenshots y videos</li>
+                        <li>Paralelizacion de pruebas</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="box">
+                    <h3>Flujo de Trabajo</h3>
+                    <div style="margin-top: 20px;">
+                        <p style="font-size: 20px; margin-bottom: 15px;">1. Escribir tests en TypeScript</p>
+                        <p style="font-size: 20px; margin-bottom: 15px;">2. Ejecutar contra el SUT</p>
+                        <p style="font-size: 20px; margin-bottom: 15px;">3. Capturar llamadas API automaticamente</p>
+                        <p style="font-size: 20px; margin-bottom: 15px;">4. Generar coleccion Postman</p>
+                        <p style="font-size: 20px; margin-bottom: 15px;">5. Reportes con Allure</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">5 / 12</div>
+    </div>
+
+    <!-- SLIDE 6: STACK API -->
+    <div class="slide" data-slide="6">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Stack Tecnologico</div>
+        </div>
+        <h2>Pruebas de API</h2>
+        <div class="two-columns">
+            <div class="tool-card" style="border-color: #ff6b6b;">
+                <div class="tool-name" style="font-size: 28px; color: #ff6b6b;">Postman</div>
+                <div class="tool-purpose" style="font-size: 18px;">Creacion y gestion de colecciones API</div>
+                <div class="box" style="margin-top: 20px; text-align: left;">
+                    <ul style="font-size: 18px;">
+                        <li>Colecciones organizadas por HU</li>
+                        <li>Variables de entorno</li>
+                        <li>Tests automatizados</li>
+                        <li>Documentacion de APIs</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tool-card" style="border-color: #51cf66;">
+                <div class="tool-name" style="font-size: 28px; color: #51cf66;">Newman</div>
+                <div class="tool-purpose" style="font-size: 18px;">Ejecucion de colecciones en CI/CD</div>
+                <div class="box" style="margin-top: 20px; text-align: left;">
+                    <ul style="font-size: 18px;">
+                        <li>Linea de comandos</li>
+                        <li>Integracion con Jenkins</li>
+                        <li>Reportes HTML/JSON</li>
+                        <li>Ejecucion en Docker</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="flow-container" style="margin-top: 40px;">
+            <div class="flow-step">Playwright<br><small>Captura APIs</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);">Postman<br><small>Coleccion</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step flow-step-alt">Newman<br><small>CI/CD</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-step">Allure<br><small>Reportes</small></div>
+        </div>
+        <div class="slide-number">6 / 12</div>
+    </div>
+
+    <!-- SLIDE 7: STACK PERFORMANCE -->
+    <div class="slide" data-slide="7">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Stack Tecnologico</div>
+        </div>
+        <h2>Pruebas de Performance</h2>
+        <div class="two-columns">
+            <div>
+                <div class="tool-card" style="margin-bottom: 30px; border-color: #9775fa;">
+                    <div class="tool-name" style="font-size: 32px; color: #9775fa;">K6</div>
+                    <div class="tool-purpose" style="font-size: 20px;">Pruebas de carga y estres</div>
+                </div>
+                <div class="box">
+                    <h3>Tipos de Prueba</h3>
+                    <ul>
+                        <li><span class="highlight">Load Testing:</span> Carga normal</li>
+                        <li><span class="highlight">Stress Testing:</span> Limites del sistema</li>
+                        <li><span class="highlight">Spike Testing:</span> Picos subitos</li>
+                        <li><span class="highlight">Soak Testing:</span> Carga sostenida</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="box">
+                    <h3>Metricas Clave</h3>
+                    <ul>
+                        <li><span class="highlight">P95:</span> Percentil 95 tiempo respuesta</li>
+                        <li><span class="highlight">Error Rate:</span> Tasa de errores</li>
+                        <li><span class="highlight">Throughput:</span> Requests por segundo</li>
+                        <li><span class="highlight">VUs:</span> Usuarios virtuales</li>
+                    </ul>
+                </div>
+                <div class="box box-success" style="margin-top: 20px;">
+                    <h3 class="success">Umbrales Sugeridos</h3>
+                    <p style="font-size: 20px;">P95 < 2 segundos</p>
+                    <p style="font-size: 20px;">Error Rate < 1%</p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">7 / 12</div>
+    </div>
+
+    <!-- SLIDE 8: STACK SEGURIDAD -->
+    <div class="slide" data-slide="8">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Stack Tecnologico</div>
+        </div>
+        <h2>Pruebas de Seguridad</h2>
+        <div class="two-columns">
+            <div>
+                <div class="tool-card" style="margin-bottom: 30px; border-color: #ff6b6b;">
+                    <div class="tool-name" style="font-size: 32px; color: #ff6b6b;">OWASP ZAP</div>
+                    <div class="tool-purpose" style="font-size: 20px;">Analisis de vulnerabilidades web</div>
+                </div>
+                <div class="box">
+                    <h3>Modos de Escaneo</h3>
+                    <ul>
+                        <li><span class="highlight">Passive Scan:</span> Analisis sin modificar</li>
+                        <li><span class="highlight">Active Scan:</span> Pruebas de penetracion</li>
+                        <li><span class="highlight">Spider:</span> Descubrimiento de URLs</li>
+                        <li><span class="highlight">API Scan:</span> Analisis de endpoints</li>
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <div class="box">
+                    <h3>OWASP Top 10</h3>
+                    <ul style="font-size: 20px;">
+                        <li>A01: Broken Access Control</li>
+                        <li>A02: Cryptographic Failures</li>
+                        <li>A03: Injection</li>
+                        <li>A04: Insecure Design</li>
+                        <li>A05: Security Misconfiguration</li>
+                        <li>A06: Vulnerable Components</li>
+                        <li>A07: Auth Failures</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">8 / 12</div>
+    </div>
+
+    <!-- SLIDE 9: CI/CD PIPELINE -->
+    <div class="slide" data-slide="9">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Pipeline CI/CD</div>
+        </div>
+        <h2>Pipeline de Pruebas</h2>
+        <p class="subtitle">Integracion Continua con Jenkins (Proyecto Libre)</p>
+        <div class="flow-container">
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">Commit</div>
+                <div class="pipeline-step-tool">GitLab</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">Build</div>
+                <div class="pipeline-step-tool">Jenkins</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">API Tests</div>
+                <div class="pipeline-step-tool">Newman</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">E2E Tests</div>
+                <div class="pipeline-step-tool">Playwright</div>
+            </div>
+        </div>
+        <div class="flow-container">
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">Security</div>
+                <div class="pipeline-step-tool">OWASP ZAP</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">Performance</div>
+                <div class="pipeline-step-tool">K6</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="pipeline-step">
+                <div class="pipeline-step-name">Reports</div>
+                <div class="pipeline-step-tool">Allure</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="pipeline-step" style="border-color: #51cf66;">
+                <div class="pipeline-step-name" style="color: #51cf66;">Deploy</div>
+                <div class="pipeline-step-tool">Docker</div>
+            </div>
+        </div>
+        <div class="box" style="margin-top: 40px;">
+            <p style="text-align: center; font-size: 22px;">
+                <span class="highlight">Grafana (opcional):</span> Dashboard en vivo para pruebas de estres si es necesario
+            </p>
+        </div>
+        <div class="slide-number">9 / 12</div>
+    </div>
+
+    <!-- SLIDE 10: RESUMEN STACK -->
+    <div class="slide" data-slide="10">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Stack Completo</div>
+        </div>
+        <h2>Resumen Stack Tecnologico</h2>
+        <table>
+            <tr>
+                <th>Tipo de Prueba</th>
+                <th>Herramienta</th>
+                <th>Proposito</th>
+            </tr>
+            <tr>
+                <td>E2E / Funcional</td>
+                <td><span class="highlight">Playwright + TypeScript</span></td>
+                <td>Automatizacion de flujos de usuario</td>
+            </tr>
+            <tr>
+                <td>API / Integracion</td>
+                <td><span class="highlight">Postman + Newman</span></td>
+                <td>Pruebas de endpoints REST</td>
+            </tr>
+            <tr>
+                <td>Performance</td>
+                <td><span class="highlight">K6</span></td>
+                <td>Carga, estres, picos</td>
+            </tr>
+            <tr>
+                <td>Seguridad</td>
+                <td><span class="highlight">OWASP ZAP</span></td>
+                <td>Vulnerabilidades OWASP Top 10</td>
+            </tr>
+            <tr>
+                <td>Repositorio</td>
+                <td><span class="highlight">GitLab</span></td>
+                <td>Versionado de codigo de pruebas</td>
+            </tr>
+            <tr>
+                <td>CI/CD</td>
+                <td><span class="highlight">Jenkins</span></td>
+                <td>Pipelines de ejecucion</td>
+            </tr>
+            <tr>
+                <td>Reportes</td>
+                <td><span class="highlight">Allure</span></td>
+                <td>Reportes de ejecucion</td>
+            </tr>
+            <tr>
+                <td>Contenedores</td>
+                <td><span class="highlight">Docker</span></td>
+                <td>Ambientes aislados</td>
+            </tr>
+        </table>
+        <div class="slide-number">10 / 12</div>
+    </div>
+
+    <!-- SLIDE 11: BENEFICIOS -->
+    <div class="slide" data-slide="11">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Beneficios</div>
+        </div>
+        <h2>Beneficios del Enfoque</h2>
+        <div class="three-columns">
+            <div class="metric-card">
+                <div class="metric-value" style="font-size: 48px; color: #51cf66;">100x</div>
+                <div class="metric-label">Ahorro en correccion de defectos</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="font-size: 48px;">100%</div>
+                <div class="metric-label">Trazabilidad de requisitos</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" style="font-size: 48px; color: #ff6b6b;">0</div>
+                <div class="metric-label">Gaps sin resolver</div>
+            </div>
+        </div>
+        <div class="two-columns" style="margin-top: 40px;">
+            <div class="box box-success">
+                <h3 class="success">Calidad</h3>
+                <ul>
+                    <li>Deteccion temprana de defectos</li>
+                    <li>Cobertura completa de BRs</li>
+                    <li>Pruebas automatizadas</li>
+                    <li>Regresion continua</li>
+                </ul>
+            </div>
+            <div class="box">
+                <h3 class="highlight">Eficiencia</h3>
+                <ul>
+                    <li>Priorizacion por VCR</li>
+                    <li>Automatizacion selectiva</li>
+                    <li>Pipeline integrado</li>
+                    <li>Reportes automaticos</li>
+                </ul>
+            </div>
+        </div>
+        <div class="slide-number">11 / 12</div>
+    </div>
+
+    <!-- SLIDE 12: CIERRE -->
+    <div class="slide" data-slide="12">
+        <div class="header">
+            <div class="logo">EPIDATA</div>
+            <div class="header-right">Cliente: AGIP | Proyecto: SIGMA</div>
+        </div>
+        <div class="center-content" style="text-align: center;">
+            <div class="big-text">?</div>
+            <h2 style="margin-bottom: 50px;">Preguntas</h2>
+            <div class="team-section" style="margin-top: 40px;">
+                <div class="team-card">
+                    <div class="team-role">Lider Tecnico QA</div>
+                    <div class="team-name">Elyer Maldonado</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-role">QA Analyst</div>
+                    <div class="team-name">Kelly Ybarra</div>
+                </div>
+            </div>
+            <div class="standards-banner" style="margin-top: 60px;">
+                <span class="standard-item">ISTQB CTFL v4.0</span>
+                <span class="standard-item">IEEE 829</span>
+                <span class="standard-item">IEEE 830</span>
+                <span class="standard-item">ISO/IEC 27001</span>
+                <span class="standard-item">ISO 9001</span>
+            </div>
+        </div>
+        <div class="slide-number">12 / 12</div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 12;
+
+        function showSlide(n) {
+            // Hide all slides
+            document.querySelectorAll('.slide').forEach(slide => {
+                slide.classList.remove('active');
+            });
+
+            // Show current slide
+            const slide = document.querySelector(`[data-slide="${n}"]`);
+            if (slide) {
+                slide.classList.add('active');
+            }
+
+            // Update button states
+            document.getElementById('prevBtn').disabled = (n === 1);
+            document.getElementById('nextBtn').disabled = (n === totalSlides);
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+
+        // Initialize
+        showSlide(1);
+    </script>
+
+</body>
+</html>

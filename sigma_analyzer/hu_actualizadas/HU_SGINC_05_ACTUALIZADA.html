@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historia de Usuario — HU_SGINC_05</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+  .us-container { max-width: 900px; margin: 0 auto; }
+  .us-header { background: #5C85D6; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0; }
+  .us-table { width: 100%; border-collapse: collapse; margin: 0; }
+  .us-table td { border: 1px solid #000; padding: 12px; vertical-align: top; }
+  .label { background: #5C85D6; color: white; font-weight: bold; width: 200px; }
+  .content { background: white; }
+  .link-ref { color: #2196F3; text-decoration: underline; font-style: italic; }
+  .description-format { margin: 5px 0; }
+  .scenario-title { font-weight: bold; margin-top: 10px; }
+  .scenario-content { margin-bottom: 10px; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-left: 3px solid #5C85D6; }
+  .scenario-nuevo { border-left: 3px solid #4CAF50; background: #f1f8e9; }
+  .bullet-point { margin-left: 0; margin-bottom: 5px; }
+  .out-scope-item { margin-bottom: 10px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 8px; }
+  .badge-original { background: #5C85D6; color: white; }
+  .badge-agregado { background: #4CAF50; color: white; }
+  .badge-br { background: #FF9800; color: white; }
+  .br-item { margin: 5px 0; }
+  .cobertura-info { background: #e3f2fd; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="us-container">
+  <div class="us-header">HISTORIA DE USUARIO</div>
+  <table class="us-table">
+    <tr>
+      <td class="label">ID</td>
+      <td class="content">HU_SGINC_05</td>
+    </tr>
+    <tr>
+      <td class="label">Nombre</td>
+      <td class="content">Carga Individual</td>
+    </tr>
+    <tr>
+      <td class="label">Épica</td>
+      <td class="content">
+        Módulo Alta de Inconsistencias EP_SIGMA_01<br>
+        <span class="link-ref">Enlace a documentación de la Épica</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Prioridad</td>
+      <td class="content">Baja – MVP 1</td>
+    </tr>
+    <tr>
+      <td class="label">Estado</td>
+      <td class="content">Análisis Estático Completado - Cobertura: 50.0% → 100%</td>
+    </tr>
+    <tr>
+      <td class="label">Descripción</td>
+      <td class="content">
+        <div class="description-format"><strong>Como</strong> Agentes de AGIP autorizados por la SDGS, con usuario IAM, habilitado por el área de seguridad informática para SIGMA, con perfil CARGA.</div>
+        <div class="description-format"><strong>Quiero</strong> Agregar información de un contribuyente</div>
+        <div class="description-format"><strong>Para</strong> Enriquecer el repositorio universo de contribuyentes y sus inconsistencias.</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Usuarios / Roles</td>
+      <td class="content">Agentes de AGIP autorizados por la SDGS, con usuario IAM, habilitado por el área de seguridad informática para SIGMA, con perfil CARGA.</td>
+    </tr>
+    <tr>
+      <td class="label">Reglas de Negocio</td>
+      <td class="content">
+        <div class="br-item"><strong>BR1:</strong> La funcionalidad “Carga Individual” se accede desde la pantalla de la grilla de alta de inconsistencias.</div><div class="br-item"><strong>BR2:</strong> El formulario debe presentar los campos detallados en el diseño de pantallas en figma (datos de contribuyente, datos de la inconsistencia, información general).</div><div class="br-item"><strong>BR3:</strong> Si falta un dato obligatorio se muestra “Faltan campos obligatorios en algunas filas.” y no se registra.</div><div class="br-item"><strong>BR4:</strong> Si están todos los datos obligatorios se agregan las entidades necesarias con estado “Ingresada” y origen “Carga Manual”.</div>
+        <span class="link-ref">CU-XXX | Casos de uso relacionados</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Precondiciones</td>
+      <td class="content">
+        • Usuario autenticado en el sistema<br>• Permisos correspondientes asignados al rol del usuario<br>• Sistema SIGMA operativo y accesible<br>• Datos de prueba disponibles en el entorno
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dependencias</td>
+      <td class="content">
+        • Integración con Keycloak (Access Manager) operativa<br>• Base de datos disponible y configurada<br>• APIs de backend funcionando correctamente
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Estimaciones</td>
+      <td class="content">
+        Story Points (SP): ____<br>
+        Valor (V 1–3): ____<br>
+        Costo (C 1–3): ____<br>
+        Probabilidad (P 1–3): ____<br>
+        Impacto (I 1–3): ____<br>
+        <strong>Riesgo (R) = P × I = ____ × ____ = ____</strong><br>
+        <strong>Total VCR = V + C + R = ____ + ____ + ____ = ____</strong><br>
+        <em>Política:</em> si <strong>VCR ≥ 9</strong> → Deuda técnica (automatizar y pasa a regresión); si es menor → Pruebas manuales.
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Escenarios de Prueba (Criterios de Aceptación)</td>
+      <td class="content">
+        
+<div class="scenario-title">E1: E1 – Acceso a carga individual <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que estoy en la pantalla con la grilla<br><strong>CUANDO</strong> selecciono “Carga Individual”<br><strong>ENTONCES</strong> el sistema muestra el formulario de carga manual con los siguientes datos separados por temas: **Datos del Contribuyente:**  CUIT:  CUIT del contribuyente. Único</div>
+<div class="scenario-title">E2: Escenario E2 <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que completo los campos obligatorios<br><strong>CUANDO</strong> presiono “Guardar”<br><strong>ENTONCES</strong> el sistema registra los datos en las entidades correspondientes<br><strong>Y</strong> muestra “Los cambios se guardaron correctamente” y vuelve a la grilla</div>
+<div class="scenario-title">E3: Escenario E3 <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que no completo un dato obligatorio<br><strong>CUANDO</strong> presiono “Guardar”<br><strong>ENTONCES</strong> el sistema muestra “Faltan campos obligatorios en algunas filas.”<br><strong>Y</strong> permanece en el formulario</div>
+<div class="scenario-title">E4: Escenario E4 <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que estoy en el formulario<br><strong>CUANDO</strong> presiono “Cancelar”<br><strong>ENTONCES</strong> el sistema no registra<br><strong>Y</strong> vuelve a la grilla</div>
+<div class="scenario-title">E5: Falta escenario negativo para BR1 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR1</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que estoy en otra pantalla del sistema<br><strong>CUANDO</strong> intento acceder a la funcionalidad 'Carga Individual' directamente<br><strong>ENTONCES</strong> el sistema no permite el acceso a la funcionalidad<br><strong>Y</strong> muestra un mensaje indicando que la funcionalidad solo es accesible desde la grilla de inconsistencias</div>
+<div class="scenario-title">E6: Falta escenario negativo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que el diseño de la pantalla de carga individual tiene un error<br><strong>CUANDO</strong> intento acceder a la funcionalidad 'Carga Individual'<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no se pudo cargar el formulario correctamente<br><strong>Y</strong> el sistema no permite la carga de datos</div>
+<div class="scenario-title">E7: Falta escenario positivo para BR3 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR3</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que todos los campos obligatorios del formulario están vacíos<br><strong>CUANDO</strong> presiono 'Guardar'<br><strong>ENTONCES</strong> el sistema muestra el mensaje 'Faltan campos obligatorios en algunas filas.'<br><strong>Y</strong> el sistema permanece en el formulario</div>
+<div class="scenario-title">E8: Falta escenario negativo para BR4 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR4</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que completo todos los campos obligatorios correctamente<br><strong>CUANDO</strong> presiono 'Guardar' y ocurre un error en la base de datos<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no se pudo guardar la información<br><strong>Y</strong> el sistema no registra los datos</div>
+        <div class="cobertura-info">
+          <strong>Análisis de Cobertura:</strong> 4 escenarios originales + 4 escenarios agregados = 8 total<br>
+          <strong>Cobertura:</strong> 50.0% inicial → 100% final
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dentro del Alcance</td>
+      <td class="content">
+        • Validación de todas las reglas de negocio documentadas<br>• Escenarios de prueba positivos (flujos exitosos)<br>• Escenarios de prueba negativos (casos de error)<br>• Integración con Access Manager (Keycloak)<br>• Gestión de perfiles y permisos según roles
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Fuera del Alcance</td>
+      <td class="content">
+        <div class='out-scope-item'>• Funcionalidades de otras historias de usuario<br>* Cubiertas por: <span class='link-ref'>HUs relacionadas</span></div><div class='out-scope-item'>• Gestión técnica de infraestructura<br>* Proceso backend/DevOps</div><div class='out-scope-item'>• Configuración de sistemas externos<br>* Responsabilidad de equipos especializados</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Referencias</td>
+      <td class="content">
+        <span class="link-ref">Documento de Requerimientos</span><br>
+        <span class="link-ref">Casos de Uso asociados</span><br>
+        <span class="link-ref">IEEE 829 - Test Documentation</span><br>
+        <span class="link-ref">ISTQB Foundation Level Syllabus</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Notas / Comentarios</td>
+      <td class="content">
+        <strong>Análisis Estático:</strong> 4 gaps identificados y corregidos mediante escenarios sugeridos.<br>
+        <strong>Cobertura Final:</strong> 100% de las reglas de negocio cubiertas.<br>
+        <strong>Generado por:</strong> SIGMA Static Analyzer v3.0 AI | 2025-11-29 09:27
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

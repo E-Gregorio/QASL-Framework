@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historia de Usuario — HU_SGPP_02</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+  .us-container { max-width: 900px; margin: 0 auto; }
+  .us-header { background: #5C85D6; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0; }
+  .us-table { width: 100%; border-collapse: collapse; margin: 0; }
+  .us-table td { border: 1px solid #000; padding: 12px; vertical-align: top; }
+  .label { background: #5C85D6; color: white; font-weight: bold; width: 200px; }
+  .content { background: white; }
+  .link-ref { color: #2196F3; text-decoration: underline; font-style: italic; }
+  .description-format { margin: 5px 0; }
+  .scenario-title { font-weight: bold; margin-top: 10px; }
+  .scenario-content { margin-bottom: 10px; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-left: 3px solid #5C85D6; }
+  .scenario-nuevo { border-left: 3px solid #4CAF50; background: #f1f8e9; }
+  .bullet-point { margin-left: 0; margin-bottom: 5px; }
+  .out-scope-item { margin-bottom: 10px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 8px; }
+  .badge-original { background: #5C85D6; color: white; }
+  .badge-agregado { background: #4CAF50; color: white; }
+  .badge-br { background: #FF9800; color: white; }
+  .br-item { margin: 5px 0; }
+  .cobertura-info { background: #e3f2fd; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="us-container">
+  <div class="us-header">HISTORIA DE USUARIO</div>
+  <table class="us-table">
+    <tr>
+      <td class="label">ID</td>
+      <td class="content">HU_SGPP_02</td>
+    </tr>
+    <tr>
+      <td class="label">Nombre</td>
+      <td class="content">Nuevo Perfil</td>
+    </tr>
+    <tr>
+      <td class="label">Épica</td>
+      <td class="content">
+        Perfiles y Permisos<br>
+        <span class="link-ref">Enlace a documentación de la Épica</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Prioridad</td>
+      <td class="content">Baja</td>
+    </tr>
+    <tr>
+      <td class="label">Estado</td>
+      <td class="content">Análisis Estático Completado - Cobertura: 28.6% → 100%</td>
+    </tr>
+    <tr>
+      <td class="label">Descripción</td>
+      <td class="content">
+        <div class="description-format"><strong>Como</strong> Usuario administrador de SIGMA</div>
+        <div class="description-format"><strong>Quiero</strong> Crear nuevos perfiles dentro del sistema</div>
+        <div class="description-format"><strong>Para</strong> Poder asignarles módulos y acciones y así controlar el acceso de los usuarios.</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Usuarios / Roles</td>
+      <td class="content">Usuario administrador de SIGMA</td>
+    </tr>
+    <tr>
+      <td class="label">Reglas de Negocio</td>
+      <td class="content">
+        <div class="br-item"><strong>BR1:</strong> El nombre del perfil es obligatorio y debe ser único dentro de SIGMA.</div><div class="br-item"><strong>BR2:</strong> El nombre del perfil en SIGMA debe coincidir con el nombre del rol en el Access Manager centralizado para que el rol sea utilizable por los usuarios autenticados.</div><div class="br-item"><strong>BR3:</strong> No se puede guardar un perfil sin al menos un módulo/acción asociado.</div><div class="br-item"><strong>BR4:</strong> Sólo los usuarios con permiso de 'Crear perfil' pueden acceder a esta funcionalidad.</div><div class="br-item"><strong>BR5:</strong> Al confirmar el guardado se debe persistir el perfil y sus permisos automáticamente.</div><div class="br-item"><strong>BR6:</strong> Si el nombre ya existe se debe impedir el alta y mostrar el mensaje de error.</div><div class="br-item"><strong>BR7:</strong> La lista de módulos y acciones debe provenir del catálogo de SIGMA (no editable en esta HU).</div>
+        <span class="link-ref">CU-XXX | Casos de uso relacionados</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Precondiciones</td>
+      <td class="content">
+        • Usuario autenticado en el sistema<br>• Permisos correspondientes asignados al rol del usuario<br>• Sistema SIGMA operativo y accesible<br>• Datos de prueba disponibles en el entorno
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dependencias</td>
+      <td class="content">
+        • Integración con Keycloak (Access Manager) operativa<br>• Base de datos disponible y configurada<br>• APIs de backend funcionando correctamente
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Estimaciones</td>
+      <td class="content">
+        Story Points (SP): ____<br>
+        Valor (V 1–3): ____<br>
+        Costo (C 1–3): ____<br>
+        Probabilidad (P 1–3): ____<br>
+        Impacto (I 1–3): ____<br>
+        <strong>Riesgo (R) = P × I = ____ × ____ = ____</strong><br>
+        <strong>Total VCR = V + C + R = ____ + ____ + ____ = ____</strong><br>
+        <em>Política:</em> si <strong>VCR ≥ 9</strong> → Deuda técnica (automatizar y pasa a regresión); si es menor → Pruebas manuales.
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Escenarios de Prueba (Criterios de Aceptación)</td>
+      <td class="content">
+        
+<div class="scenario-title">E1: E1  Acceso al alta <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que** estoy autenticado como administrador<br><strong>CUANDO</strong> desde la pantalla de Gestión de perfiles seleccione 'Nuevo perfil'<br><strong>ENTONCES</strong> el sistema muestra el formulario de creación con las secciones Datos del perfil</div>
+<div class="scenario-title">E2: E2  Validación de unicidad <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que completé el nombre del perfil<br><strong>CUANDO</strong> selecciono 'Guardar'<br><strong>ENTONCES</strong> si ya existe un perfil con el mismo nombre el sistema muestra el mensaje 'Nombre de perfil ya creado'<br><strong>Y</strong> permanece en el formulario</div>
+<div class="scenario-title">E3: E3  Alta correcta <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que completé el nombre, descripción y agregué al menos un módulo con al menos una acción<br><strong>CUANDO</strong> confirmo el guardado<br><strong>ENTONCES</strong> el sistema Muestra un modal con el mensaje “Estás seguro que deseas crear un nuevo perfil?” Si se acepta crea el registro en la entidad Perfil, crea las relaciones en Perfil\_Modulo\_Permiso<br><strong>Y</strong> si no se acepta</div>
+<div class="scenario-title">E4: E4 Cancelación <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que estoy creando un perfil y ya ingresé datos<br><strong>CUANDO</strong> selecciono 'Cancelar'<br><strong>ENTONCES</strong> el sistema muestra el mensaje “Desea cancelar la creación del perfil?” con las opciones Confirmar/Cancelar<br><strong>Y</strong> ya ingresé datos</div>
+<div class="scenario-title">E5: Falta escenario positivo para BR1 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR1</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que completé el nombre del perfil con un nombre que no existe en el sistema<br><strong>CUANDO</strong> selecciono 'Guardar'<br><strong>ENTONCES</strong> el sistema guarda el perfil correctamente<br><strong>Y</strong> el perfil se muestra en la lista de perfiles</div>
+<div class="scenario-title">E6: Falta escenario positivo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que el nombre del perfil en SIGMA coincide con el nombre del rol en Access Manager<br><strong>CUANDO</strong> un usuario intenta autenticarse con ese rol<br><strong>ENTONCES</strong> el usuario se autentica correctamente y puede acceder a las funcionalidades del perfil</div>
+<div class="scenario-title">E7: Falta escenario negativo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que el nombre del perfil en SIGMA NO coincide con el nombre del rol en Access Manager<br><strong>CUANDO</strong> un usuario intenta autenticarse con ese rol<br><strong>ENTONCES</strong> el usuario NO se autentica correctamente o no puede acceder a las funcionalidades del perfil<br><strong>Y</strong> el sistema muestra un mensaje de error</div>
+<div class="scenario-title">E8: Falta escenario negativo para BR3 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR3</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que completé el nombre del perfil pero no agregué ningún módulo/acción<br><strong>CUANDO</strong> selecciono 'Guardar'<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que debe agregar al menos un módulo/acción<br><strong>Y</strong> el sistema no guarda el perfil</div>
+<div class="scenario-title">E9: Falta escenario negativo para BR4 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR4</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que estoy autenticado como un usuario SIN permiso de 'Crear perfil'<br><strong>CUANDO</strong> intento acceder a la pantalla de creación de perfiles<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no tengo permisos para acceder a esta funcionalidad<br><strong>Y</strong> el sistema me redirige a una pantalla donde sí tengo permisos</div>
+<div class="scenario-title">E10: Falta escenario negativo para BR5 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR5</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que completé el nombre, descripción y agregué al menos un módulo con al menos una acción<br><strong>CUANDO</strong> confirmo el guardado y la persistencia del perfil falla (por ejemplo, por un error de base de datos)<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no se pudo guardar el perfil<br><strong>Y</strong> el sistema no guarda el perfil</div>
+<div class="scenario-title">E11: Falta escenario positivo para BR7 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR7</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que accedo a la pantalla de creación de perfiles<br><strong>CUANDO</strong> visualizo la lista de módulos y acciones disponibles<br><strong>ENTONCES</strong> la lista de módulos y acciones coincide con la lista definida en el catálogo de SIGMA</div>
+<div class="scenario-title">E12: Falta escenario negativo para BR7 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR7</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que accedo a la pantalla de creación de perfiles<br><strong>CUANDO</strong> intento agregar, modificar o eliminar módulos/acciones de la lista<br><strong>ENTONCES</strong> el sistema no permite realizar estas acciones y muestra un mensaje indicando que la lista no es editable</div>
+        <div class="cobertura-info">
+          <strong>Análisis de Cobertura:</strong> 4 escenarios originales + 8 escenarios agregados = 12 total<br>
+          <strong>Cobertura:</strong> 28.6% inicial → 100% final
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dentro del Alcance</td>
+      <td class="content">
+        • Validación de todas las reglas de negocio documentadas<br>• Escenarios de prueba positivos (flujos exitosos)<br>• Escenarios de prueba negativos (casos de error)<br>• Integración con Access Manager (Keycloak)<br>• Gestión de perfiles y permisos según roles
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Fuera del Alcance</td>
+      <td class="content">
+        <div class='out-scope-item'>• Funcionalidades de otras historias de usuario<br>* Cubiertas por: <span class='link-ref'>HUs relacionadas</span></div><div class='out-scope-item'>• Gestión técnica de infraestructura<br>* Proceso backend/DevOps</div><div class='out-scope-item'>• Configuración de sistemas externos<br>* Responsabilidad de equipos especializados</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Referencias</td>
+      <td class="content">
+        <span class="link-ref">Documento de Requerimientos</span><br>
+        <span class="link-ref">Casos de Uso asociados</span><br>
+        <span class="link-ref">IEEE 829 - Test Documentation</span><br>
+        <span class="link-ref">ISTQB Foundation Level Syllabus</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Notas / Comentarios</td>
+      <td class="content">
+        <strong>Análisis Estático:</strong> 8 gaps identificados y corregidos mediante escenarios sugeridos.<br>
+        <strong>Cobertura Final:</strong> 100% de las reglas de negocio cubiertas.<br>
+        <strong>Generado por:</strong> SIGMA Static Analyzer v3.0 AI | 2025-11-29 12:34
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

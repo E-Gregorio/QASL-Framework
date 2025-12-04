@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historia de Usuario — HU_SGINC_03</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+  .us-container { max-width: 900px; margin: 0 auto; }
+  .us-header { background: #5C85D6; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0; }
+  .us-table { width: 100%; border-collapse: collapse; margin: 0; }
+  .us-table td { border: 1px solid #000; padding: 12px; vertical-align: top; }
+  .label { background: #5C85D6; color: white; font-weight: bold; width: 200px; }
+  .content { background: white; }
+  .link-ref { color: #2196F3; text-decoration: underline; font-style: italic; }
+  .description-format { margin: 5px 0; }
+  .scenario-title { font-weight: bold; margin-top: 10px; }
+  .scenario-content { margin-bottom: 10px; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-left: 3px solid #5C85D6; }
+  .scenario-nuevo { border-left: 3px solid #4CAF50; background: #f1f8e9; }
+  .bullet-point { margin-left: 0; margin-bottom: 5px; }
+  .out-scope-item { margin-bottom: 10px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 8px; }
+  .badge-original { background: #5C85D6; color: white; }
+  .badge-agregado { background: #4CAF50; color: white; }
+  .badge-br { background: #FF9800; color: white; }
+  .br-item { margin: 5px 0; }
+  .cobertura-info { background: #e3f2fd; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="us-container">
+  <div class="us-header">HISTORIA DE USUARIO</div>
+  <table class="us-table">
+    <tr>
+      <td class="label">ID</td>
+      <td class="content">HU_SGINC_03</td>
+    </tr>
+    <tr>
+      <td class="label">Nombre</td>
+      <td class="content">Grilla de Inconsistencias</td>
+    </tr>
+    <tr>
+      <td class="label">Épica</td>
+      <td class="content">
+        Módulo Alta de Inconsistencias<br>
+        <span class="link-ref">Enlace a documentación de la Épica</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Prioridad</td>
+      <td class="content"></td>
+    </tr>
+    <tr>
+      <td class="label">Estado</td>
+      <td class="content">Análisis Estático Completado - Cobertura: 50.0% → 100%</td>
+    </tr>
+    <tr>
+      <td class="label">Descripción</td>
+      <td class="content">
+        <div class="description-format"><strong>Como</strong> </div>
+        <div class="description-format"><strong>Quiero</strong> gestionar la funcionalidad correspondiente</div>
+        <div class="description-format"><strong>Para</strong> lograr el objetivo de negocio correspondiente</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Usuarios / Roles</td>
+      <td class="content"></td>
+    </tr>
+    <tr>
+      <td class="label">Reglas de Negocio</td>
+      <td class="content">
+        <div class="br-item"><strong>BR1:</strong> La grilla debe mostrar datos de contribuyentes y sus inconsistencias ingresadas, una fila por CUIT, Razón social y período.</div><div class="br-item"><strong>BR2:</strong> La grilla debe permitir búsqueda por CUIT, Razón social y Período.</div><div class="br-item"><strong>BR3:</strong> Cada fila debe permitir edición y borrado con confirmación.</div><div class="br-item"><strong>BR4:</strong> La grilla debe permitir la selección de una o varias filas.</div><div class="br-item"><strong>BR5:</strong> Si hay selección, se habilita “Generar Lote” (HU_SGINC_06).</div>
+        <span class="link-ref">CU-XXX | Casos de uso relacionados</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Precondiciones</td>
+      <td class="content">
+        • Usuario autenticado en el sistema<br>• Permisos correspondientes asignados al rol del usuario<br>• Sistema SIGMA operativo y accesible<br>• Datos de prueba disponibles en el entorno
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dependencias</td>
+      <td class="content">
+        • Integración con Keycloak (Access Manager) operativa<br>• Base de datos disponible y configurada<br>• APIs de backend funcionando correctamente
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Estimaciones</td>
+      <td class="content">
+        Story Points (SP): ____<br>
+        Valor (V 1–3): ____<br>
+        Costo (C 1–3): ____<br>
+        Probabilidad (P 1–3): ____<br>
+        Impacto (I 1–3): ____<br>
+        <strong>Riesgo (R) = P × I = ____ × ____ = ____</strong><br>
+        <strong>Total VCR = V + C + R = ____ + ____ + ____ = ____</strong><br>
+        <em>Política:</em> si <strong>VCR ≥ 9</strong> → Deuda técnica (automatizar y pasa a regresión); si es menor → Pruebas manuales.
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Escenarios de Prueba (Criterios de Aceptación)</td>
+      <td class="content">
+        
+<div class="scenario-title">E1: Visualizar <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> ingreso con un usuario con perfil CARGA<br><strong>CUANDO</strong> accedo a la pantalla del módulo<br><strong>ENTONCES</strong> visualizo la grilla con las inconsistencias cargadas y las acciones de Edición, Borrado y Selección.</div>
+<div class="scenario-title">E2: Búsqueda <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> la grilla cuenta con el campo de búsqueda<br><strong>CUANDO</strong> ingreso un texto y ejecuto la búsqueda<br><strong>ENTONCES</strong> la grilla muestra sólo las inconsistencias de los contribuyentes que contengan el texto que se escribe y se consideran los campos de CUIT, Razón social y Período. Si no hay coincidencias, muestra “No se encontraron resultados de  búsqueda”</div>
+<div class="scenario-title">E3: Edición <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> selecciono “Edición” en una fila<br><strong>CUANDO</strong> completo los datos obligatorios y muestra un mensaje “¿Estás seguro que deseas guardar estos cambios?” si se confirma<br><strong>ENTONCES</strong> el sistema modifica los datos y muestra “Los cambios se guardaron correctamente” en snackbar. Si falta algún dato obligatorio muestra “Faltan campos obligatorios en algunas filas” en snackbar.</div>
+<div class="scenario-title">E4: Borrado <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> selecciono “Borrado”<br><strong>CUANDO</strong> selecciono muestra el pop up ¿Estás seguro que deseas eliminar esta información? confirmo la operación<br><strong>ENTONCES</strong> el sistema elimina los datos y muestra “La información fue eliminada correctamente”.</div>
+<div class="scenario-title">E5: Selección <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> seleccioné una o más filas<br><strong>CUANDO</strong> se habilita la opción “Generar Lote”<br><strong>ENTONCES</strong> podré invocar la HU_SGINC_06.
+VALIDACIONES DE CAMPOS
+
+
+Validar datos obligatorios en edición.
+Validar formato de período.
+Validar que exista al menos una fila seleccionada para habilitar “Generar Lote”.
+MENSAJES Y NOTIFICACIONES
+
+
+“No se encontraron resultados de  búsqueda.”
+“Faltan campos obligatorios en algunas filas.”
+“¿Estás seguro que deseas guardar estos cambios?”
+“¿Estás seguro que deseas eliminar esta información?”
+“Los cambios se guardaron correctamente”
+“La información fue eliminada correctamente.”
+DENTRO DEL ALCANCE
+
+
+Listado, búsqueda, orden, edición, borrado y selección de inconsistencias.
+Acceso a Importar Lote y Carga Individual.
+FUERA DEL ALCANCE
+
+
+Definir reglas de fiscalización.
+Procesar el expediente (eso está en HU_SGINC_06).
+Mantenimiento de listas maestras (Tributos, Campañas, Motivos).
+REFERENCIA AL MODELO DE DATOS
+
+
+
+Entidades
+Campo
+Contribuyente
+CUIT
+Razon Social
+Inconsistencias / contribuyente
+Anticipo
+TRX
+Rég.
+ISIB Anual
+DDJJs ISIB
+PNG Anual
+DDJJs IVA
+Actividades / contribuyente
+Cod. Act.
+Desc. Act. NAES
+Inconsistencias / contribuyente
+Base Imp.
+Alic.Dec.
+Imp. Decla
+Obs.
+Alic.Leg.
+Imp. Determ.
+Diferencia
+Categoría
+Fecha de Proceso
+
+ Archivo a Importar
+DIAGRAMA DE FLUJO DE DATOS
+
+
+Usuario → Grilla → Filtros → BD Inconsistencias → Resultado
+DIAGRAMA DE ESTADOS
+
+
+Inconsistencia: Ingresada → Candidata a Fiscalizar</div>
+<div class="scenario-title">E6: Falta escenario negativo para BR1 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR1</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que no existen inconsistencias cargadas en el sistema<br><strong>CUANDO</strong> accedo a la pantalla del módulo<br><strong>ENTONCES</strong> visualizo un mensaje indicando que no hay inconsistencias cargadas y la grilla se muestra vacía<br><strong>Y</strong> no se muestran las acciones de Edición, Borrado y Selección.</div>
+<div class="scenario-title">E7: Falta escenario negativo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> la grilla cuenta con el campo de búsqueda<br><strong>CUANDO</strong> ingreso un texto con caracteres especiales en el campo de búsqueda y ejecuto la búsqueda<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no se permiten caracteres especiales en la búsqueda<br><strong>Y</strong> la grilla no realiza la búsqueda.</div>
+<div class="scenario-title">E8: Falta escenario negativo para BR3 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR3</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> selecciono “Edición” en una fila<br><strong>CUANDO</strong> intento guardar los cambios sin tener permisos de edición<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no tengo permisos para editar la información<br><strong>Y</strong> los datos no se modifican.</div>
+<div class="scenario-title">E9: Falta escenario negativo para BR4 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR4</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> la grilla muestra las inconsistencias<br><strong>CUANDO</strong> intento seleccionar una fila cuando no tengo permisos para generar lotes<br><strong>ENTONCES</strong> la fila no se selecciona y se muestra un mensaje indicando que no tengo permisos para generar lotes<br><strong>Y</strong> la opción 'Generar Lote' permanece deshabilitada.</div>
+<div class="scenario-title">E10: Falta escenario positivo para BR5 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR5</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> seleccioné una o más filas en la grilla<br><strong>CUANDO</strong> verifico la disponibilidad de la opción 'Generar Lote'<br><strong>ENTONCES</strong> la opción 'Generar Lote' se encuentra habilitada y puedo hacer clic en ella<br><strong>Y</strong> al hacer clic, se invoca la HU_SGINC_06.</div>
+<div class="scenario-title">E11: Falta escenario negativo para BR5 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR5</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> no seleccioné ninguna fila en la grilla<br><strong>CUANDO</strong> verifico la disponibilidad de la opción 'Generar Lote'<br><strong>ENTONCES</strong> la opción 'Generar Lote' se encuentra deshabilitada y no puedo hacer clic en ella<br><strong>Y</strong> se muestra un mensaje indicando que debo seleccionar al menos una fila para generar el lote.</div>
+        <div class="cobertura-info">
+          <strong>Análisis de Cobertura:</strong> 5 escenarios originales + 6 escenarios agregados = 11 total<br>
+          <strong>Cobertura:</strong> 50.0% inicial → 100% final
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dentro del Alcance</td>
+      <td class="content">
+        • Validación de todas las reglas de negocio documentadas<br>• Escenarios de prueba positivos (flujos exitosos)<br>• Escenarios de prueba negativos (casos de error)<br>• Integración con Access Manager (Keycloak)<br>• Gestión de perfiles y permisos según roles
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Fuera del Alcance</td>
+      <td class="content">
+        <div class='out-scope-item'>• Funcionalidades de otras historias de usuario<br>* Cubiertas por: <span class='link-ref'>HUs relacionadas</span></div><div class='out-scope-item'>• Gestión técnica de infraestructura<br>* Proceso backend/DevOps</div><div class='out-scope-item'>• Configuración de sistemas externos<br>* Responsabilidad de equipos especializados</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Referencias</td>
+      <td class="content">
+        <span class="link-ref">Documento de Requerimientos</span><br>
+        <span class="link-ref">Casos de Uso asociados</span><br>
+        <span class="link-ref">IEEE 829 - Test Documentation</span><br>
+        <span class="link-ref">ISTQB Foundation Level Syllabus</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Notas / Comentarios</td>
+      <td class="content">
+        <strong>Análisis Estático:</strong> 6 gaps identificados y corregidos mediante escenarios sugeridos.<br>
+        <strong>Cobertura Final:</strong> 100% de las reglas de negocio cubiertas.<br>
+        <strong>Generado por:</strong> SIGMA Static Analyzer v3.0 AI | 2025-11-29 09:18
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

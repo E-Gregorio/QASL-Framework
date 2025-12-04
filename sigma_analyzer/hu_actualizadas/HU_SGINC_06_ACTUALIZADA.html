@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historia de Usuario — HU_SGINC_06</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+  .us-container { max-width: 900px; margin: 0 auto; }
+  .us-header { background: #5C85D6; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0; }
+  .us-table { width: 100%; border-collapse: collapse; margin: 0; }
+  .us-table td { border: 1px solid #000; padding: 12px; vertical-align: top; }
+  .label { background: #5C85D6; color: white; font-weight: bold; width: 200px; }
+  .content { background: white; }
+  .link-ref { color: #2196F3; text-decoration: underline; font-style: italic; }
+  .description-format { margin: 5px 0; }
+  .scenario-title { font-weight: bold; margin-top: 10px; }
+  .scenario-content { margin-bottom: 10px; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-left: 3px solid #5C85D6; }
+  .scenario-nuevo { border-left: 3px solid #4CAF50; background: #f1f8e9; }
+  .bullet-point { margin-left: 0; margin-bottom: 5px; }
+  .out-scope-item { margin-bottom: 10px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 8px; }
+  .badge-original { background: #5C85D6; color: white; }
+  .badge-agregado { background: #4CAF50; color: white; }
+  .badge-br { background: #FF9800; color: white; }
+  .br-item { margin: 5px 0; }
+  .cobertura-info { background: #e3f2fd; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="us-container">
+  <div class="us-header">HISTORIA DE USUARIO</div>
+  <table class="us-table">
+    <tr>
+      <td class="label">ID</td>
+      <td class="content">HU_SGINC_06</td>
+    </tr>
+    <tr>
+      <td class="label">Nombre</td>
+      <td class="content">Generar Expediente Lote</td>
+    </tr>
+    <tr>
+      <td class="label">Épica</td>
+      <td class="content">
+        Módulo Alta de Inconsistencias<br>
+        <span class="link-ref">Enlace a documentación de la Épica</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Prioridad</td>
+      <td class="content">Alta – MVP 1</td>
+    </tr>
+    <tr>
+      <td class="label">Estado</td>
+      <td class="content">Análisis Estático Completado - Cobertura: 37.5% → 100%</td>
+    </tr>
+    <tr>
+      <td class="label">Descripción</td>
+      <td class="content">
+        <div class="description-format"><strong>Como</strong> Agentes de AGIP autorizados por la SDGS, con usuario IAM, habilitado por el área de seguridad informática para SIGMA, con perfil CARGA.</div>
+        <div class="description-format"><strong>Quiero</strong> Generar y enviar un lote de inconsistencias</div>
+        <div class="description-format"><strong>Para</strong> Derivar a la dirección selección y control y así pueda ser visualizado y gestionado.</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Usuarios / Roles</td>
+      <td class="content">Agentes de AGIP autorizados por la SDGS, con usuario IAM, habilitado por el área de seguridad informática para SIGMA, con perfil CARGA.</td>
+    </tr>
+    <tr>
+      <td class="label">Reglas de Negocio</td>
+      <td class="content">
+        <div class="br-item"><strong>BR1:</strong> La opción “Generar Lote” solo se habilita cuando hay una selección de una o más inconsistencias en la grilla.</div><div class="br-item"><strong>BR2:</strong> Al generar el lote se debe crear un expediente (integración SADE) y asociar el número de expediente a cada inconsistencia seleccionada.</div><div class="br-item"><strong>BR3:</strong> Las inconsistencias enviadas deben quedar con estado “Candidato a fiscalizar”.</div><div class="br-item"><strong>BR4:</strong> En caso de error en la generación del expediente debe mostrarse un mensaje de error.</div>
+        <span class="link-ref">CU-XXX | Casos de uso relacionados</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Precondiciones</td>
+      <td class="content">
+        • Usuario autenticado en el sistema<br>• Permisos correspondientes asignados al rol del usuario<br>• Sistema SIGMA operativo y accesible<br>• Datos de prueba disponibles en el entorno
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dependencias</td>
+      <td class="content">
+        • Integración con Keycloak (Access Manager) operativa<br>• Base de datos disponible y configurada<br>• APIs de backend funcionando correctamente
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Estimaciones</td>
+      <td class="content">
+        Story Points (SP): ____<br>
+        Valor (V 1–3): ____<br>
+        Costo (C 1–3): ____<br>
+        Probabilidad (P 1–3): ____<br>
+        Impacto (I 1–3): ____<br>
+        <strong>Riesgo (R) = P × I = ____ × ____ = ____</strong><br>
+        <strong>Total VCR = V + C + R = ____ + ____ + ____ = ____</strong><br>
+        <em>Política:</em> si <strong>VCR ≥ 9</strong> → Deuda técnica (automatizar y pasa a regresión); si es menor → Pruebas manuales.
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Escenarios de Prueba (Criterios de Aceptación)</td>
+      <td class="content">
+        
+<div class="scenario-title">E1: E1 – Habilitación de la opción <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que estoy en la grilla de inconsistencias<br><strong>CUANDO</strong> selecciono una o más filas<br><strong>ENTONCES</strong> se habilita la opción “Generar Lote”</div>
+<div class="scenario-title">E2: E2 – Generación exitosa <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que seleccioné inconsistencias y presioné “Generar Lote”<br><strong>CUANDO</strong> Se elige la acción Generar Lote se muestra un Pop up con mensaje "¿Estás seguro que deseas generar un nuevo lote?”  si acepto el sistema se “integra con SADE” y recibe un número de expediente<br><strong>ENTONCES</strong> se muestra “Se ha generado con éxito el expediente: \[Nro Expediente\]” se completarán los registros de inconsistencias que formaron el lote con los siguientes datos:: Oficina Origen \= Dirección Análisis<br><strong>Y</strong> si se cancela no se genera el lote</div>
+<div class="scenario-title">E3: E3 – Error en la generación <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que seleccioné inconsistencias y presioné “Generar Lote”<br><strong>CUANDO</strong> la integración devuelve un error<br><strong>ENTONCES</strong> se muestra un mensaje que informe el error<br><strong>Y</strong> presioné “Generar Lote” **Cuando** la integración devuelve un error **Entonces** se muestra un mensaje que informe el error</div>
+<div class="scenario-title">E4: Falta escenario negativo para BR1 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR1</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que estoy en la grilla de inconsistencias<br><strong>CUANDO</strong> no selecciono ninguna fila<br><strong>ENTONCES</strong> la opción “Generar Lote” permanece deshabilitada</div>
+<div class="scenario-title">E5: Falta escenario negativo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que seleccioné inconsistencias y presioné “Generar Lote”<br><strong>CUANDO</strong> la integración con SADE falla y no se puede crear el expediente<br><strong>ENTONCES</strong> se muestra un mensaje de error específico indicando que no se pudo crear el expediente y las inconsistencias NO se asocian a ningún expediente<br><strong>Y</strong> Las inconsistencias permanecen en su estado original.</div>
+<div class="scenario-title">E6: Falta escenario negativo para BR3 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR3</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que seleccioné inconsistencias y presioné “Generar Lote” y la integración con SADE fue exitosa<br><strong>CUANDO</strong> la actualización del estado de las inconsistencias a “Candidato a fiscalizar” falla<br><strong>ENTONCES</strong> se muestra un mensaje de error indicando que no se pudo actualizar el estado de las inconsistencias y el expediente se revierte o se marca como inválido<br><strong>Y</strong> Las inconsistencias permanecen en su estado original.</div>
+<div class="scenario-title">E7: Falta escenario positivo para BR4 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR4</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que seleccioné inconsistencias y presioné “Generar Lote”<br><strong>CUANDO</strong> la integración con SADE es exitosa y se crea el expediente<br><strong>ENTONCES</strong> se muestra el mensaje de éxito con el número de expediente y NO se muestra ningún mensaje de error</div>
+        <div class="cobertura-info">
+          <strong>Análisis de Cobertura:</strong> 3 escenarios originales + 4 escenarios agregados = 7 total<br>
+          <strong>Cobertura:</strong> 37.5% inicial → 100% final
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dentro del Alcance</td>
+      <td class="content">
+        • Validación de todas las reglas de negocio documentadas<br>• Escenarios de prueba positivos (flujos exitosos)<br>• Escenarios de prueba negativos (casos de error)<br>• Integración con Access Manager (Keycloak)<br>• Gestión de perfiles y permisos según roles
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Fuera del Alcance</td>
+      <td class="content">
+        <div class='out-scope-item'>• Funcionalidades de otras historias de usuario<br>* Cubiertas por: <span class='link-ref'>HUs relacionadas</span></div><div class='out-scope-item'>• Gestión técnica de infraestructura<br>* Proceso backend/DevOps</div><div class='out-scope-item'>• Configuración de sistemas externos<br>* Responsabilidad de equipos especializados</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Referencias</td>
+      <td class="content">
+        <span class="link-ref">Documento de Requerimientos</span><br>
+        <span class="link-ref">Casos de Uso asociados</span><br>
+        <span class="link-ref">IEEE 829 - Test Documentation</span><br>
+        <span class="link-ref">ISTQB Foundation Level Syllabus</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Notas / Comentarios</td>
+      <td class="content">
+        <strong>Análisis Estático:</strong> 4 gaps identificados y corregidos mediante escenarios sugeridos.<br>
+        <strong>Cobertura Final:</strong> 100% de las reglas de negocio cubiertas.<br>
+        <strong>Generado por:</strong> SIGMA Static Analyzer v3.0 AI | 2025-11-29 09:32
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

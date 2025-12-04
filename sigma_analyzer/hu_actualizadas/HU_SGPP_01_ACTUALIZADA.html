@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historia de Usuario — HU_SGPP_01</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+  .us-container { max-width: 900px; margin: 0 auto; }
+  .us-header { background: #5C85D6; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0; }
+  .us-table { width: 100%; border-collapse: collapse; margin: 0; }
+  .us-table td { border: 1px solid #000; padding: 12px; vertical-align: top; }
+  .label { background: #5C85D6; color: white; font-weight: bold; width: 200px; }
+  .content { background: white; }
+  .link-ref { color: #2196F3; text-decoration: underline; font-style: italic; }
+  .description-format { margin: 5px 0; }
+  .scenario-title { font-weight: bold; margin-top: 10px; }
+  .scenario-content { margin-bottom: 10px; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-left: 3px solid #5C85D6; }
+  .scenario-nuevo { border-left: 3px solid #4CAF50; background: #f1f8e9; }
+  .bullet-point { margin-left: 0; margin-bottom: 5px; }
+  .out-scope-item { margin-bottom: 10px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 8px; }
+  .badge-original { background: #5C85D6; color: white; }
+  .badge-agregado { background: #4CAF50; color: white; }
+  .badge-br { background: #FF9800; color: white; }
+  .br-item { margin: 5px 0; }
+  .cobertura-info { background: #e3f2fd; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="us-container">
+  <div class="us-header">HISTORIA DE USUARIO</div>
+  <table class="us-table">
+    <tr>
+      <td class="label">ID</td>
+      <td class="content">HU_SGPP_01</td>
+    </tr>
+    <tr>
+      <td class="label">Nombre</td>
+      <td class="content">Gestión de Perfiles y Permisos</td>
+    </tr>
+    <tr>
+      <td class="label">Épica</td>
+      <td class="content">
+        Perfiles y Permisos<br>
+        <span class="link-ref">Enlace a documentación de la Épica</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Prioridad</td>
+      <td class="content">Baja</td>
+    </tr>
+    <tr>
+      <td class="label">Estado</td>
+      <td class="content">Análisis Estático Completado - Cobertura: 14.3% → 100%</td>
+    </tr>
+    <tr>
+      <td class="label">Descripción</td>
+      <td class="content">
+        <div class="description-format"><strong>Como</strong> Usuario administrador de SIGMA</div>
+        <div class="description-format"><strong>Quiero</strong> Visualizar el listado de perfiles/permisos existentes con sus acciones disponibles</div>
+        <div class="description-format"><strong>Para</strong> Poder administrarlos.</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Usuarios / Roles</td>
+      <td class="content">Usuario administrador de SIGMA</td>
+    </tr>
+    <tr>
+      <td class="label">Reglas de Negocio</td>
+      <td class="content">
+        <div class="br-item"><strong>BR1:</strong> La autenticación de usuarios y el alta lógica de los roles base se realiza en el Access Manager centralizado (Keycloak); SIGMA sólo permite gestionarlos si el nombre coincide con el rol existente en el AM.</div><div class="br-item"><strong>BR2:</strong> La gestión de usuarios y de sus credenciales es realizada a través de Keycloak.</div><div class="br-item"><strong>BR3:</strong> Para poder acceder a SIGMA, el usuario debe estar previamente registrado en Keycloak.</div><div class="br-item"><strong>BR4:</strong> Desde SIGMA, se debe realizar el alta de los roles de usuario ya existentes en Keycloak y la asignación de sus respectivos permisos.</div><div class="br-item"><strong>BR5:</strong> En SIGMA tienen que registrarse los roles de usuario con los mismos nombres con los que se registraron en Keycloak.</div><div class="br-item"><strong>BR6:</strong> A cada usuario que requiera acceder al SIGMA se le deben asignar los roles correspondientes en Keycloak.</div><div class="br-item"><strong>BR7:</strong> Una vez que el usuario accede por primera vez al SIGMA, queda registrado en el sistema.</div><div class="br-item"><strong>BR8:</strong> Desde el SIGMA se podrá consultar el listado de usuarios con acceso, junto con los roles asignados.</div><div class="br-item"><strong>BR9:</strong> El usuario tendrá su rol asignado en Keycloak y los accesos que se le asignaron a ese rol en SIGMA.</div><div class="br-item"><strong>BR10:</strong> Sólo los usuarios con permiso de administración de seguridad pueden acceder a esta pantalla.</div><div class="br-item"><strong>BR11:</strong> El listado de perfiles debe mostrar todos los perfiles activos de SIGMA, aunque el rol haya sido deshabilitado en el AM, para fines de trazabilidad.</div><div class="br-item"><strong>BR12:</strong> La búsqueda debe filtrar por nombre y descripción del perfil.</div><div class="br-item"><strong>BR13:</strong> Las acciones ‘Nuevo Perfil’, 'Ver detalle', 'Editar' y Deshabilitar deben mostrarse según los permisos asignados al usuario autenticado.</div><div class="br-item"><strong>BR14:</strong> Si SIGMA recibe un perfil desde el AM que no existe en SIGMA, se debe mostrar un mensaje que el perfil no existe, hasta que se cree completamente en SIGMA.</div>
+        <span class="link-ref">CU-XXX | Casos de uso relacionados</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Precondiciones</td>
+      <td class="content">
+        • Usuario autenticado en el sistema<br>• Permisos correspondientes asignados al rol del usuario<br>• Sistema SIGMA operativo y accesible<br>• Datos de prueba disponibles en el entorno
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dependencias</td>
+      <td class="content">
+        • Integración con Keycloak (Access Manager) operativa<br>• Base de datos disponible y configurada<br>• APIs de backend funcionando correctamente
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Estimaciones</td>
+      <td class="content">
+        Story Points (SP): ____<br>
+        Valor (V 1–3): ____<br>
+        Costo (C 1–3): ____<br>
+        Probabilidad (P 1–3): ____<br>
+        Impacto (I 1–3): ____<br>
+        <strong>Riesgo (R) = P × I = ____ × ____ = ____</strong><br>
+        <strong>Total VCR = V + C + R = ____ + ____ + ____ = ____</strong><br>
+        <em>Política:</em> si <strong>VCR ≥ 9</strong> → Deuda técnica (automatizar y pasa a regresión); si es menor → Pruebas manuales.
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Escenarios de Prueba (Criterios de Aceptación)</td>
+      <td class="content">
+        
+<div class="scenario-title">E1: E1  Listado de perfiles <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que me autentique en SIGMA con un usuario con permisos de administración<br><strong>CUANDO</strong> ingreso al módulo 'Gestión de perfiles y permisos'<br><strong>ENTONCES</strong> el sistema muestra la grilla con: nombre del perfil, descripción, módulos<br><strong>Y</strong> permisos'</div>
+<div class="scenario-title">E2: E2  Búsqueda de perfiles <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que me encuentro en la grilla de perfiles<br><strong>CUANDO</strong> ingreso un texto en el campo de búsqueda<br><strong>ENTONCES</strong> el sistema muestra únicamente los perfiles cuyo nombre o descripción contiene el texto ingresado<br><strong>Y</strong> si no hay coincidencias muestra el mensaje 'No se encontraron resultados de búsqueda'</div>
+<div class="scenario-title">E3: E3  Acceso a acciones <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que visualizo la grilla de perfiles<br><strong>CUANDO</strong> selecciono la acción 'Ver detalle' sobre un perfil<br><strong>ENTONCES</strong> el sistema navega a la pantalla de detalle de ese perfil</div>
+<div class="scenario-title">E4: E4  Integración con AM <span class="badge badge-original">Original</span></div>
+<div class="scenario-content"><strong>DADO</strong> que el usuario está autenticado por Keycloak<br><strong>CUANDO</strong> ingresa al módulo<br><strong>ENTONCES</strong> el sistema asocia el usuario autenticado con sus roles del AM<br><strong>Y</strong> habilita sólo las acciones coincidentes en SIGMA</div>
+<div class="scenario-title">E5: Falta escenario positivo para BR1 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR1</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con un rol existente en Keycloak intenta acceder a SIGMA<br><strong>CUANDO</strong> el usuario se autentica correctamente en Keycloak<br><strong>ENTONCES</strong> SIGMA permite el acceso al usuario y gestiona los roles basándose en la coincidencia de nombres con Keycloak</div>
+<div class="scenario-title">E6: Falta escenario negativo para BR1 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR1</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con un rol NO existente en Keycloak intenta acceder a SIGMA<br><strong>CUANDO</strong> el usuario intenta autenticarse<br><strong>ENTONCES</strong> SIGMA rechaza el acceso al usuario y muestra un mensaje de error indicando que el rol no es válido</div>
+<div class="scenario-title">E7: Falta escenario positivo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario intenta modificar sus credenciales en SIGMA<br><strong>CUANDO</strong> el usuario intenta cambiar su contraseña<br><strong>ENTONCES</strong> SIGMA redirige al usuario a Keycloak para la gestión de credenciales</div>
+<div class="scenario-title">E8: Falta escenario negativo para BR2 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR2</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario intenta crear un nuevo usuario directamente en SIGMA<br><strong>CUANDO</strong> el usuario intenta guardar la información del nuevo usuario<br><strong>ENTONCES</strong> SIGMA muestra un mensaje de error indicando que la gestión de usuarios se realiza a través de Keycloak</div>
+<div class="scenario-title">E9: Falta escenario negativo para BR3 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR3</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario NO registrado en Keycloak intenta acceder a SIGMA<br><strong>CUANDO</strong> el usuario intenta autenticarse<br><strong>ENTONCES</strong> SIGMA rechaza el acceso al usuario y muestra un mensaje de error indicando que debe registrarse en Keycloak</div>
+<div class="scenario-title">E10: Falta escenario positivo para BR4 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR4</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con permisos de administración accede a la pantalla de gestión de roles<br><strong>CUANDO</strong> el usuario crea un nuevo rol y le asigna permisos<br><strong>ENTONCES</strong> SIGMA guarda el nuevo rol y sus permisos correctamente</div>
+<div class="scenario-title">E11: Falta escenario negativo para BR4 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR4</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con permisos de administración intenta crear un rol con un nombre ya existente en Keycloak<br><strong>CUANDO</strong> el usuario intenta guardar el nuevo rol<br><strong>ENTONCES</strong> SIGMA muestra un mensaje de error indicando que el nombre del rol ya existe</div>
+<div class="scenario-title">E12: Falta escenario positivo para BR5 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR5</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con permisos de administración crea un nuevo rol en SIGMA<br><strong>CUANDO</strong> el usuario ingresa el nombre del rol que coincide con un rol existente en Keycloak<br><strong>ENTONCES</strong> SIGMA permite la creación del rol</div>
+<div class="scenario-title">E13: Falta escenario negativo para BR5 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR5</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con permisos de administración crea un nuevo rol en SIGMA<br><strong>CUANDO</strong> el usuario ingresa un nombre de rol que NO coincide con un rol existente en Keycloak<br><strong>ENTONCES</strong> SIGMA muestra un mensaje de error indicando que el nombre del rol debe coincidir con un rol de Keycloak</div>
+<div class="scenario-title">E14: Falta escenario positivo para BR6 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR6</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario tiene asignado un rol en Keycloak<br><strong>CUANDO</strong> el usuario intenta acceder a SIGMA<br><strong>ENTONCES</strong> SIGMA permite el acceso al usuario basándose en los roles asignados en Keycloak</div>
+<div class="scenario-title">E15: Falta escenario negativo para BR6 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR6</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario NO tiene asignado ningún rol en Keycloak<br><strong>CUANDO</strong> el usuario intenta acceder a SIGMA<br><strong>ENTONCES</strong> SIGMA rechaza el acceso al usuario y muestra un mensaje de error indicando que debe tener roles asignados en Keycloak</div>
+<div class="scenario-title">E16: Falta escenario positivo para BR7 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR7</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario accede por primera vez a SIGMA<br><strong>CUANDO</strong> el usuario se autentica correctamente<br><strong>ENTONCES</strong> SIGMA registra al usuario en el sistema<br><strong>Y</strong> se puede verificar en la base de datos que el usuario fue creado</div>
+<div class="scenario-title">E17: Falta escenario negativo para BR7 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR7</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con permisos de administración intenta registrar un nuevo usuario manualmente en SIGMA<br><strong>CUANDO</strong> el usuario intenta guardar la información del nuevo usuario<br><strong>ENTONCES</strong> SIGMA muestra un mensaje de error indicando que el registro se realiza automáticamente al primer acceso</div>
+<div class="scenario-title">E18: Falta escenario positivo para BR8 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR8</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario con permisos de administración accede a la pantalla de gestión de usuarios<br><strong>CUANDO</strong> el usuario visualiza el listado de usuarios<br><strong>ENTONCES</strong> SIGMA muestra el listado de usuarios con sus roles asignados</div>
+<div class="scenario-title">E19: Falta escenario negativo para BR8 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR8</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que no hay usuarios registrados en SIGMA<br><strong>CUANDO</strong> un usuario con permisos de administración accede a la pantalla de gestión de usuarios<br><strong>ENTONCES</strong> SIGMA muestra un mensaje indicando que no hay usuarios registrados</div>
+<div class="scenario-title">E20: Falta escenario positivo para BR9 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR9</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario tiene un rol asignado en Keycloak y ese rol tiene permisos asignados en SIGMA<br><strong>CUANDO</strong> el usuario accede a una funcionalidad en SIGMA<br><strong>ENTONCES</strong> SIGMA permite el acceso a la funcionalidad basándose en los permisos asignados al rol en SIGMA</div>
+<div class="scenario-title">E21: Falta escenario negativo para BR9 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR9</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que un usuario tiene un rol asignado en Keycloak pero ese rol NO tiene permisos asignados en SIGMA para una funcionalidad específica<br><strong>CUANDO</strong> el usuario intenta acceder a esa funcionalidad en SIGMA<br><strong>ENTONCES</strong> SIGMA rechaza el acceso a la funcionalidad y muestra un mensaje de error indicando que no tiene permisos</div>
+<div class="scenario-title">E22: Falta escenario negativo para BR10 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR10</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que me autentique en SIGMA con un usuario SIN permisos de administración de seguridad<br><strong>CUANDO</strong> intento ingresar al módulo 'Gestión de perfiles y permisos'<br><strong>ENTONCES</strong> el sistema muestra un mensaje de error indicando que no tengo permisos para acceder<br><strong>Y</strong> el sistema no permite el acceso al módulo</div>
+<div class="scenario-title">E23: Falta escenario negativo para BR11 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR11</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que me autentique en SIGMA con un usuario con permisos de administración<br><strong>CUANDO</strong> ingreso al módulo 'Gestión de perfiles y permisos'<br><strong>ENTONCES</strong> el sistema muestra la grilla con todos los perfiles, incluyendo aquellos que están deshabilitados en el AM<br><strong>Y</strong> se indica de alguna forma que el perfil está deshabilitado en el AM</div>
+<div class="scenario-title">E24: Falta escenario negativo para BR12 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR12</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que me encuentro en la grilla de perfiles<br><strong>CUANDO</strong> ingreso un texto en el campo de búsqueda que no coincide con ningún nombre o descripción de perfil<br><strong>ENTONCES</strong> el sistema muestra el mensaje 'No se encontraron resultados de búsqueda'<br><strong>Y</strong> la grilla está vacía</div>
+<div class="scenario-title">E25: Falta escenario negativo para BR13 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR13</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que me autentique en SIGMA con un usuario SIN permisos para 'Nuevo Perfil'<br><strong>CUANDO</strong> ingreso al módulo 'Gestión de perfiles y permisos'<br><strong>ENTONCES</strong> la acción 'Nuevo Perfil' no se muestra en la grilla<br><strong>Y</strong> las demás acciones se muestran según los permisos del usuario</div>
+<div class="scenario-title">E26: Falta escenario positivo para BR14 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR14</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que SIGMA recibe un perfil desde el AM que no existe en SIGMA<br><strong>CUANDO</strong> se intenta visualizar el listado de perfiles<br><strong>ENTONCES</strong> el sistema muestra un mensaje indicando que el perfil no existe en SIGMA y debe ser creado<br><strong>Y</strong> el perfil no se muestra en la grilla hasta que se cree completamente</div>
+<div class="scenario-title">E27: Falta escenario negativo para BR14 <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR14</span></div>
+<div class="scenario-content scenario-nuevo"><strong>DADO</strong> que SIGMA recibe un perfil desde el AM que no existe en SIGMA<br><strong>CUANDO</strong> se intenta acceder a la pantalla de detalle de ese perfil<br><strong>ENTONCES</strong> el sistema muestra un mensaje indicando que el perfil no existe en SIGMA y no se puede acceder a la pantalla de detalle</div>
+        <div class="cobertura-info">
+          <strong>Análisis de Cobertura:</strong> 4 escenarios originales + 23 escenarios agregados = 27 total<br>
+          <strong>Cobertura:</strong> 14.3% inicial → 100% final
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Dentro del Alcance</td>
+      <td class="content">
+        • Validación de todas las reglas de negocio documentadas<br>• Escenarios de prueba positivos (flujos exitosos)<br>• Escenarios de prueba negativos (casos de error)<br>• Integración con Access Manager (Keycloak)<br>• Gestión de perfiles y permisos según roles
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Fuera del Alcance</td>
+      <td class="content">
+        <div class='out-scope-item'>• Funcionalidades de otras historias de usuario<br>* Cubiertas por: <span class='link-ref'>HUs relacionadas</span></div><div class='out-scope-item'>• Gestión técnica de infraestructura<br>* Proceso backend/DevOps</div><div class='out-scope-item'>• Configuración de sistemas externos<br>* Responsabilidad de equipos especializados</div>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Referencias</td>
+      <td class="content">
+        <span class="link-ref">Documento de Requerimientos</span><br>
+        <span class="link-ref">Casos de Uso asociados</span><br>
+        <span class="link-ref">IEEE 829 - Test Documentation</span><br>
+        <span class="link-ref">ISTQB Foundation Level Syllabus</span>
+      </td>
+    </tr>
+    <tr>
+      <td class="label">Notas / Comentarios</td>
+      <td class="content">
+        <strong>Análisis Estático:</strong> 23 gaps identificados y corregidos mediante escenarios sugeridos.<br>
+        <strong>Cobertura Final:</strong> 100% de las reglas de negocio cubiertas.<br>
+        <strong>Generado por:</strong> SIGMA Static Analyzer v3.0 AI | 2025-11-29 12:30
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>
