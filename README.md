@@ -54,7 +54,8 @@ qa-hu-template/
 │   └── Guia-Estimacion-VCR-Story-Points.md # Estimacion VCR
 │
 ├── docker/                      # Configuracion Docker
-├── docker-compose.yml           # Servicios (Grafana, InfluxDB, Allure)
+│   └── postgres/init.sql        # Schema y datos de prueba PostgreSQL
+├── docker-compose.yml           # Servicios Docker (ver tabla abajo)
 ├── playwright.config.ts         # Configuracion Playwright
 └── package.json                 # Scripts npm
 ```
@@ -352,3 +353,110 @@ npm run docker:down
 | 8 | `npm run zap` | Ejecutar OWASP ZAP | `reports/zap/*.html` |
 | 9 | `npm run pipeline` | Ejecutar TODO | Todos los reportes |
 | 10 | `npm run docker:down` | Apagar servicios Docker | - |
+
+---
+
+## Servicios Docker
+
+| Servicio | Puerto | URL | Credenciales |
+|----------|--------|-----|--------------|
+| **Grafana** | 3001 | http://localhost:3001 | admin / admin |
+| **InfluxDB** | 8086 | http://localhost:8086 | - |
+| **Allure Server** | 4040, 5050 | http://localhost:4040 | - |
+| **PostgreSQL** | 5432 | localhost:5432 | sigma_qa / sigma_qa_2024 |
+| **Adminer** | 8083 | http://localhost:8083 | (ver PostgreSQL) |
+| **Redis** | 6379 | localhost:6379 | - |
+| **SQL Server** | 1433 | localhost:1433 | sa / MyStr0ngP4ssw0rd |
+| **OWASP ZAP** | 8082 | http://localhost:8082 | - |
+| **n8n** | 5678 | http://localhost:5678 | admin / admin |
+
+---
+
+## Base de Datos PostgreSQL (Test Data)
+
+Base de datos para simular datos de prueba en tests E2E.
+
+### Conexion
+
+```
+Host: localhost (o "postgres" desde Docker)
+Puerto: 5432
+Usuario: sigma_qa
+Password: sigma_qa_2024
+Base de datos: sigma_test
+```
+
+### Acceso via Adminer (GUI Web)
+
+1. Abrir http://localhost:8083
+2. Seleccionar **PostgreSQL** en el dropdown
+3. Servidor: `postgres`
+4. Usuario: `sigma_qa`
+5. Password: `sigma_qa_2024`
+6. Base de datos: `sigma_test`
+
+### Esquema de Tablas
+
+| Tabla | Descripcion | Registros |
+|-------|-------------|-----------|
+| `usuarios` | Usuarios del sistema | 5 |
+| `roles` | Roles de usuario | 5 |
+| `permisos` | Permisos del sistema | 9 |
+| `rol_permisos` | Relacion roles-permisos | 15 |
+| `estados` | Estados de workflow | 6 |
+| `categorias` | Categorias de registros | 5 |
+| `registros` | Registros principales | 5 |
+| `comentarios` | Comentarios en registros | 0 |
+| `archivos_adjuntos` | Archivos adjuntos | 0 |
+
+### Usuarios de Prueba
+
+| Username | Email | Password | Rol |
+|----------|-------|----------|-----|
+| admin_test | admin@test.local | Test123! | Administrador |
+| supervisor_test | supervisor@test.local | Test123! | Supervisor |
+| analista_test | analista@test.local | Test123! | Analista |
+| operador_test | operador@test.local | Test123! | Operador |
+| auditor_test | auditor@test.local | Test123! | Auditor |
+
+### Uso en Tests E2E (Playwright)
+
+```typescript
+import { Pool } from 'pg';
+
+const pool = new Pool({
+    host: 'localhost',
+    port: 5432,
+    user: 'sigma_qa',
+    password: 'sigma_qa_2024',
+    database: 'sigma_test'
+});
+
+// Obtener usuario de prueba
+const { rows } = await pool.query(
+    'SELECT * FROM usuarios WHERE username = $1',
+    ['admin_test']
+);
+
+// Limpiar datos de prueba
+await pool.query('DELETE FROM registros WHERE codigo LIKE $1', ['TEST-%']);
+```
+
+### Comandos Utiles PostgreSQL
+
+```bash
+# Conectar via Docker
+docker exec -it sigma-postgres psql -U sigma_qa -d sigma_test
+
+# Ver tablas
+\dt
+
+# Ver estructura de tabla
+\d usuarios
+
+# Ejecutar query
+SELECT * FROM usuarios;
+
+# Salir
+\q
+```
