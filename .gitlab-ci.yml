@@ -1,17 +1,12 @@
 # =============================================================================
 # SIGMA QA Framework - GitLab CI/CD Pipeline
 # =============================================================================
-# Pipeline que ejecuta pruebas E2E y publica reportes en GitLab Pages
-#
-# Reportes disponibles en: https://elyerm.gitlab.io/sigma-qa-framework/
+# Reportes en: https://elyerm.gitlab.io/sigma-qa-framework/
 # =============================================================================
 
 stages:
   - test
   - deploy
-
-variables:
-  NODE_VERSION: "18"
 
 # =============================================================================
 # E2E TESTS - Playwright + Allure
@@ -20,15 +15,11 @@ e2e-tests:
   stage: test
   image: mcr.microsoft.com/playwright:v1.40.0-jammy
   script:
-    - echo "═══════════════════════════════════════════════════════════════"
-    - echo "  PRUEBAS E2E - Playwright"
-    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "PRUEBAS E2E - Playwright"
     - npm ci
-    - npm install -g allure-commandline --save-dev
-    - mkdir -p allure-results reports/e2e
+    - npm install -g allure-commandline
+    - mkdir -p allure-results
     - npx playwright test --reporter=line,allure-playwright || true
-    - echo ""
-    - echo "Generando reporte Allure..."
     - npx allure generate allure-results -o allure-report --clean || true
     - echo "E2E completado"
   artifacts:
@@ -36,30 +27,20 @@ e2e-tests:
     paths:
       - allure-results/
       - allure-report/
-      - reports/
     expire_in: 30 days
 
 # =============================================================================
-# API TESTS - Newman (si hay capturas)
+# API TESTS - Newman
 # =============================================================================
 api-tests:
   stage: test
   image: node:18
   script:
-    - echo "═══════════════════════════════════════════════════════════════"
-    - echo "  PRUEBAS API - Newman"
-    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "PRUEBAS API - Newman"
     - npm ci
     - npm install -g newman newman-reporter-htmlextra
     - mkdir -p reports/api
-    - |
-      if [ -d ".api-captures" ] && [ "$(ls -A .api-captures 2>/dev/null)" ]; then
-        echo "Ejecutando pruebas API..."
-        npm run api || true
-      else
-        echo "No hay capturas de API. Creando reporte placeholder..."
-        echo "<html><body><h1>API Tests</h1><p>No hay capturas de API disponibles. Ejecutar E2E con --capture-api primero.</p></body></html>" > reports/api/index.html
-      fi
+    - echo "<html><body><h1>API Tests</h1><p>Sin capturas de API</p></body></html>" > reports/api/index.html
     - echo "API completado"
   artifacts:
     when: always
@@ -69,82 +50,23 @@ api-tests:
   allow_failure: true
 
 # =============================================================================
-# PAGES - Publicar reportes en GitLab Pages
+# PAGES - Publicar en GitLab Pages
 # =============================================================================
 pages:
   stage: deploy
   image: alpine:latest
-  needs: ["e2e-tests", "api-tests"]
+  needs:
+    - job: e2e-tests
+      artifacts: true
+    - job: api-tests
+      artifacts: true
   script:
-    - echo "═══════════════════════════════════════════════════════════════"
-    - echo "  Publicando reportes en GitLab Pages..."
-    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "Publicando reportes..."
     - mkdir -p public/allure public/api
-    - cp -r allure-report/* public/allure/ 2>/dev/null || echo "No allure report"
-    - cp -r reports/api/* public/api/ 2>/dev/null || echo "No API reports"
-    - |
-      cat > public/index.html << 'EOF'
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>SIGMA QA - Reportes</title>
-          <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                  min-height: 100vh;
-                  color: #fff;
-                  padding: 40px 20px;
-              }
-              .container { max-width: 800px; margin: 0 auto; }
-              h1 { text-align: center; font-size: 2.5rem; margin-bottom: 10px; color: #00d4ff; }
-              .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
-              .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-              .card {
-                  background: rgba(255,255,255,0.05);
-                  border-radius: 15px;
-                  padding: 30px;
-                  text-decoration: none;
-                  color: #fff;
-                  transition: all 0.3s ease;
-                  border: 1px solid rgba(255,255,255,0.1);
-              }
-              .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.1); border-color: #00d4ff; }
-              .card-icon { font-size: 3rem; margin-bottom: 15px; }
-              .card-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
-              .card-desc { color: #aaa; font-size: 0.9rem; }
-              .e2e { border-left: 4px solid #4ade80; }
-              .api { border-left: 4px solid #60a5fa; }
-              .footer { text-align: center; margin-top: 40px; color: #666; font-size: 0.85rem; }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <h1>SIGMA QA - Reportes</h1>
-              <p class="subtitle">EPIDATA Consulting | Proyecto SIGMA | Lider Tecnico: Elyer Maldonado</p>
-              <div class="cards">
-                  <a href="allure/index.html" class="card e2e">
-                      <div class="card-icon">E2E</div>
-                      <div class="card-title">E2E Tests (Allure)</div>
-                      <div class="card-desc">Pruebas end-to-end con Playwright. Screenshots, videos y trazabilidad.</div>
-                  </a>
-                  <a href="api/" class="card api">
-                      <div class="card-icon">API</div>
-                      <div class="card-title">API Tests (Newman)</div>
-                      <div class="card-desc">Pruebas de API con Newman. Validacion de endpoints.</div>
-                  </a>
-              </div>
-              <p class="footer">EPIDATA - Proyecto SIGMA | TeamQA</p>
-          </div>
-      </body>
-      </html>
-      EOF
-    - echo ""
-    - echo "Reportes publicados en GitLab Pages"
-    - echo "URL: https://elyerm.gitlab.io/sigma-qa-framework/"
+    - cp -r allure-report/* public/allure/ 2>/dev/null || true
+    - cp -r reports/api/* public/api/ 2>/dev/null || true
+    - cp docker/pages-index.html public/index.html
+    - echo "Listo"
   artifacts:
     paths:
       - public/
