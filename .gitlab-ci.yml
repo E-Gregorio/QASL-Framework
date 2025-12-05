@@ -100,8 +100,21 @@ pages:
       </html>
       ENDOFHTML
     - ls -la public/
-    - echo "Listo"
+    - echo ""
+    - echo "=========================================="
+    - echo "  REPORTES PUBLICADOS"
+    - echo "=========================================="
+    - echo ""
+    - echo "  https://elyerm.gitlab.io/sigma-qa-framework/"
+    - echo ""
+    - echo "  - E2E:  https://elyerm.gitlab.io/sigma-qa-framework/allure/"
+    - echo "  - API:  https://elyerm.gitlab.io/sigma-qa-framework/api/"
+    - echo ""
+    - echo "=========================================="
   artifacts:
     paths:
       - public/
     expire_in: 30 days
+  environment:
+    name: production
+    url: https://elyerm.gitlab.io/sigma-qa-framework/
