@@ -197,11 +197,12 @@ try {
     console.error('');
     console.error('  ERROR: Newman falló');
 
-    // Intentar enviar métricas aunque fallen tests
+    // Enviar métricas aunque fallen tests (visible)
     try {
-        execSync('node scripts_metricas/send-api-metrics.mjs', { stdio: 'pipe' });
+        console.log('');
+        execSync('node scripts_metricas/send-api-metrics.mjs', { stdio: 'inherit' });
     } catch (metricsError) {
-        // Silencioso
+        // No fallar si métricas no se envían
     }
 
     process.exit(1);

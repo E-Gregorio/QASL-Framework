@@ -33,8 +33,10 @@ Esperar ~30 segundos. **Verificar:** http://localhost:3001 (Grafana)
 ### PASO 3: Ejecutar Pruebas E2E (Playwright)
 
 ```bash
-npm run e2e -- --capture-api
+npm run e2e:capture
 ```
+
+> Este comando ejecuta E2E + captura APIs para los siguientes pasos.
 
 ---
 
@@ -49,8 +51,25 @@ npm run api
 ### PASO 5: Ejecutar Pruebas Performance (K6)
 
 ```bash
-npm run k6
+# Limpiar métricas anteriores (Grafana limpio)
+npm run k6:reset
+
+# Ejecutar test (opciones disponibles)
+npm run k6                                    # Default: 10 VUs, 30s
+npm run k6 -- --type=stairs --vus=5 --duration=150s   # Escalera (demo)
+npm run k6 -- --type=stress --vus=50          # Estres
+npm run k6 -- --type=spike --vus=30           # Pico
+npm run k6 -- --vus=20 --duration=60s         # Personalizado
 ```
+
+**Tipos de prueba:**
+| Tipo | Descripción |
+|------|-------------|
+| `load` | Carga normal (default) |
+| `stairs` | Escalera visible en Grafana |
+| `stress` | Estrés hasta el límite |
+| `spike` | Pico de carga repentino |
+| `soak` | Resistencia prolongada |
 
 ---
 
@@ -101,14 +120,15 @@ npm run clean
 # 2. Levantar servicios
 npm run docker:up
 
-# 3. E2E
-npm run e2e -- --capture-api
+# 3. E2E con captura de APIs
+npm run e2e:capture
 
 # 4. API
 npm run api
 
-# 5. Performance
-npm run k6
+# 5. Performance (reset + escalera para demo)
+npm run k6:reset
+npm run k6 -- --type=stairs --vus=5 --duration=150s
 
 # 6. Seguridad
 npm run zap

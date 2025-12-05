@@ -31,14 +31,14 @@ jobs:
 - parameters:
     reportDescription: ''
     reportDir: /zap/wrk/
-    reportFile: reports/zap/TS-002-BOOKSTORE-2025-12-04T13-11-21-report.html
+    reportFile: reports/zap/TS-002-BOOKSTORE-2025-12-05T19-47-16-report.html
     reportTitle: ZAP Scanning Report
     template: traditional-html
   type: report
 - parameters:
     reportDescription: ''
     reportDir: /zap/wrk/
-    reportFile: reports/zap/TS-002-BOOKSTORE-2025-12-04T13-11-21-report.json
+    reportFile: reports/zap/TS-002-BOOKSTORE-2025-12-05T19-47-16-report.json
     reportTitle: ZAP Scanning Report
     template: traditional-json
   type: report

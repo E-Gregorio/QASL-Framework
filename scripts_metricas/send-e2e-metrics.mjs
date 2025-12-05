@@ -17,8 +17,8 @@ import fs from 'fs';
 import path from 'path';
 import { sendE2EMetrics, checkInfluxConnection } from './influx-client.mjs';
 
-const RESULTS_DIR = 'test-results';
-const ALLURE_RESULTS = 'allure-results';
+const RESULTS_DIR = 'reports/e2e';
+const ALLURE_RESULTS = 'reports/e2e/allure-results';
 
 async function main() {
     console.log('');
@@ -63,8 +63,9 @@ async function main() {
         }
     }
 
-    // Opción 2: Leer de test-results (Playwright JSON reporter)
+    // Opción 2: Leer de reports/e2e/results.json (Playwright JSON reporter)
     const jsonReportPath = path.join(RESULTS_DIR, 'results.json');
+    const altJsonReportPath = 'reports/e2e/results.json';
     if (fs.existsSync(jsonReportPath)) {
         try {
             const report = JSON.parse(fs.readFileSync(jsonReportPath, 'utf-8'));

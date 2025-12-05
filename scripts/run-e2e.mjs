@@ -54,12 +54,14 @@ if (specFile) {
     }
 }
 
-// Variables de entorno
-const env = { ...process.env };
+// Variables de entorno - Windows necesita cross-env style
+// Siempre establecemos RECORD_HAR basado en captureAPI
+process.env.RECORD_HAR = captureAPI ? 'true' : 'false';
+
 if (captureAPI) {
-    env.RECORD_HAR = 'true';
     console.log('  API Capture: ENABLED');
 }
+const env = { ...process.env, RECORD_HAR: captureAPI ? 'true' : 'false' };
 
 console.log(`  Spec: ${specFile || 'ALL'}`);
 console.log(`  Reports: ${REPORTS_DIR}/`);
@@ -115,11 +117,21 @@ try {
     console.error('');
     console.error('  ERROR: Tests fallaron');
 
-    // Intentar enviar métricas aunque fallen tests
+    // Generar reporte Allure aunque fallen tests
     try {
-        execSync('node scripts_metricas/send-e2e-metrics.mjs', { stdio: 'pipe' });
+        execSync(`npx allure generate ${ALLURE_RESULTS} -o ${ALLURE_REPORT} --clean`, {
+            stdio: 'pipe'
+        });
+    } catch (e) {
+        // Ignorar error de Allure
+    }
+
+    // Enviar métricas aunque fallen tests (visible)
+    try {
+        console.log('');
+        execSync('node scripts_metricas/send-e2e-metrics.mjs', { stdio: 'inherit' });
     } catch (metricsError) {
-        // Silencioso
+        // No fallar si métricas no se envían
     }
 
     process.exit(1);
