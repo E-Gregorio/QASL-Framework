@@ -1,28 +1,19 @@
-# =============================================================================
 # SIGMA QA Framework - GitLab CI/CD Pipeline
-# =============================================================================
-# Reportes en: https://elyerm.gitlab.io/sigma-qa-framework/
-# =============================================================================
-
 stages:
   - test
   - deploy
+  - notify
 
-# =============================================================================
-# E2E TESTS - Playwright + Allure
-# =============================================================================
+# E2E TESTS
 e2e-tests:
   stage: test
   image: mcr.microsoft.com/playwright:v1.40.0-jammy
   script:
-    - echo "PRUEBAS E2E - Playwright"
     - npm ci
     - npm install -g allure-commandline
     - mkdir -p allure-results
     - npx playwright test --reporter=line,allure-playwright || true
     - npx allure generate allure-results -o allure-report --clean || true
-    - ls -la allure-report/ || echo "No allure-report dir"
-    - echo "E2E completado"
   artifacts:
     when: always
     paths:
@@ -30,19 +21,14 @@ e2e-tests:
       - allure-report/
     expire_in: 30 days
 
-# =============================================================================
-# API TESTS - Newman
-# =============================================================================
+# API TESTS
 api-tests:
   stage: test
   image: node:18
   script:
-    - echo "PRUEBAS API - Newman"
     - npm ci
-    - npm install -g newman newman-reporter-htmlextra
     - mkdir -p reports/api
-    - echo "<html><body><h1>API Tests</h1><p>Ejecutar E2E con --capture-api primero.</p></body></html>" > reports/api/index.html
-    - echo "API completado"
+    - echo "<html><body><h1>API Tests</h1><p>Sin capturas</p></body></html>" > reports/api/index.html
   artifacts:
     when: always
     paths:
@@ -50,9 +36,7 @@ api-tests:
     expire_in: 30 days
   allow_failure: true
 
-# =============================================================================
-# PAGES - Publicar en GitLab Pages
-# =============================================================================
+# PAGES
 pages:
   stage: deploy
   image: alpine:latest
@@ -62,59 +46,24 @@ pages:
     - job: api-tests
       artifacts: true
   script:
-    - echo "Publicando reportes..."
     - mkdir -p public/allure public/api
-    - ls -la
-    - ls -la allure-report/ || echo "No allure-report"
-    - cp -r allure-report/* public/allure/ || echo "Allure copy failed"
-    - cp -r reports/api/* public/api/ || echo "API copy failed"
-    - |
-      cat > public/index.html << 'ENDOFHTML'
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>SIGMA QA - Reportes</title>
-        <style>
-          body { font-family: Arial; background: #1a1a2e; color: white; padding: 40px; }
-          h1 { color: #00d4ff; text-align: center; }
-          .cards { display: flex; gap: 20px; justify-content: center; margin-top: 40px; }
-          .card { background: #16213e; padding: 30px; border-radius: 10px; text-decoration: none; color: white; }
-          .card:hover { background: #1f4068; }
-        </style>
-      </head>
-      <body>
-        <h1>SIGMA QA - Reportes</h1>
-        <p style="text-align:center;color:#888;">EPIDATA - Proyecto SIGMA - Elyer Maldonado</p>
-        <div class="cards">
-          <a href="allure/index.html" class="card">
-            <h2>E2E Tests</h2>
-            <p>Allure Report</p>
-          </a>
-          <a href="api/index.html" class="card">
-            <h2>API Tests</h2>
-            <p>Newman Report</p>
-          </a>
-        </div>
-      </body>
-      </html>
-      ENDOFHTML
-    - ls -la public/
-    - echo ""
-    - echo "=========================================="
-    - echo "  REPORTES PUBLICADOS"
-    - echo "=========================================="
-    - echo ""
-    - echo "  https://elyerm.gitlab.io/sigma-qa-framework/"
-    - echo ""
-    - echo "  - E2E:  https://elyerm.gitlab.io/sigma-qa-framework/allure/"
-    - echo "  - API:  https://elyerm.gitlab.io/sigma-qa-framework/api/"
-    - echo ""
-    - echo "=========================================="
+    - cp -r allure-report/* public/allure/ || true
+    - cp -r reports/api/* public/api/ || true
+    - echo "<html><head><title>SIGMA QA</title><style>body{font-family:Arial;background:#1a1a2e;color:white;padding:40px;text-align:center}h1{color:#00d4ff}a{color:#4ade80;font-size:1.2rem}</style></head><body><h1>SIGMA QA - Reportes</h1><p>EPIDATA - Elyer Maldonado</p><br><a href=allure/index.html>E2E Tests - Allure</a><br><br><a href=api/index.html>API Tests - Newman</a></body></html>" > public/index.html
   artifacts:
     paths:
       - public/
     expire_in: 30 days
-  environment:
-    name: production
-    url: https://elyerm.gitlab.io/sigma-qa-framework/
+
+# NOTIFY - Enviar email con links
+notify:
+  stage: notify
+  image: alpine:latest
+  needs:
+    - job: pages
+      artifacts: false
+  script:
+    - apk add --no-cache curl
+    - echo "Pipeline completado"
+    - echo "Reportes en https://sigma-qa-framework-207db7.gitlab.io/"
+  when: on_success
