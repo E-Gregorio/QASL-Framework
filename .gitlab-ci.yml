@@ -21,6 +21,7 @@ e2e-tests:
     - mkdir -p allure-results
     - npx playwright test --reporter=line,allure-playwright || true
     - npx allure generate allure-results -o allure-report --clean || true
+    - ls -la allure-report/ || echo "No allure-report dir"
     - echo "E2E completado"
   artifacts:
     when: always
@@ -40,7 +41,7 @@ api-tests:
     - npm ci
     - npm install -g newman newman-reporter-htmlextra
     - mkdir -p reports/api
-    - echo "<html><body><h1>API Tests</h1><p>Ejecutar E2E con --capture-api primero para generar capturas.</p></body></html>" > reports/api/index.html
+    - echo "<html><body><h1>API Tests</h1><p>Ejecutar E2E con --capture-api primero.</p></body></html>" > reports/api/index.html
     - echo "API completado"
   artifacts:
     when: always
@@ -63,11 +64,42 @@ pages:
   script:
     - echo "Publicando reportes..."
     - mkdir -p public/allure public/api
-    - cp -r allure-report/* public/allure/ 2>/dev/null || echo "No allure"
-    - cp -r reports/api/* public/api/ 2>/dev/null || echo "No api"
-    - echo '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>SIGMA QA - Reportes</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);min-height:100vh;color:#fff;padding:40px 20px}.container{max-width:800px;margin:0 auto}h1{text-align:center;font-size:2.5rem;margin-bottom:10px;color:#00d4ff}.subtitle{text-align:center;color:#888;margin-bottom:40px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}.card{background:rgba(255,255,255,0.05);border-radius:15px;padding:30px;text-decoration:none;color:#fff;transition:all 0.3s ease;border:1px solid rgba(255,255,255,0.1)}.card:hover{transform:translateY(-5px);background:rgba(255,255,255,0.1);border-color:#00d4ff}.card-icon{font-size:3rem;margin-bottom:15px}.card-title{font-size:1.3rem;font-weight:bold;margin-bottom:10px}.card-desc{color:#aaa;font-size:0.9rem}.e2e{border-left:4px solid #4ade80}.api{border-left:4px solid #60a5fa}.footer{text-align:center;margin-top:40px;color:#666;font-size:0.85rem}</style></head><body><div class="container"><h1>SIGMA QA - Reportes</h1><p class="subtitle">EPIDATA Consulting | Proyecto SIGMA | Lider Tecnico: Elyer Maldonado</p><div class="cards"><a href="allure/index.html" class="card e2e"><div class="card-icon">E2E</div><div class="card-title">E2E Tests (Allure)</div><div class="card-desc">Pruebas end-to-end con Playwright.</div></a><a href="api/index.html" class="card api"><div class="card-icon">API</div><div class="card-title">API Tests (Newman)</div><div class="card-desc">Pruebas de API con Newman.</div></a></div><p class="footer">EPIDATA - Proyecto SIGMA | TeamQA</p></div></body></html>' > public/index.html
+    - ls -la
+    - ls -la allure-report/ || echo "No allure-report"
+    - cp -r allure-report/* public/allure/ || echo "Allure copy failed"
+    - cp -r reports/api/* public/api/ || echo "API copy failed"
+    - |
+      cat > public/index.html << 'ENDOFHTML'
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>SIGMA QA - Reportes</title>
+        <style>
+          body { font-family: Arial; background: #1a1a2e; color: white; padding: 40px; }
+          h1 { color: #00d4ff; text-align: center; }
+          .cards { display: flex; gap: 20px; justify-content: center; margin-top: 40px; }
+          .card { background: #16213e; padding: 30px; border-radius: 10px; text-decoration: none; color: white; }
+          .card:hover { background: #1f4068; }
+        </style>
+      </head>
+      <body>
+        <h1>SIGMA QA - Reportes</h1>
+        <p style="text-align:center;color:#888;">EPIDATA - Proyecto SIGMA - Elyer Maldonado</p>
+        <div class="cards">
+          <a href="allure/index.html" class="card">
+            <h2>E2E Tests</h2>
+            <p>Allure Report</p>
+          </a>
+          <a href="api/index.html" class="card">
+            <h2>API Tests</h2>
+            <p>Newman Report</p>
+          </a>
+        </div>
+      </body>
+      </html>
+      ENDOFHTML
     - ls -la public/
-    - ls -la public/allure/ || echo "No allure dir"
     - echo "Listo"
   artifacts:
     paths:
