@@ -6,29 +6,27 @@ EPIDATA - Proyecto SIGMA | TeamQA
 
 ---
 
-## DEMO EN VIVO - COMANDOS SECUENCIALES
+## DIA NUEVO DE TRABAJO - COMANDOS EN ORDEN
 
 > **IMPORTANTE:** Ejecutar los comandos en el orden indicado.
 
-### PASO 1: Levantar Servicios Docker
+### PASO 1: Limpiar Todo (Empezar desde Cero)
+
+```bash
+npm run clean
+```
+
+> Elimina: `reports/`, `allure-results/`, `.api-captures/`, `.temp-k6/`, `.temp-newman/`
+
+---
+
+### PASO 2: Levantar Servicios Docker
 
 ```bash
 npm run docker:up
 ```
 
-Esperar ~30 segundos a que todos los servicios inicien.
-
-**Verificar:** Abrir http://localhost:3001 (Grafana - Centro de Control)
-
----
-
-### PASO 2: Limpiar Reportes Anteriores (Opcional)
-
-```bash
-npm run clean:reports
-```
-
-> Solo ejecutar si quieres empezar desde cero.
+Esperar ~30 segundos. **Verificar:** http://localhost:3001 (Grafana)
 
 ---
 
@@ -38,71 +36,51 @@ npm run clean:reports
 npm run e2e -- --capture-api
 ```
 
-**Salida:**
-- Reporte Allure: `reports/e2e/allure-report/`
-- APIs capturadas: `.api-captures/*.json`
-- Metricas enviadas a Grafana automaticamente
-
 ---
 
-### PASO 4: Ver Reporte Allure (Opcional)
-
-```bash
-npm run allure:open
-```
-
----
-
-### PASO 5: Ejecutar Pruebas API (Newman)
+### PASO 4: Ejecutar Pruebas API (Newman)
 
 ```bash
 npm run api
 ```
 
-**Salida:**
-- Reporte HTML: `reports/api/*.html`
-- Metricas enviadas a Grafana automaticamente
-
 ---
 
-### PASO 6: Ejecutar Pruebas Performance (K6)
+### PASO 5: Ejecutar Pruebas Performance (K6)
 
 ```bash
 npm run k6
 ```
 
-**Con parametros personalizados:**
-```bash
-npm run k6 -- --vus=20 --duration=60s
-```
-
-**Salida:**
-- Reporte HTML: `reports/k6/*.html`
-- Metricas enviadas a Grafana en tiempo real
-
 ---
 
-### PASO 7: Ejecutar Pruebas Seguridad (OWASP ZAP)
+### PASO 6: Ejecutar Pruebas Seguridad (OWASP ZAP)
 
 ```bash
 npm run zap
 ```
 
-**Salida:**
-- Reporte HTML: `reports/zap/*.html`
-- Reporte JSON: `reports/zap/*.json`
-- Metricas enviadas a Grafana automaticamente
-
 ---
 
-### PASO 8: Ver Centro de Control (Grafana)
+### PASO 7: Ver Centro de Control (Grafana)
 
-Abrir en navegador:
 ```
 http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
 ```
 
 **Credenciales:** admin / admin
+
+---
+
+### PASO 8: Publicar Reportes a GitLab Pages
+
+```bash
+npm run publish
+```
+
+**URL Reportes:** https://sigma-qa-framework-207db7.gitlab.io/
+
+> Envia este link por correo a tu equipo.
 
 ---
 
@@ -117,11 +95,11 @@ npm run docker:down
 ## RESUMEN RAPIDO - COPY/PASTE
 
 ```bash
-# 1. Levantar servicios
-npm run docker:up
+# 1. Limpiar todo (dia nuevo)
+npm run clean
 
-# 2. Limpiar (opcional)
-npm run clean:reports
+# 2. Levantar servicios
+npm run docker:up
 
 # 3. E2E
 npm run e2e -- --capture-api
@@ -135,11 +113,22 @@ npm run k6
 # 6. Seguridad
 npm run zap
 
-# 7. Ver dashboard
+# 7. Ver Grafana
 # http://localhost:3001
 
-# 8. Apagar
+# 8. Publicar reportes
+npm run publish
+
+# 9. Apagar
 npm run docker:down
+```
+
+---
+
+## Ver Reporte Allure Local
+
+```bash
+npm run allure:open
 ```
 
 ---
