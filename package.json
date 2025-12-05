@@ -14,7 +14,8 @@
         "allure:open": "allure open reports/e2e/allure-report",
         "allure:generate": "allure generate reports/e2e/allure-results -o reports/e2e/allure-report --clean",
         "clean": "node -e \"const fs=require('fs');['reports','allure-results','.api-captures','.temp-k6','.temp-newman'].forEach(d=>{if(fs.existsSync(d))fs.rmSync(d,{recursive:true,force:true});console.log('Deleted:',d)})\"",
-        "clean:reports": "node -e \"const fs=require('fs');if(fs.existsSync('reports'))fs.rmSync('reports',{recursive:true,force:true});console.log('Reports cleaned')\""
+        "clean:reports": "node -e \"const fs=require('fs');if(fs.existsSync('reports'))fs.rmSync('reports',{recursive:true,force:true});console.log('Reports cleaned')\"",
+        "publish": "node scripts/publish-reports.mjs"
     },
     "keywords": [
         "qa",

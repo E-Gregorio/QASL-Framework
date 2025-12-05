@@ -1,85 +1,12 @@
-# SIGMA QA Framework - GitLab CI/CD Pipeline
-# Usa runner local para enviar métricas a Grafana
+image: alpine:latest
 
-stages:
-  - test
-  - metrics
-  - deploy
-
-variables:
-  GIT_STRATEGY: clone
-
-# E2E TESTS
-e2e-tests:
-  stage: test
-  tags:
-    - local
-  script:
-    - npm ci
-    - if (!(Test-Path allure-results)) { New-Item -ItemType Directory -Path allure-results }
-    - npx playwright test --reporter=line,allure-playwright; exit 0
-    - npx allure generate allure-results -o allure-report --clean; exit 0
-  artifacts:
-    when: always
-    paths:
-      - allure-results/
-      - allure-report/
-      - .e2e-last-results.json
-    expire_in: 30 days
-  allow_failure: true
-
-# API TESTS
-api-tests:
-  stage: test
-  tags:
-    - local
-  script:
-    - npm ci
-    - if (!(Test-Path reports/api)) { New-Item -ItemType Directory -Path reports/api -Force }
-    - npm run api; exit 0
-  artifacts:
-    when: always
-    paths:
-      - reports/api/
-      - .api-last-results.json
-    expire_in: 30 days
-  allow_failure: true
-
-# METRICS - Enviar a Grafana
-send-metrics:
-  stage: metrics
-  tags:
-    - local
-  needs:
-    - job: e2e-tests
-      artifacts: true
-    - job: api-tests
-      artifacts: true
-  script:
-    - Write-Host "Enviando metricas a Grafana..."
-    - node scripts_metricas/send-e2e-metrics.mjs; exit 0
-    - node scripts_metricas/send-api-metrics.mjs; exit 0
-    - Write-Host "Metricas enviadas!"
-  allow_failure: true
-
-# PAGES
 pages:
   stage: deploy
-  tags:
-    - local
-  needs:
-    - job: e2e-tests
-      artifacts: true
-    - job: api-tests
-      artifacts: true
   script:
-    - if (!(Test-Path public/allure)) { New-Item -ItemType Directory -Path public/allure -Force }
-    - if (!(Test-Path public/api)) { New-Item -ItemType Directory -Path public/api -Force }
-    - if (Test-Path allure-report) { Copy-Item -Path allure-report/* -Destination public/allure -Recurse -Force }
-    - if (Test-Path reports/api) { Copy-Item -Path reports/api/* -Destination public/api -Recurse -Force }
-    - Set-Content -Path public/index.html -Value '<html><head><title>SIGMA QA</title><style>body{font-family:Arial;background:#1a1a2e;color:white;padding:40px;text-align:center}h1{color:#00d4ff}a{color:#4ade80;font-size:1.2rem}</style></head><body><h1>SIGMA QA - Reportes</h1><p>EPIDATA - Elyer Maldonado</p><br><a href=allure/index.html>E2E Tests - Allure</a><br><br><a href=api/index.html>API Tests - Newman</a></body></html>'
+    - echo "Desplegando GitLab Pages - SIGMA QA Framework"
+    - ls -la public/ || echo "Carpeta public/ no encontrada"
   artifacts:
     paths:
-      - public/
-    expire_in: 30 days
-  allow_failure: true
+      - public
+  only:
+    - main
