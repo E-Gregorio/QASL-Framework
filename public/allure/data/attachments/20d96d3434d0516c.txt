@@ -1,0 +1,2 @@
+⏭️  API capture disabled (set RECORD_HAR=true to enable)
+ℹ️  API capture was not enabled
