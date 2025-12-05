@@ -1,0 +1,174 @@
+# =============================================================================
+# SIGMA QA Framework - GitLab CI/CD Pipeline
+# =============================================================================
+# Pipeline automático que ejecuta todas las pruebas y genera reportes
+# Configurar Schedule en GitLab para ejecución diaria a las 8:00 AM
+# =============================================================================
+
+stages:
+  - setup
+  - test
+  - report
+  - notify
+
+variables:
+  NODE_VERSION: "18"
+  ALLURE_RESULTS: "allure-results"
+  REPORTS_DIR: "reports"
+
+# =============================================================================
+# SETUP - Instalación de dependencias
+# =============================================================================
+setup:
+  stage: setup
+  image: node:18
+  script:
+    - npm ci
+    - npx playwright install --with-deps chromium
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 hour
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+      - ~/.cache/ms-playwright/
+
+# =============================================================================
+# TESTS - Ejecución de pruebas en paralelo
+# =============================================================================
+e2e-tests:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.40.0-jammy
+  needs: ["setup"]
+  script:
+    - npm ci
+    - npx playwright test --reporter=line,allure-playwright
+  artifacts:
+    when: always
+    paths:
+      - allure-results/
+      - reports/e2e/
+      - test-results/
+    expire_in: 7 days
+  allow_failure: true
+
+api-tests:
+  stage: test
+  image: node:18
+  needs: ["setup"]
+  script:
+    - npm ci
+    - npm run api || true
+  artifacts:
+    when: always
+    paths:
+      - reports/api/
+    expire_in: 7 days
+  allow_failure: true
+
+k6-tests:
+  stage: test
+  image: grafana/k6:latest
+  needs: []
+  script:
+    - echo "Running K6 performance tests..."
+    - k6 run --out json=reports/k6/results.json scripts/k6-test.js || true
+  artifacts:
+    when: always
+    paths:
+      - reports/k6/
+    expire_in: 7 days
+  allow_failure: true
+
+# =============================================================================
+# REPORT - Generación de Allure Report
+# =============================================================================
+allure-report:
+  stage: report
+  image: frankescobar/allure-docker-service:latest
+  needs: ["e2e-tests", "api-tests"]
+  script:
+    - allure generate allure-results --clean -o public/allure-report
+    - |
+      # Generar resumen para email
+      echo "# SIGMA QA - Reporte de Pruebas" > public/summary.md
+      echo "" >> public/summary.md
+      echo "**Fecha:** $(date '+%Y-%m-%d %H:%M')" >> public/summary.md
+      echo "**Branch:** ${CI_COMMIT_REF_NAME}" >> public/summary.md
+      echo "**Pipeline:** ${CI_PIPELINE_ID}" >> public/summary.md
+      echo "" >> public/summary.md
+      echo "## Resultados" >> public/summary.md
+      echo "" >> public/summary.md
+      if [ -d "allure-results" ]; then
+        TOTAL=$(ls -1 allure-results/*.json 2>/dev/null | wc -l)
+        echo "Total de tests ejecutados: ${TOTAL}" >> public/summary.md
+      fi
+      echo "" >> public/summary.md
+      echo "**Ver reporte completo:** ${CI_PAGES_URL}/allure-report" >> public/summary.md
+  artifacts:
+    paths:
+      - public/
+    expire_in: 30 days
+
+# =============================================================================
+# PAGES - Publicar Allure en GitLab Pages
+# =============================================================================
+pages:
+  stage: report
+  needs: ["allure-report"]
+  script:
+    - echo "Publishing Allure Report to GitLab Pages..."
+  artifacts:
+    paths:
+      - public/
+    expire_in: 30 days
+  only:
+    - main
+    - master
+    - schedules
+
+# =============================================================================
+# NOTIFY - Notificación por email
+# =============================================================================
+notify-success:
+  stage: notify
+  image: alpine:latest
+  needs: ["pages"]
+  script:
+    - apk add --no-cache curl
+    - |
+      echo "================================================"
+      echo "  SIGMA QA - Pipeline Completado"
+      echo "================================================"
+      echo ""
+      echo "  Estado: SUCCESS"
+      echo "  Fecha: $(date '+%Y-%m-%d %H:%M')"
+      echo "  Branch: ${CI_COMMIT_REF_NAME}"
+      echo ""
+      echo "  Ver Allure Report:"
+      echo "  ${CI_PAGES_URL}/allure-report"
+      echo ""
+      echo "================================================"
+  when: on_success
+
+notify-failure:
+  stage: notify
+  image: alpine:latest
+  needs: ["e2e-tests", "api-tests"]
+  script:
+    - |
+      echo "================================================"
+      echo "  SIGMA QA - Pipeline FALLIDO"
+      echo "================================================"
+      echo ""
+      echo "  Estado: FAILED"
+      echo "  Fecha: $(date '+%Y-%m-%d %H:%M')"
+      echo "  Branch: ${CI_COMMIT_REF_NAME}"
+      echo ""
+      echo "  Revisar logs en:"
+      echo "  ${CI_PIPELINE_URL}"
+      echo ""
+      echo "================================================"
+  when: on_failure
