@@ -227,115 +227,22 @@ send-metrics:
 # =============================================================================
 pages:
   stage: report
+  image: alpine:latest
   needs: ["e2e-tests", "api-tests", "k6-tests", "zap-tests"]
   script:
     - echo "═══════════════════════════════════════════════════════════════"
-    - echo "  📦 Publicando reportes en GitLab Pages..."
+    - echo "  Publicando reportes en GitLab Pages..."
     - echo "═══════════════════════════════════════════════════════════════"
-    - mkdir -p public
-    # Crear index.html con links a todos los reportes
-    - |
-      cat > public/index.html << 'HTMLEOF'
-      <!DOCTYPE html>
-      <html lang="es">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>SIGMA QA - Reportes</title>
-          <style>
-              * { margin: 0; padding: 0; box-sizing: border-box; }
-              body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-                  min-height: 100vh;
-                  color: #fff;
-                  padding: 40px 20px;
-              }
-              .container { max-width: 800px; margin: 0 auto; }
-              h1 {
-                  text-align: center;
-                  font-size: 2.5rem;
-                  margin-bottom: 10px;
-                  color: #00d4ff;
-              }
-              .subtitle {
-                  text-align: center;
-                  color: #888;
-                  margin-bottom: 40px;
-              }
-              .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-              .card {
-                  background: rgba(255,255,255,0.05);
-                  border-radius: 15px;
-                  padding: 30px;
-                  text-decoration: none;
-                  color: #fff;
-                  transition: all 0.3s ease;
-                  border: 1px solid rgba(255,255,255,0.1);
-              }
-              .card:hover {
-                  transform: translateY(-5px);
-                  background: rgba(255,255,255,0.1);
-                  border-color: #00d4ff;
-              }
-              .card-icon { font-size: 3rem; margin-bottom: 15px; }
-              .card-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
-              .card-desc { color: #aaa; font-size: 0.9rem; }
-              .e2e { border-left: 4px solid #4ade80; }
-              .api { border-left: 4px solid #60a5fa; }
-              .k6 { border-left: 4px solid #a78bfa; }
-              .zap { border-left: 4px solid #f87171; }
-              .footer { text-align: center; margin-top: 40px; color: #666; font-size: 0.85rem; }
-          </style>
-      </head>
-      <body>
-          <div class="container">
-              <h1>🚀 SIGMA QA - Reportes</h1>
-              <p class="subtitle">EPIDATA Consulting | Proyecto SIGMA | Líder Técnico: Elyer Maldonado</p>
-
-              <div class="cards">
-                  <a href="allure/index.html" class="card e2e">
-                      <div class="card-icon">🧪</div>
-                      <div class="card-title">E2E Tests (Allure)</div>
-                      <div class="card-desc">Pruebas end-to-end con Playwright. Incluye screenshots, videos y trazabilidad.</div>
-                  </a>
-
-                  <a href="api/" class="card api">
-                      <div class="card-icon">🔌</div>
-                      <div class="card-title">API Tests (Newman)</div>
-                      <div class="card-desc">Pruebas de API con Newman HTMLExtra. Validación de endpoints y responses.</div>
-                  </a>
-
-                  <a href="k6/" class="card k6">
-                      <div class="card-icon">⚡</div>
-                      <div class="card-title">Performance (K6)</div>
-                      <div class="card-desc">Pruebas de carga y rendimiento. Métricas de response time y throughput.</div>
-                  </a>
-
-                  <a href="zap/" class="card zap">
-                      <div class="card-icon">🛡️</div>
-                      <div class="card-title">Security (OWASP ZAP)</div>
-                      <div class="card-desc">Análisis de seguridad. Vulnerabilidades clasificadas por severidad.</div>
-                  </a>
-              </div>
-
-              <p class="footer">
-                  Pipeline: ${CI_PIPELINE_ID} | Branch: ${CI_COMMIT_REF_NAME} |
-                  Generado: $(date '+%Y-%m-%d %H:%M')
-              </p>
-          </div>
-      </body>
-      </html>
-      HTMLEOF
-    - echo ""
-    - echo "✅ Reportes publicados en GitLab Pages"
-    - echo ""
-    - echo "📎 URLs de reportes:"
-    - echo "   Index:  ${CI_PAGES_URL}"
-    - echo "   Allure: ${CI_PAGES_URL}/allure"
-    - echo "   API:    ${CI_PAGES_URL}/api"
-    - echo "   K6:     ${CI_PAGES_URL}/k6"
-    - echo "   ZAP:    ${CI_PAGES_URL}/zap"
+    - mkdir -p public/allure public/api public/k6 public/zap
+    - cp -r allure-results/* public/allure/ 2>/dev/null || echo "No allure results"
+    - cp reports/api/*.html public/api/ 2>/dev/null || echo "No API reports"
+    - cp reports/api/*.json public/api/ 2>/dev/null || true
+    - cp reports/k6/*.html public/k6/ 2>/dev/null || echo "No K6 reports"
+    - cp reports/k6/*.json public/k6/ 2>/dev/null || true
+    - cp reports/zap/*.html public/zap/ 2>/dev/null || echo "No ZAP reports"
+    - cp reports/zap/*.json public/zap/ 2>/dev/null || true
+    - echo "<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'><title>SIGMA QA - Reportes</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e 0%,#16213e 100%);min-height:100vh;color:#fff;padding:40px 20px}.container{max-width:800px;margin:0 auto}h1{text-align:center;font-size:2.5rem;margin-bottom:10px;color:#00d4ff}.subtitle{text-align:center;color:#888;margin-bottom:40px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}.card{background:rgba(255,255,255,0.05);border-radius:15px;padding:30px;text-decoration:none;color:#fff;transition:all 0.3s ease;border:1px solid rgba(255,255,255,0.1)}.card:hover{transform:translateY(-5px);background:rgba(255,255,255,0.1);border-color:#00d4ff}.card-icon{font-size:3rem;margin-bottom:15px}.card-title{font-size:1.3rem;font-weight:bold;margin-bottom:10px}.card-desc{color:#aaa;font-size:0.9rem}.e2e{border-left:4px solid #4ade80}.api{border-left:4px solid #60a5fa}.k6{border-left:4px solid #a78bfa}.zap{border-left:4px solid #f87171}.footer{text-align:center;margin-top:40px;color:#666;font-size:0.85rem}</style></head><body><div class='container'><h1>SIGMA QA - Reportes</h1><p class='subtitle'>EPIDATA Consulting | Proyecto SIGMA | Lider Tecnico: Elyer Maldonado</p><div class='cards'><a href='allure/index.html' class='card e2e'><div class='card-icon'>E2E</div><div class='card-title'>E2E Tests (Allure)</div><div class='card-desc'>Pruebas end-to-end con Playwright. Incluye screenshots, videos y trazabilidad.</div></a><a href='api/' class='card api'><div class='card-icon'>API</div><div class='card-title'>API Tests (Newman)</div><div class='card-desc'>Pruebas de API con Newman HTMLExtra. Validacion de endpoints y responses.</div></a><a href='k6/' class='card k6'><div class='card-icon'>K6</div><div class='card-title'>Performance (K6)</div><div class='card-desc'>Pruebas de carga y rendimiento. Metricas de response time y throughput.</div></a><a href='zap/' class='card zap'><div class='card-icon'>ZAP</div><div class='card-title'>Security (OWASP ZAP)</div><div class='card-desc'>Analisis de seguridad. Vulnerabilidades clasificadas por severidad.</div></a></div><p class='footer'>EPIDATA - Proyecto SIGMA | TeamQA</p></div></body></html>" > public/index.html
+    - echo "Reportes publicados en GitLab Pages"
   artifacts:
     paths:
       - public/
