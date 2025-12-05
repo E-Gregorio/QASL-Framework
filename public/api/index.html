@@ -1,21 +1,64 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <title>API Tests - Newman Reports</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background: #1a1a2e; color: #eee; }
-        h1 { color: #00d9ff; }
-        a { display: block; padding: 15px; margin: 10px 0; background: #16213e; border-radius: 5px; color: #00ff88; text-decoration: none; }
-        a:hover { background: #1f4068; }
-        .back { color: #ff6b6b; font-size: 14px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0d0d0d; color: #fff; min-height: 100vh; }
+        .header { background: #1a1a1a; padding: 30px 20px; border-bottom: 3px solid #2196F3; }
+        .header-content { max-width: 900px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+        .back { color: #888; text-decoration: none; font-size: 14px; }
+        .back:hover { color: #e63946; }
+        .title { font-size: 24px; color: #fff; }
+        .title span { color: #2196F3; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+        .report-item {
+            display: flex; align-items: center; background: #1a1a1a; border-radius: 8px;
+            padding: 20px; margin-bottom: 12px; text-decoration: none;
+            border: 1px solid #2a2a2a; transition: all 0.3s ease;
+        }
+        .report-item:hover { background: #252525; border-color: #2196F3; transform: translateX(5px); }
+        .icon { width: 45px; height: 45px; background: linear-gradient(135deg, #2196F3, #1565C0); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 20px; font-size: 18px; font-weight: bold; }
+        .info { flex: 1; }
+        .name { color: #fff; font-size: 16px; font-weight: 500; }
+        .date { color: #888; font-size: 13px; margin-top: 3px; }
+        .arrow { color: #2196F3; font-size: 20px; }
     </style>
 </head>
 <body>
-    <a class="back" href="../">← Volver al inicio</a>
-    <h1>API Tests - Newman Reports</h1>
-    <a href="TS-002-BOOKSTORE-2025-12-05T10-30-32-report.html">TS-002-BOOKSTORE - 2025-12-05 10:30 (Ultimo)</a>
-    <a href="TS-002-BOOKSTORE-2025-12-05T10-30-01-report.html">TS-002-BOOKSTORE - 2025-12-05 10:30</a>
-    <a href="TS-002-BOOKSTORE-2025-12-04T12-36-16-report.html">TS-002-BOOKSTORE - 2025-12-04 12:36</a>
+    <div class="header">
+        <div class="header-content">
+            <a class="back" href="../">← Volver al inicio</a>
+            <div class="title">Pruebas <span>API</span> - Newman</div>
+        </div>
+    </div>
+    <div class="container">
+        <a class="report-item" href="TS-002-BOOKSTORE-2025-12-05T10-30-32-report.html">
+            <div class="icon">API</div>
+            <div class="info">
+                <div class="name">TS-002-BOOKSTORE</div>
+                <div class="date">05 Diciembre 2024 - 10:30 (Ultimo)</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a class="report-item" href="TS-002-BOOKSTORE-2025-12-05T10-30-01-report.html">
+            <div class="icon">API</div>
+            <div class="info">
+                <div class="name">TS-002-BOOKSTORE</div>
+                <div class="date">05 Diciembre 2024 - 10:30</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+        <a class="report-item" href="TS-002-BOOKSTORE-2025-12-04T12-36-16-report.html">
+            <div class="icon">API</div>
+            <div class="info">
+                <div class="name">TS-002-BOOKSTORE</div>
+                <div class="date">04 Diciembre 2024 - 12:36</div>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+    </div>
 </body>
 </html>
