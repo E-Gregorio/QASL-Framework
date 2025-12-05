@@ -161,13 +161,14 @@ fs.writeFileSync(environmentPath, JSON.stringify(environment, null, 2));
 
 // Ruta del reporte
 const reportPath = path.join(REPORTS_DIR, `${testName}-${timestamp}-report.html`);
+const jsonReportPath = path.join(REPORTS_DIR, `${testName}-${timestamp}-report.json`);
 
 console.log('  Ejecutando Newman...');
 console.log('───────────────────────────────────────────────────────────────────────────');
 
 try {
-    // Ejecutar Newman
-    execSync(`npx newman run "${collectionPath}" -e "${environmentPath}" --insecure -r cli,htmlextra --reporter-htmlextra-export "${reportPath}"`, {
+    // Ejecutar Newman con reporters HTML y JSON
+    execSync(`npx newman run "${collectionPath}" -e "${environmentPath}" --insecure -r cli,htmlextra,json --reporter-htmlextra-export "${reportPath}" --reporter-json-export "${jsonReportPath}"`, {
         stdio: 'inherit'
     });
 
@@ -184,8 +185,24 @@ try {
     // Limpiar temporales
     fs.rmSync(TEMP_DIR, { recursive: true, force: true });
 
+    // Enviar métricas a InfluxDB
+    try {
+        console.log('');
+        execSync('node scripts_metricas/send-api-metrics.mjs', { stdio: 'inherit' });
+    } catch (metricsError) {
+        // No fallar si métricas no se envían
+    }
+
 } catch (error) {
     console.error('');
     console.error('  ERROR: Newman falló');
+
+    // Intentar enviar métricas aunque fallen tests
+    try {
+        execSync('node scripts_metricas/send-api-metrics.mjs', { stdio: 'pipe' });
+    } catch (metricsError) {
+        // Silencioso
+    }
+
     process.exit(1);
 }

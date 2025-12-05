@@ -1,7 +1,5 @@
 {
-  "annotations": {
-    "list": []
-  },
+  "annotations": { "list": [] },
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -13,96 +11,414 @@
       "gridPos": { "h": 3, "w": 24, "x": 0, "y": 0 },
       "id": 1,
       "options": {
-        "code": {
-          "language": "plaintext",
-          "showLineNumbers": false,
-          "showMiniMap": false
-        },
-        "content": "<div style=\"text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; border-radius: 10px;\">\n  <h1 style=\"color: #00d4ff; margin: 0; font-size: 28px; font-weight: bold;\">🚀 SIGMA QA - CENTRO DE CONTROL</h1>\n  <p style=\"color: #888; margin: 5px 0 0 0; font-size: 14px;\">EPIDATA Consulting | Proyecto SIGMA | QA Lead: Elyer Maldonado</p>\n</div>",
+        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
+        "content": "<div style=\"text-align: center; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; border-radius: 10px;\">\n  <h1 style=\"color: #00d4ff; margin: 0; font-size: 28px; font-weight: bold;\">🚀 SIGMA QA - CENTRO DE CONTROL</h1>\n  <p style=\"color: #888; margin: 5px 0 0 0; font-size: 14px;\">EPIDATA Consulting | Proyecto SIGMA | Líder Técnico: Elyer Maldonado</p>\n</div>",
         "mode": "html"
       },
-      "pluginVersion": "10.0.0",
       "type": "text"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb"
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 3 },
+      "id": 100,
+      "options": {
+        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
+        "content": "<div style=\"text-align: center; padding: 8px; background: linear-gradient(90deg, #2d5016 0%, #1a3009 100%); border-radius: 5px; border-left: 4px solid #4ade80;\">\n  <span style=\"color: #4ade80; font-size: 16px; font-weight: bold;\">🧪 PRUEBAS E2E (Playwright)</span>\n</div>",
+        "mode": "html"
       },
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               { "color": "red", "value": null },
-              { "color": "yellow", "value": 80 },
-              { "color": "green", "value": 95 }
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 90 }
             ]
           },
-          "unit": "percent"
+          "unit": "percent",
+          "min": 0,
+          "max": 100
         }
       },
-      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 3 },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 5 },
       "id": 2,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "title": "🧪 E2E Tests",
+      "targets": [
+        {
+          "query": "SELECT last(\"pass_rate\") as \"value\" FROM \"e2e_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+      "title": "✅ E2E Pass Rate",
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb"
-      },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 6, "y": 5 },
+      "id": 101,
+      "targets": [
+        {
+          "query": "SELECT last(\"passed\") as \"value\" FROM \"e2e_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "✅ Passed",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 10, "y": 5 },
+      "id": 102,
+      "targets": [
+        {
+          "query": "SELECT last(\"failed\") as \"value\" FROM \"e2e_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "❌ Failed",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "yellow", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 14, "y": 5 },
+      "id": 103,
+      "targets": [
+        {
+          "query": "SELECT last(\"skipped\") as \"value\" FROM \"e2e_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "⏭️ Skipped",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 5 },
+      "id": 104,
+      "targets": [
+        {
+          "query": "SELECT last(\"duration\") as \"value\" FROM \"e2e_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "⏱️ Duration",
+      "type": "stat"
+    },
+    {
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 10 },
+      "id": 200,
+      "options": {
+        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
+        "content": "<div style=\"text-align: center; padding: 8px; background: linear-gradient(90deg, #1e3a5f 0%, #0d2137 100%); border-radius: 5px; border-left: 4px solid #60a5fa;\">\n  <span style=\"color: #60a5fa; font-size: 16px; font-weight: bold;\">🔌 PRUEBAS API (Newman)</span>\n</div>",
+        "mode": "html"
+      },
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
             "steps": [
               { "color": "red", "value": null },
-              { "color": "yellow", "value": 80 },
-              { "color": "green", "value": 95 }
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 90 }
             ]
           },
-          "unit": "percent"
+          "unit": "percent",
+          "min": 0,
+          "max": 100
         }
       },
-      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 3 },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 12 },
       "id": 3,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "title": "🔌 API Tests",
+      "targets": [
+        {
+          "query": "SELECT last(\"pass_rate\") as \"value\" FROM \"api_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+      "title": "✅ API Pass Rate",
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb"
-      },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 6, "y": 12 },
+      "id": 201,
+      "targets": [
+        {
+          "query": "SELECT last(\"passed\") as \"value\" FROM \"api_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "✅ Passed",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 10, "y": 12 },
+      "id": 202,
+      "targets": [
+        {
+          "query": "SELECT last(\"failed\") as \"value\" FROM \"api_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "❌ Failed",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "cyan", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 14, "y": 12 },
+      "id": 203,
+      "targets": [
+        {
+          "query": "SELECT last(\"total_requests\") as \"value\" FROM \"api_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "📡 Total Requests",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 12 },
+      "id": 204,
+      "targets": [
+        {
+          "query": "SELECT last(\"duration\") as \"value\" FROM \"api_tests\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "⏱️ Duration",
+      "type": "stat"
+    },
+    {
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 17 },
+      "id": 300,
+      "options": {
+        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
+        "content": "<div style=\"text-align: center; padding: 8px; background: linear-gradient(90deg, #5c1a1a 0%, #3d0d0d 100%); border-radius: 5px; border-left: 4px solid #f87171;\">\n  <span style=\"color: #f87171; font-size: 16px; font-weight: bold;\">🛡️ SEGURIDAD (OWASP ZAP)</span>\n</div>",
+        "mode": "html"
+      },
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 19 },
+      "id": 301,
+      "targets": [
+        {
+          "query": "SELECT last(\"high\") as \"value\" FROM \"zap_security\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "🔴 HIGH",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "orange", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 19 },
+      "id": 302,
+      "targets": [
+        {
+          "query": "SELECT last(\"medium\") as \"value\" FROM \"zap_security\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "🟠 MEDIUM",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 19 },
+      "id": 303,
+      "targets": [
+        {
+          "query": "SELECT last(\"low\") as \"value\" FROM \"zap_security\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "🟡 LOW",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 19 },
+      "id": 304,
+      "targets": [
+        {
+          "query": "SELECT last(\"informational\") as \"value\" FROM \"zap_security\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "🔵 INFO",
+      "type": "stat"
+    },
+    {
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 24 },
+      "id": 400,
+      "options": {
+        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
+        "content": "<div style=\"text-align: center; padding: 8px; background: linear-gradient(90deg, #4a1d96 0%, #2d1160 100%); border-radius: 5px; border-left: 4px solid #a78bfa;\">\n  <span style=\"color: #a78bfa; font-size: 16px; font-weight: bold;\">⚡ PERFORMANCE (K6)</span>\n</div>",
+        "mode": "html"
+      },
+      "type": "text"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "green", "value": 90 }
+            ]
+          },
+          "unit": "percent",
+          "min": 0,
+          "max": 100
+        }
+      },
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 26 },
+      "id": 4,
+      "targets": [
+        {
+          "query": "SELECT 100 - (mean(\"value\") * 100) as \"success_rate\" FROM \"http_req_failed\" WHERE $timeFilter GROUP BY time(1h) fill(null)",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+      "title": "✅ K6 Success Rate",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -111,219 +427,179 @@
               { "color": "red", "value": 1000 }
             ]
           },
-          "unit": "ms"
+          "unit": "ms",
+          "min": 0,
+          "max": 2000
         }
       },
-      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 3 },
-      "id": 4,
-      "options": {
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["mean"],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      },
-      "title": "⚡ K6 Response Time",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 26 },
+      "id": 5,
+      "targets": [
+        {
+          "query": "SELECT mean(\"value\") as \"response_time\" FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time(1m) fill(null)",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "showThresholdLabels": false, "showThresholdMarkers": true },
+      "title": "⏱️ Response Time",
       "type": "gauge"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb"
-      },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
-          "mappings": [
-            { "options": { "0": { "color": "green", "index": 0, "text": "0 CRITICAL" } }, "type": "value" }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 3 }
-            ]
-          },
-          "unit": "none"
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "blue", "value": null }] },
+          "unit": "short"
         }
       },
-      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 3 },
-      "id": 5,
-      "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "center",
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "title": "🛡️ ZAP Security Issues",
+      "gridPos": { "h": 6, "w": 4, "x": 12, "y": 26 },
+      "id": 8,
+      "targets": [
+        {
+          "query": "SELECT max(\"value\") as \"vus\" FROM \"vus\" WHERE $timeFilter GROUP BY time(1m) fill(null)",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "👥 VUs",
       "type": "stat"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb"
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "short"
+        }
       },
+      "gridPos": { "h": 6, "w": 4, "x": 16, "y": 26 },
+      "id": 9,
+      "targets": [
+        {
+          "query": "SELECT sum(\"value\") as \"total_requests\" FROM \"http_reqs\" WHERE $timeFilter",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "📡 Requests",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 6, "w": 4, "x": 20, "y": 26 },
+      "id": 401,
+      "targets": [
+        {
+          "query": "SELECT sum(\"value\") as \"errors\" FROM \"errors\" WHERE $timeFilter GROUP BY time(1h) fill(0)",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "textMode": "auto" },
+      "title": "❌ Errors",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 20,
             "gradientMode": "opacity",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
             "lineInterpolation": "smooth",
             "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
             "showPoints": "auto",
             "spanNulls": false,
-            "stacking": { "group": "A", "mode": "none" },
-            "thresholdsStyle": { "mode": "off" }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null }
-            ]
+            "stacking": { "group": "A", "mode": "none" }
           },
           "unit": "reqps"
         }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 9 },
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 32 },
       "id": 6,
-      "options": {
-        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "none" }
-      },
-      "title": "📈 K6 Performance - Requests/sec",
+      "targets": [
+        {
+          "query": "SELECT mean(\"value\") as \"requests_per_sec\" FROM \"http_reqs\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "📈 K6 Requests/sec",
       "type": "timeseries"
     },
     {
-      "datasource": {
-        "type": "influxdb",
-        "uid": "influxdb"
-      },
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "palette-classic" },
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
             "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "bars",
-            "fillOpacity": 80,
-            "gradientMode": "hue",
-            "hideFrom": { "legend": false, "tooltip": false, "viz": false },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": { "type": "linear" },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": { "group": "A", "mode": "normal" },
-            "thresholdsStyle": { "mode": "off" }
+            "showPoints": "auto",
+            "spanNulls": false
           },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null }
-            ]
-          }
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "passed" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }]
-          },
-          {
-            "matcher": { "id": "byName", "options": "failed" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }]
-          }
-        ]
+          "unit": "ms"
+        }
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 9 },
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 32 },
       "id": 7,
-      "options": {
-        "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "multi", "sort": "none" }
-      },
-      "title": "📊 Test Results History (Last 24h)",
+      "targets": [
+        {
+          "query": "SELECT mean(\"value\") as \"response_time\" FROM \"http_req_duration\" WHERE $timeFilter GROUP BY time(10s) fill(null)",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "options": { "legend": { "calcs": ["mean", "max", "last"], "displayMode": "table", "placement": "bottom", "showLegend": true }, "tooltip": { "mode": "multi", "sort": "none" } },
+      "title": "📊 Response Time History",
       "type": "timeseries"
     },
     {
-      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 17 },
-      "id": 8,
-      "options": {
-        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
-        "content": "<div style=\"background: #1e3a5f; padding: 15px; border-radius: 8px; text-align: center;\">\n  <h3 style=\"color: #00ff88; margin: 0;\">✅ ÚLTIMA EJECUCIÓN</h3>\n  <p style=\"color: white; font-size: 24px; margin: 10px 0;\">SUCCESS</p>\n  <p style=\"color: #888; margin: 0;\">Hace 15 minutos</p>\n</div>",
-        "mode": "html"
-      },
-      "title": "",
-      "type": "text"
-    },
-    {
-      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 17 },
-      "id": 9,
-      "options": {
-        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
-        "content": "<div style=\"background: #1e3a5f; padding: 15px; border-radius: 8px; text-align: center;\">\n  <h3 style=\"color: #00d4ff; margin: 0;\">⏰ PRÓXIMA EJECUCIÓN</h3>\n  <p style=\"color: white; font-size: 24px; margin: 10px 0;\">14:00 hrs</p>\n  <p style=\"color: #888; margin: 0;\">En 45 minutos</p>\n</div>",
-        "mode": "html"
-      },
-      "title": "",
-      "type": "text"
-    },
-    {
-      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 17 },
-      "id": 10,
-      "options": {
-        "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
-        "content": "<div style=\"background: #1e3a5f; padding: 15px; border-radius: 8px; text-align: center;\">\n  <h3 style=\"color: #ffd700; margin: 0;\">📅 HOY</h3>\n  <p style=\"color: white; font-size: 24px; margin: 10px 0;\">8 Ejecuciones</p>\n  <p style=\"color: #888; margin: 0;\">7 ✅ | 1 ⚠️ | 0 ❌</p>\n</div>",
-        "mode": "html"
-      },
-      "title": "",
-      "type": "text"
-    },
-    {
-      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 21 },
-      "id": 11,
+      "gridPos": { "h": 2, "w": 24, "x": 0, "y": 39 },
+      "id": 12,
       "options": {
         "code": { "language": "plaintext", "showLineNumbers": false, "showMiniMap": false },
         "content": "<div style=\"text-align: center; padding: 10px; background: #0d1117; border-radius: 5px;\">\n  <span style=\"color: #666;\">EPIDATA Consulting © 2024 | Proyecto SIGMA | QASL-Framework v1.0 | Desarrollado por Elyer Maldonado</span>\n</div>",
         "mode": "html"
       },
-      "title": "",
       "type": "text"
     }
   ],
   "refresh": "5s",
   "schemaVersion": 38,
   "style": "dark",
-  "tags": ["qa", "sigma", "epidata", "testing"],
+  "tags": ["qa", "sigma", "epidata", "e2e", "api", "k6", "zap", "security"],
   "templating": { "list": [] },
-  "time": { "from": "now-24h", "to": "now" },
+  "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "browser",
   "title": "SIGMA QA - Centro de Control",
   "uid": "sigma-qa-control",
-  "version": 1,
-  "weekStart": ""
+  "version": 3
 }

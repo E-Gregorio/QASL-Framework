@@ -103,8 +103,24 @@ try {
         console.log('  Los resultados están en:', ALLURE_RESULTS);
     }
 
+    // Enviar métricas a InfluxDB
+    try {
+        console.log('');
+        execSync('node scripts_metricas/send-e2e-metrics.mjs', { stdio: 'inherit' });
+    } catch (metricsError) {
+        // No fallar si métricas no se envían
+    }
+
 } catch (error) {
     console.error('');
     console.error('  ERROR: Tests fallaron');
+
+    // Intentar enviar métricas aunque fallen tests
+    try {
+        execSync('node scripts_metricas/send-e2e-metrics.mjs', { stdio: 'pipe' });
+    } catch (metricsError) {
+        // Silencioso
+    }
+
     process.exit(1);
 }

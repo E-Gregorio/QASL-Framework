@@ -136,8 +136,24 @@ try {
         console.log('');
         console.log('  Revisa el reporte para ver las vulnerabilidades encontradas.');
         console.log('═══════════════════════════════════════════════════════════════════════════');
+
+        // Enviar métricas a InfluxDB
+        try {
+            console.log('');
+            execSync('node scripts_metricas/send-zap-metrics.mjs', { stdio: 'inherit' });
+        } catch (metricsError) {
+            // No fallar si métricas no se envían
+        }
     } else {
         console.error('  ERROR: ZAP falló');
         process.exit(1);
     }
+}
+
+// Enviar métricas después de éxito
+try {
+    console.log('');
+    execSync('node scripts_metricas/send-zap-metrics.mjs', { stdio: 'inherit' });
+} catch (metricsError) {
+    // No fallar si métricas no se envían
 }

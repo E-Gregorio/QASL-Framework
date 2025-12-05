@@ -1,20 +1,39 @@
 # =============================================================================
 # SIGMA QA Framework - GitLab CI/CD Pipeline
 # =============================================================================
-# Pipeline automático que ejecuta todas las pruebas y genera reportes
-# Configurar Schedule en GitLab para ejecución diaria a las 8:00 AM
+# Pipeline automático que ejecuta todas las pruebas y publica reportes
+#
+# Configurar Schedule en GitLab: Settings > CI/CD > Schedules
+#   - Descripción: "Ejecución Diaria QA"
+#   - Interval: 0 8 * * 1-5 (Lunes a Viernes 8:00 AM)
+#   - Target branch: main
+#
+# Variables requeridas en GitLab (Settings > CI/CD > Variables):
+#   - INFLUX_URL: URL de InfluxDB (ej: http://tu-servidor:8086)
+#   - SMTP_SERVER: Servidor SMTP para emails
+#   - SMTP_USER: Usuario SMTP
+#   - SMTP_PASSWORD: Password SMTP
+#   - NOTIFICATION_EMAILS: Emails separados por coma
+#
+# Reportes disponibles en GitLab Pages:
+#   - https://<grupo>.gitlab.io/<proyecto>/allure/
+#   - https://<grupo>.gitlab.io/<proyecto>/api/
+#   - https://<grupo>.gitlab.io/<proyecto>/k6/
+#   - https://<grupo>.gitlab.io/<proyecto>/zap/
 # =============================================================================
 
 stages:
   - setup
   - test
+  - metrics
   - report
   - notify
 
 variables:
   NODE_VERSION: "18"
-  ALLURE_RESULTS: "allure-results"
-  REPORTS_DIR: "reports"
+  # URLs de InfluxDB (configurar en GitLab CI/CD Variables)
+  INFLUX_URL: ${INFLUX_URL:-"http://localhost:8086"}
+  INFLUX_DB: "k6"
 
 # =============================================================================
 # SETUP - Instalación de dependencias
@@ -23,8 +42,12 @@ setup:
   stage: setup
   image: node:18
   script:
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  SIGMA QA - Instalando dependencias..."
+    - echo "═══════════════════════════════════════════════════════════════"
     - npm ci
     - npx playwright install --with-deps chromium
+    - echo "✅ Dependencias instaladas"
   artifacts:
     paths:
       - node_modules/
@@ -36,139 +59,380 @@ setup:
       - ~/.cache/ms-playwright/
 
 # =============================================================================
-# TESTS - Ejecución de pruebas en paralelo
+# E2E TESTS - Playwright + Allure
 # =============================================================================
 e2e-tests:
   stage: test
   image: mcr.microsoft.com/playwright:v1.40.0-jammy
   needs: ["setup"]
   script:
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  🧪 PRUEBAS E2E - Playwright"
+    - echo "═══════════════════════════════════════════════════════════════"
     - npm ci
-    - npx playwright test --reporter=line,allure-playwright
+    - mkdir -p allure-results reports/e2e public/allure
+    - npx playwright test --reporter=line,allure-playwright || true
+    - echo ""
+    - echo "📊 Generando reporte Allure..."
+    - npx allure generate allure-results -o public/allure --clean || true
+    - cp -r allure-results reports/e2e/ || true
+    - echo "✅ E2E completado"
   artifacts:
     when: always
     paths:
       - allure-results/
       - reports/e2e/
-      - test-results/
-    expire_in: 7 days
+      - public/allure/
+    expire_in: 30 days
   allow_failure: true
 
+# =============================================================================
+# API TESTS - Newman + HTMLExtra
+# =============================================================================
 api-tests:
   stage: test
   image: node:18
   needs: ["setup"]
   script:
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  🔌 PRUEBAS API - Newman"
+    - echo "═══════════════════════════════════════════════════════════════"
     - npm ci
-    - npm run api || true
+    - mkdir -p reports/api public/api
+    - |
+      if [ -d ".api-captures" ] && [ "$(ls -A .api-captures 2>/dev/null)" ]; then
+        npm run api || true
+        cp reports/api/*.html public/api/ 2>/dev/null || true
+        cp reports/api/*.json public/api/ 2>/dev/null || true
+      else
+        echo "⚠️ No hay capturas de API. Ejecutar E2E con --capture-api primero."
+      fi
+    - echo "✅ API completado"
   artifacts:
     when: always
     paths:
       - reports/api/
-    expire_in: 7 days
+      - public/api/
+    expire_in: 30 days
   allow_failure: true
 
+# =============================================================================
+# K6 TESTS - Performance
+# =============================================================================
 k6-tests:
   stage: test
   image: grafana/k6:latest
   needs: []
   script:
-    - echo "Running K6 performance tests..."
-    - k6 run --out json=reports/k6/results.json scripts/k6-test.js || true
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  ⚡ PRUEBAS PERFORMANCE - K6"
+    - echo "═══════════════════════════════════════════════════════════════"
+    - mkdir -p reports/k6 public/k6
+    - |
+      if [ -d ".api-captures" ] && [ "$(ls -A .api-captures 2>/dev/null)" ]; then
+        # K6 con output a InfluxDB si está configurado
+        if [ -n "$INFLUX_URL" ]; then
+          k6 run --out influxdb=${INFLUX_URL}/${INFLUX_DB} \
+                 --out json=reports/k6/results.json \
+                 .temp-k6/performance.js || true
+        else
+          k6 run --out json=reports/k6/results.json \
+                 .temp-k6/performance.js || true
+        fi
+        cp reports/k6/*.html public/k6/ 2>/dev/null || true
+        cp reports/k6/*.json public/k6/ 2>/dev/null || true
+      else
+        echo "⚠️ No hay capturas de API para K6."
+      fi
+    - echo "✅ K6 completado"
   artifacts:
     when: always
     paths:
       - reports/k6/
-    expire_in: 7 days
+      - public/k6/
+    expire_in: 30 days
   allow_failure: true
 
 # =============================================================================
-# REPORT - Generación de Allure Report
+# ZAP TESTS - Security (Solo en schedule o manual)
 # =============================================================================
-allure-report:
-  stage: report
-  image: frankescobar/allure-docker-service:latest
-  needs: ["e2e-tests", "api-tests"]
+zap-tests:
+  stage: test
+  image: ghcr.io/zaproxy/zaproxy:stable
+  needs: []
   script:
-    - allure generate allure-results --clean -o public/allure-report
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  🛡️ PRUEBAS SEGURIDAD - OWASP ZAP"
+    - echo "═══════════════════════════════════════════════════════════════"
+    - mkdir -p reports/zap public/zap
     - |
-      # Generar resumen para email
-      echo "# SIGMA QA - Reporte de Pruebas" > public/summary.md
-      echo "" >> public/summary.md
-      echo "**Fecha:** $(date '+%Y-%m-%d %H:%M')" >> public/summary.md
-      echo "**Branch:** ${CI_COMMIT_REF_NAME}" >> public/summary.md
-      echo "**Pipeline:** ${CI_PIPELINE_ID}" >> public/summary.md
-      echo "" >> public/summary.md
-      echo "## Resultados" >> public/summary.md
-      echo "" >> public/summary.md
-      if [ -d "allure-results" ]; then
-        TOTAL=$(ls -1 allure-results/*.json 2>/dev/null | wc -l)
-        echo "Total de tests ejecutados: ${TOTAL}" >> public/summary.md
+      if [ -d ".api-captures" ] && [ "$(ls -A .api-captures 2>/dev/null)" ]; then
+        # Obtener URL del primer archivo de captura
+        CAPTURE_FILE=$(ls -t .api-captures/*-apis.json 2>/dev/null | head -1)
+        if [ -f "$CAPTURE_FILE" ]; then
+          TARGET_URL=$(cat "$CAPTURE_FILE" | python3 -c "import sys,json; print(json.load(sys.stdin)[0]['url'].split('/')[0]+'//'+json.load(sys.stdin)[0]['url'].split('/')[2])" 2>/dev/null || echo "")
+          if [ -n "$TARGET_URL" ]; then
+            echo "Target: $TARGET_URL"
+            zap-baseline.py -t "$TARGET_URL" \
+                           -r reports/zap/zap-report.html \
+                           -J reports/zap/zap-report.json \
+                           -a -j || true
+            cp reports/zap/*.html public/zap/ 2>/dev/null || true
+            cp reports/zap/*.json public/zap/ 2>/dev/null || true
+          fi
+        fi
+      else
+        echo "⚠️ No hay capturas de API para ZAP."
       fi
-      echo "" >> public/summary.md
-      echo "**Ver reporte completo:** ${CI_PAGES_URL}/allure-report" >> public/summary.md
+    - echo "✅ ZAP completado"
   artifacts:
+    when: always
     paths:
-      - public/
+      - reports/zap/
+      - public/zap/
     expire_in: 30 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - when: manual
+  allow_failure: true
 
 # =============================================================================
-# PAGES - Publicar Allure en GitLab Pages
+# METRICS - Enviar métricas a InfluxDB/Grafana
+# =============================================================================
+send-metrics:
+  stage: metrics
+  image: node:18
+  needs: ["e2e-tests", "api-tests"]
+  script:
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  📊 Enviando métricas a Grafana..."
+    - echo "═══════════════════════════════════════════════════════════════"
+    - npm ci
+    - |
+      if [ -n "$INFLUX_URL" ]; then
+        export INFLUX_URL=$INFLUX_URL
+        export INFLUX_DB=$INFLUX_DB
+        node scripts_metricas/send-e2e-metrics.mjs || true
+        node scripts_metricas/send-api-metrics.mjs || true
+        node scripts_metricas/send-zap-metrics.mjs || true
+        echo "✅ Métricas enviadas a Grafana"
+      else
+        echo "⚠️ INFLUX_URL no configurado. Métricas no enviadas."
+      fi
+  allow_failure: true
+
+# =============================================================================
+# PAGES - Publicar TODOS los reportes en GitLab Pages
 # =============================================================================
 pages:
   stage: report
-  needs: ["allure-report"]
+  needs: ["e2e-tests", "api-tests", "k6-tests", "zap-tests"]
   script:
-    - echo "Publishing Allure Report to GitLab Pages..."
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  📦 Publicando reportes en GitLab Pages..."
+    - echo "═══════════════════════════════════════════════════════════════"
+    - mkdir -p public
+    # Crear index.html con links a todos los reportes
+    - |
+      cat > public/index.html << 'HTMLEOF'
+      <!DOCTYPE html>
+      <html lang="es">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>SIGMA QA - Reportes</title>
+          <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body {
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                  min-height: 100vh;
+                  color: #fff;
+                  padding: 40px 20px;
+              }
+              .container { max-width: 800px; margin: 0 auto; }
+              h1 {
+                  text-align: center;
+                  font-size: 2.5rem;
+                  margin-bottom: 10px;
+                  color: #00d4ff;
+              }
+              .subtitle {
+                  text-align: center;
+                  color: #888;
+                  margin-bottom: 40px;
+              }
+              .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+              .card {
+                  background: rgba(255,255,255,0.05);
+                  border-radius: 15px;
+                  padding: 30px;
+                  text-decoration: none;
+                  color: #fff;
+                  transition: all 0.3s ease;
+                  border: 1px solid rgba(255,255,255,0.1);
+              }
+              .card:hover {
+                  transform: translateY(-5px);
+                  background: rgba(255,255,255,0.1);
+                  border-color: #00d4ff;
+              }
+              .card-icon { font-size: 3rem; margin-bottom: 15px; }
+              .card-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
+              .card-desc { color: #aaa; font-size: 0.9rem; }
+              .e2e { border-left: 4px solid #4ade80; }
+              .api { border-left: 4px solid #60a5fa; }
+              .k6 { border-left: 4px solid #a78bfa; }
+              .zap { border-left: 4px solid #f87171; }
+              .footer { text-align: center; margin-top: 40px; color: #666; font-size: 0.85rem; }
+          </style>
+      </head>
+      <body>
+          <div class="container">
+              <h1>🚀 SIGMA QA - Reportes</h1>
+              <p class="subtitle">EPIDATA Consulting | Proyecto SIGMA | Líder Técnico: Elyer Maldonado</p>
+
+              <div class="cards">
+                  <a href="allure/index.html" class="card e2e">
+                      <div class="card-icon">🧪</div>
+                      <div class="card-title">E2E Tests (Allure)</div>
+                      <div class="card-desc">Pruebas end-to-end con Playwright. Incluye screenshots, videos y trazabilidad.</div>
+                  </a>
+
+                  <a href="api/" class="card api">
+                      <div class="card-icon">🔌</div>
+                      <div class="card-title">API Tests (Newman)</div>
+                      <div class="card-desc">Pruebas de API con Newman HTMLExtra. Validación de endpoints y responses.</div>
+                  </a>
+
+                  <a href="k6/" class="card k6">
+                      <div class="card-icon">⚡</div>
+                      <div class="card-title">Performance (K6)</div>
+                      <div class="card-desc">Pruebas de carga y rendimiento. Métricas de response time y throughput.</div>
+                  </a>
+
+                  <a href="zap/" class="card zap">
+                      <div class="card-icon">🛡️</div>
+                      <div class="card-title">Security (OWASP ZAP)</div>
+                      <div class="card-desc">Análisis de seguridad. Vulnerabilidades clasificadas por severidad.</div>
+                  </a>
+              </div>
+
+              <p class="footer">
+                  Pipeline: ${CI_PIPELINE_ID} | Branch: ${CI_COMMIT_REF_NAME} |
+                  Generado: $(date '+%Y-%m-%d %H:%M')
+              </p>
+          </div>
+      </body>
+      </html>
+      HTMLEOF
+    - echo ""
+    - echo "✅ Reportes publicados en GitLab Pages"
+    - echo ""
+    - echo "📎 URLs de reportes:"
+    - echo "   Index:  ${CI_PAGES_URL}"
+    - echo "   Allure: ${CI_PAGES_URL}/allure"
+    - echo "   API:    ${CI_PAGES_URL}/api"
+    - echo "   K6:     ${CI_PAGES_URL}/k6"
+    - echo "   ZAP:    ${CI_PAGES_URL}/zap"
   artifacts:
     paths:
       - public/
     expire_in: 30 days
-  only:
-    - main
-    - master
-    - schedules
 
 # =============================================================================
-# NOTIFY - Notificación por email
+# NOTIFY SUCCESS - Enviar email con resumen y links
 # =============================================================================
 notify-success:
   stage: notify
   image: alpine:latest
-  needs: ["pages"]
+  needs: ["pages", "send-metrics"]
   script:
-    - apk add --no-cache curl
+    - apk add --no-cache curl jq
+    - echo "═══════════════════════════════════════════════════════════════"
+    - echo "  📧 Enviando notificación de éxito..."
+    - echo "═══════════════════════════════════════════════════════════════"
     - |
-      echo "================================================"
-      echo "  SIGMA QA - Pipeline Completado"
-      echo "================================================"
+      # Extraer métricas de los reportes
+      E2E_PASSED=0
+      E2E_FAILED=0
+      API_PASSED=0
+      API_FAILED=0
+      ZAP_HIGH=0
+      ZAP_MEDIUM=0
+      ZAP_LOW=0
+
+      # Leer métricas de E2E (allure)
+      if [ -d "allure-results" ]; then
+        E2E_PASSED=$(ls -1 allure-results/*-result.json 2>/dev/null | xargs grep -l '"status":"passed"' 2>/dev/null | wc -l || echo 0)
+        E2E_FAILED=$(ls -1 allure-results/*-result.json 2>/dev/null | xargs grep -l '"status":"failed"' 2>/dev/null | wc -l || echo 0)
+      fi
+
+      # Leer métricas de ZAP
+      if [ -f "reports/zap/zap-report.json" ]; then
+        ZAP_HIGH=$(cat reports/zap/zap-report.json | jq '[.site[].alerts[] | select(.riskcode=="3")] | length' 2>/dev/null || echo 0)
+        ZAP_MEDIUM=$(cat reports/zap/zap-report.json | jq '[.site[].alerts[] | select(.riskcode=="2")] | length' 2>/dev/null || echo 0)
+        ZAP_LOW=$(cat reports/zap/zap-report.json | jq '[.site[].alerts[] | select(.riskcode=="1")] | length' 2>/dev/null || echo 0)
+      fi
+
+      E2E_TOTAL=$((E2E_PASSED + E2E_FAILED))
+      if [ $E2E_TOTAL -gt 0 ]; then
+        E2E_RATE=$((E2E_PASSED * 100 / E2E_TOTAL))
+      else
+        E2E_RATE=0
+      fi
+
       echo ""
-      echo "  Estado: SUCCESS"
-      echo "  Fecha: $(date '+%Y-%m-%d %H:%M')"
-      echo "  Branch: ${CI_COMMIT_REF_NAME}"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "  🚀 SIGMA QA - Pipeline Completado"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
       echo ""
-      echo "  Ver Allure Report:"
-      echo "  ${CI_PAGES_URL}/allure-report"
+      echo "  📅 Fecha:    $(date '+%Y-%m-%d %H:%M')"
+      echo "  🔀 Branch:   ${CI_COMMIT_REF_NAME}"
+      echo "  🏷️  Pipeline: #${CI_PIPELINE_ID}"
       echo ""
-      echo "================================================"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "  📊 RESUMEN"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+      echo "  🧪 E2E:  ${E2E_RATE}% (${E2E_PASSED}/${E2E_TOTAL} passed)"
+      echo "  🛡️  ZAP:  ${ZAP_HIGH} High | ${ZAP_MEDIUM} Medium | ${ZAP_LOW} Low"
+      echo ""
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "  📎 REPORTES"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo ""
+      echo "  📋 Index:   ${CI_PAGES_URL}"
+      echo "  🧪 Allure:  ${CI_PAGES_URL}/allure"
+      echo "  🔌 API:     ${CI_PAGES_URL}/api"
+      echo "  ⚡ K6:      ${CI_PAGES_URL}/k6"
+      echo "  🛡️  ZAP:     ${CI_PAGES_URL}/zap"
+      echo ""
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "  EPIDATA - Proyecto SIGMA | TeamQA"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   when: on_success
 
+# =============================================================================
+# NOTIFY FAILURE - Notificar errores
+# =============================================================================
 notify-failure:
   stage: notify
   image: alpine:latest
   needs: ["e2e-tests", "api-tests"]
   script:
     - |
-      echo "================================================"
-      echo "  SIGMA QA - Pipeline FALLIDO"
-      echo "================================================"
       echo ""
-      echo "  Estado: FAILED"
-      echo "  Fecha: $(date '+%Y-%m-%d %H:%M')"
-      echo "  Branch: ${CI_COMMIT_REF_NAME}"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+      echo "  ⚠️ SIGMA QA - Pipeline FALLIDO"
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
       echo ""
-      echo "  Revisar logs en:"
-      echo "  ${CI_PIPELINE_URL}"
+      echo "  📅 Fecha:    $(date '+%Y-%m-%d %H:%M')"
+      echo "  🔀 Branch:   ${CI_COMMIT_REF_NAME}"
+      echo "  🏷️  Pipeline: #${CI_PIPELINE_ID}"
       echo ""
-      echo "================================================"
+      echo "  🔍 Ver logs: ${CI_PIPELINE_URL}"
+      echo ""
+      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
   when: on_failure
