@@ -1,15 +1,18 @@
 # SIGMA QA Framework - GitLab CI/CD Pipeline
+# Usa runner local para enviar métricas a Grafana
+
 stages:
   - test
+  - metrics
   - deploy
 
 # E2E TESTS
 e2e-tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.40.0-jammy
+  tags:
+    - local
   script:
     - npm ci
-    - npm install -g allure-commandline
     - mkdir -p allure-results
     - npx playwright test --reporter=line,allure-playwright || true
     - npx allure generate allure-results -o allure-report --clean || true
@@ -18,27 +21,48 @@ e2e-tests:
     paths:
       - allure-results/
       - allure-report/
+      - .e2e-last-results.json
     expire_in: 30 days
 
 # API TESTS
 api-tests:
   stage: test
-  image: node:18
+  tags:
+    - local
   script:
     - npm ci
     - mkdir -p reports/api
-    - echo "<html><body><h1>API Tests</h1><p>Sin capturas</p></body></html>" > reports/api/index.html
+    - npm run api || true
   artifacts:
     when: always
     paths:
       - reports/api/
+      - .api-last-results.json
     expire_in: 30 days
+  allow_failure: true
+
+# METRICS - Enviar a Grafana
+send-metrics:
+  stage: metrics
+  tags:
+    - local
+  needs:
+    - job: e2e-tests
+      artifacts: true
+    - job: api-tests
+      artifacts: true
+  script:
+    - echo "Enviando metricas a Grafana..."
+    - node scripts_metricas/send-e2e-metrics.mjs || true
+    - node scripts_metricas/send-api-metrics.mjs || true
+    - echo "Metricas enviadas!"
   allow_failure: true
 
 # PAGES
 pages:
   stage: deploy
-  image: alpine:latest
+  tags:
+    - local
   needs:
     - job: e2e-tests
       artifacts: true
