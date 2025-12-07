@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-RTM Analyzer con Google Gemini AI v3.0
-======================================
-Analizador de Matriz de Trazabilidad usando Google Gemini AI para analisis semantico preciso.
+RTM Analyzer con Anthropic Claude AI v3.0
+=========================================
+Analizador de Matriz de Trazabilidad usando Anthropic Claude AI para analisis semantico preciso.
 Reemplaza el matching por keywords con analisis de IA para precision 100%.
 
 Autor: SIGMA QA Team
 Fecha: 2025-11-29
+Actualizado: 2025-12-07 - Migrado de Google Gemini a Anthropic Claude
 """
 
 import os
@@ -14,7 +15,7 @@ import sys
 import json
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
-import google.generativeai as genai
+import anthropic
 from dotenv import load_dotenv
 
 from parser import HistoriaUsuario, ReglaNegocio, Escenario
@@ -68,27 +69,27 @@ class GapAI:
 
 
 class RTMAnalyzerAI:
-    """Analizador RTM con Google Gemini AI para precision maxima"""
+    """Analizador RTM con Anthropic Claude AI para precision maxima"""
 
     def __init__(self, hu: HistoriaUsuario):
         self.hu = hu
-        # Configurar Google Gemini
-        genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-        self.model = genai.GenerativeModel('gemini-2.0-flash')
+        # Configurar Anthropic Claude
+        self.client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        self.model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-5-20250929")
         self.gaps: List[GapAI] = []
         self.coberturas: List[CoberturaBRAI] = []
 
     def analizar(self) -> Dict:
-        """Ejecuta analisis completo con Google Gemini AI"""
+        """Ejecuta analisis completo con Anthropic Claude AI"""
         print("   [AI] Preparando datos para analisis...")
 
-        # Preparar datos para Gemini
+        # Preparar datos para Claude
         datos_hu = self._preparar_datos_hu()
 
-        print("   [AI] Enviando a Google Gemini para analisis semantico...")
+        print("   [AI] Enviando a Anthropic Claude para analisis semantico...")
 
-        # Llamar a Gemini para analisis
-        resultado_ai = self._analizar_con_gemini(datos_hu)
+        # Llamar a Claude para analisis
+        resultado_ai = self._analizar_con_claude(datos_hu)
 
         print("   [AI] Procesando resultados...")
 
@@ -137,8 +138,8 @@ class RTMAnalyzerAI:
 
         return json.dumps(datos, ensure_ascii=False, indent=2)
 
-    def _analizar_con_gemini(self, datos_hu: str) -> Dict:
-        """Envia a Google Gemini AI para analisis semantico preciso"""
+    def _analizar_con_claude(self, datos_hu: str) -> Dict:
+        """Envia a Anthropic Claude AI para analisis semantico preciso"""
 
         prompt = f"""Eres un QA Engineer Senior ISTQB CTFL/CTAL con 15+ años de experiencia en analisis de trazabilidad RTM.
 
@@ -278,16 +279,16 @@ INSTRUCCIONES FINALES
 6. Responde SOLO con JSON valido, sin texto adicional ni bloques markdown"""
 
         try:
-            # Usar Google Gemini
-            response = self.model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0,
-                    max_output_tokens=8000,
-                )
+            # Usar Anthropic Claude
+            message = self.client.messages.create(
+                model=self.model,
+                max_tokens=8000,
+                messages=[
+                    {"role": "user", "content": prompt}
+                ]
             )
 
-            response_text = response.text
+            response_text = message.content[0].text
 
             # Limpiar respuesta (quitar markdown si existe)
             if "```json" in response_text:

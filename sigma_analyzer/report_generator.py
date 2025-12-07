@@ -253,7 +253,7 @@ No se identificaron brechas. Todas las reglas de negocio tienen cobertura comple
 
 🤖 **SIGMA Static Analyzer v3.0 AI** | {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
-*Análisis potenciado por Google Gemini AI para precisión semántica.*
+*Análisis potenciado por Anthropic Claude AI para precisión semántica.*
 """
 
     def _calcular_estado(self) -> str:
