@@ -8,7 +8,7 @@ EPIDATA - Proyecto SIGMA | TeamQA
 
 ## DIA NUEVO DE TRABAJO - COMANDOS EN ORDEN
 
-> **IMPORTANTE:** Ejecutar los comandos en el orden indicado.
+> **IMPORTANTE:** Ejecutar los comandos en el orden indicado para que Grafana muestre todas las metricas.
 
 ### PASO 1: Limpiar Todo (Empezar desde Cero)
 
@@ -30,58 +30,66 @@ Esperar ~30 segundos. **Verificar:** http://localhost:3001 (Grafana)
 
 ---
 
-### PASO 3: Ejecutar Pruebas E2E (Playwright)
+### PASO 3: Ejecutar Unit Tests del Framework (Vitest)
+
+```bash
+npm run unit
+```
+
+> Valida que los helpers, validators y generadores de datos funcionen correctamente antes de ejecutar E2E.
+
+---
+
+### PASO 4: Ejecutar Pruebas E2E (Playwright) + Enviar Metricas
 
 ```bash
 npm run e2e:capture
+node scripts_metricas/send-e2e-metrics.mjs
 ```
 
-> Este comando ejecuta E2E + captura APIs para los siguientes pasos.
+> Ejecuta E2E + captura APIs + envia metricas a Grafana.
 
 ---
 
-### PASO 4: Ejecutar Pruebas API (Newman)
+### PASO 5: Ejecutar Pruebas API (Newman) + Enviar Metricas
 
 ```bash
 npm run api
+node scripts_metricas/send-api-metrics.mjs
 ```
 
 ---
 
-### PASO 5: Ejecutar Pruebas Performance (K6)
+### PASO 6: Ejecutar Pruebas Performance (K6)
 
 ```bash
-# Limpiar métricas anteriores (Grafana limpio)
 npm run k6:reset
-
-# Ejecutar test (opciones disponibles)
-npm run k6                                    # Default: 10 VUs, 30s
-npm run k6 -- --type=stairs --vus=5 --duration=150s   # Escalera (demo)
-npm run k6 -- --type=stress --vus=50          # Estres
-npm run k6 -- --type=spike --vus=30           # Pico
-npm run k6 -- --vus=20 --duration=60s         # Personalizado
+npm run k6 -- --type=stairs --vus=5 --duration=150s
 ```
 
-**Tipos de prueba:**
-| Tipo | Descripción |
-|------|-------------|
-| `load` | Carga normal (default) |
-| `stairs` | Escalera visible en Grafana |
-| `stress` | Estrés hasta el límite |
-| `spike` | Pico de carga repentino |
-| `soak` | Resistencia prolongada |
+> K6 envia metricas automaticamente a InfluxDB/Grafana.
+
+**Tipos de prueba disponibles:**
+| Tipo | Descripcion | Comando |
+|------|-------------|---------|
+| `load` | Carga normal (default) | `npm run k6` |
+| `stairs` | Escalera visible en Grafana | `npm run k6 -- --type=stairs --vus=5 --duration=150s` |
+| `stress` | Estres hasta el limite | `npm run k6 -- --type=stress --vus=50` |
+| `spike` | Pico de carga repentino | `npm run k6 -- --type=spike --vus=30` |
+| `soak` | Resistencia prolongada | `npm run k6 -- --type=soak --vus=10 --duration=300s` |
 
 ---
 
-### PASO 6: Ejecutar Pruebas Seguridad (OWASP ZAP)
+### PASO 7: Ejecutar Pruebas Seguridad (OWASP ZAP) + Enviar Metricas
 
 ```bash
 npm run zap
+node scripts_metricas/send-zap-metrics.mjs
 ```
 
 ---
 
-### PASO 7: Ver Centro de Control (Grafana)
+### PASO 8: Ver Centro de Control (Grafana)
 
 ```
 http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
@@ -91,7 +99,7 @@ http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
 
 ---
 
-### PASO 8: Publicar Reportes a GitLab Pages
+### PASO 9: Publicar Reportes a GitLab Pages
 
 ```bash
 npm run publish
@@ -103,7 +111,7 @@ npm run publish
 
 ---
 
-### PASO 9: Fin del Dia - Apagar Docker
+### PASO 10: Fin del Dia - Apagar Docker
 
 ```bash
 npm run docker:down
@@ -117,29 +125,35 @@ npm run docker:down
 # 1. Limpiar todo (dia nuevo)
 npm run clean
 
-# 2. Levantar servicios
+# 2. Levantar servicios Docker
 npm run docker:up
 
-# 3. E2E con captura de APIs
+# 3. Unit Tests del Framework (validar helpers antes de E2E)
+npm run unit
+
+# 4. E2E + Metricas a Grafana
 npm run e2e:capture
+node scripts_metricas/send-e2e-metrics.mjs
 
-# 4. API
+# 5. API + Metricas a Grafana
 npm run api
+node scripts_metricas/send-api-metrics.mjs
 
-# 5. Performance (reset + escalera para demo)
+# 6. Performance (K6 envia metricas automaticamente)
 npm run k6:reset
 npm run k6 -- --type=stairs --vus=5 --duration=150s
 
-# 6. Seguridad
+# 7. Seguridad + Metricas a Grafana
 npm run zap
+node scripts_metricas/send-zap-metrics.mjs
 
-# 7. Ver Grafana
-# http://localhost:3001
+# 8. Ver Grafana (todas las metricas visibles)
+# http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
 
-# 8. Publicar reportes
+# 9. Publicar reportes
 npm run publish
 
-# 9. Apagar
+# 10. Apagar Docker
 npm run docker:down
 ```
 
@@ -149,6 +163,52 @@ npm run docker:down
 
 ```bash
 npm run allure:open
+```
+
+---
+
+## Unit Tests del Framework de Automatizacion (Vitest)
+
+Pruebas unitarias que validan el codigo de automatizacion (helpers, validators, generadores).
+
+> **IMPORTANTE:** Estas pruebas NO testean el codigo fuente de la aplicacion (eso lo hacen los desarrolladores). Testean las funciones del framework de automatizacion para garantizar que la automatizacion es 100% confiable.
+
+### Comandos
+
+```bash
+npm run unit              # Ejecutar todos los unit tests
+npm run unit:watch        # Modo desarrollo (re-ejecuta al guardar)
+npm run unit:ui           # Interfaz visual de Vitest
+npm run unit:coverage     # Con reporte de cobertura de codigo
+```
+
+### Que se testea
+
+| Modulo | Funcion | Proposito |
+|--------|---------|-----------|
+| `validators.ts` | `validateCUIT()` | Valida CUIT argentino antes de usarlo en formularios |
+| `validators.ts` | `validateEmail()` | Valida formato de email |
+| `validators.ts` | `validateDateFormat()` | Valida fecha DD/MM/YYYY |
+| `formatters.ts` | `formatCurrency()` | Formatea montos correctamente |
+| `test-data-generator.ts` | `generateValidCUIT()` | Genera CUIT valido para tests |
+| `test-data-generator.ts` | `generateTestUser()` | Genera usuario completo fake |
+
+### Por que es importante
+
+1. **Confiabilidad** - Si `generateValidCUIT()` genera un CUIT invalido, 100 tests E2E fallarian
+2. **Deteccion temprana** - Detecta bugs en el framework antes de ejecutar E2E
+3. **Documentacion viva** - Los tests documentan como funcionan los helpers
+4. **Cobertura 80%** - Configurado con umbrales minimos de cobertura
+
+### Reportes
+
+```
+reports/
+├── unit/
+│   ├── results.json       # Resultados JSON
+│   └── junit.xml          # Para CI/CD
+└── unit-coverage/
+    └── index.html         # Reporte visual de cobertura
 ```
 
 ---
@@ -238,9 +298,24 @@ qa-hu-template/
 │   ├── grafana/dashboards/      # Dashboard Centro de Control
 │   └── postgres/init.sql        # Schema y datos de prueba
 │
+├── sigma-sql/                   # [DB] BASE DE DATOS DE PRUEBAS
+│   ├── SIGMA_DDL.sql            # DDL completo (30+ tablas)
+│   ├── importar_csv_docker.sql  # Script para Docker
+│   ├── importar_csv_windows.sql # Script para Windows/SSMS
+│   ├── datos_prueba.csv         # ~911 registros enmascarados
+│   └── README.md                # Documentacion de uso
+│
+├── unit/                        # [UNIT] TESTS DEL FRAMEWORK DE AUTOMATIZACION
+│   ├── utils/                   # Validators, formatters (testeados)
+│   ├── helpers/                 # Generadores de datos (testeados)
+│   ├── __tests__/               # Tests unitarios con Vitest
+│   ├── setup.ts                 # Configuracion global
+│   └── index.ts                 # Exports centralizados
+│
 ├── plantillas-istqb/            # Plantillas documentacion QA
 ├── docker-compose.yml           # Servicios Docker
 ├── playwright.config.ts         # Configuracion Playwright
+├── vitest.config.ts             # Configuracion Unit Tests
 └── package.json                 # Scripts npm
 ```
 
@@ -465,6 +540,46 @@ Base de datos: sigma_test
 | analista_test | analista@test.local | Test123! | Analista |
 | operador_test | operador@test.local | Test123! | Operador |
 | auditor_test | auditor@test.local | Test123! | Auditor |
+
+---
+
+## Base de Datos SQL Server - Datos Enmascarados (sigma-sql/)
+
+Base de datos con datos enmascarados para pruebas E2E con formularios.
+
+### Conexion
+
+```
+Host: localhost
+Puerto: 1433
+Usuario: sa
+Password: MyStr0ngP4ssw0rd
+Base de datos: SIGMA
+```
+
+### Cargar Datos de Prueba
+
+```powershell
+# 1. Copiar archivos al contenedor
+docker cp sigma-sql/datos_prueba.csv sqlserver:/tmp/data.csv
+docker cp sigma-sql/importar_csv_docker.sql sqlserver:/tmp/importar.sql
+
+# 2. Ejecutar importacion
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStr0ngP4ssw0rd" -C -i /tmp/importar.sql
+
+# 3. Verificar
+docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStr0ngP4ssw0rd" -C -d SIGMA -Q "SELECT COUNT(*) AS Total FROM contribuyente"
+```
+
+### Datos Disponibles
+
+| Tabla | Registros | Descripcion |
+|-------|-----------|-------------|
+| `contribuyente` | ~911 | CUIT, razon social, tipo persona |
+| `inconsistencia` | ~911 | Datos tributarios enmascarados |
+| `actividad` | ~173 | Actividades economicas |
+
+> Ver documentacion completa en `sigma-sql/README.md`
 
 ---
 

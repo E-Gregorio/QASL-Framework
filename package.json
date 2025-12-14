@@ -4,6 +4,10 @@
     "description": "Template Universal QA - Shift-Left Testing (E2E, API, Performance, Security)",
     "type": "module",
     "scripts": {
+        "unit": "vitest run",
+        "unit:watch": "vitest",
+        "unit:ui": "vitest --ui",
+        "unit:coverage": "vitest run --coverage",
         "e2e": "node scripts/run-e2e.mjs",
         "e2e:capture": "node scripts/run-e2e.mjs --capture-api",
         "api": "node scripts/run-api.mjs",
@@ -31,9 +35,12 @@
     "devDependencies": {
         "@playwright/test": "^1.40.0",
         "@types/node": "^24.10.1",
+        "@vitest/coverage-v8": "^2.0.0",
+        "@vitest/ui": "^2.0.0",
         "allure-commandline": "^2.25.0",
         "allure-playwright": "^2.15.0",
-        "typescript": "^5.3.0"
+        "typescript": "^5.3.0",
+        "vitest": "^2.0.0"
     },
     "dependencies": {
         "dotenv": "^16.3.1"
