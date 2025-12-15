@@ -173,6 +173,39 @@ services:
       - qa-network
     restart: unless-stopped
 
+  # ============================================
+  # FASE 7: INFRASTRUCTURE OBSERVABILITY (LOKI)
+  # ============================================
+
+  # Loki - Agregador de Logs (ligero, no indexa texto completo)
+  loki:
+    image: grafana/loki:latest
+    container_name: epidata-loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./docker/loki/loki-config.yml:/etc/loki/local-config.yaml
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - qa-network
+    restart: unless-stopped
+
+  # Promtail - Recolector de Logs de contenedores Docker
+  promtail:
+    image: grafana/promtail:latest
+    container_name: epidata-promtail
+    volumes:
+      - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - promtail-data:/var/log
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - qa-network
+    depends_on:
+      - loki
+    restart: unless-stopped
+
 volumes:
   grafana-data:
     driver: local
@@ -191,6 +224,10 @@ volumes:
   zap-data:
     driver: local
   sqlserver-data:
+    driver: local
+  loki-data:
+    driver: local
+  promtail-data:
     driver: local
 
 networks:

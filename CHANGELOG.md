@@ -5,6 +5,39 @@ All notable changes to QASL Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-12-15
+
+### Added
+
+#### Phase 7: Infrastructure Observability (Loki + Promtail)
+- **Loki Integration**: Lightweight log aggregation (~350MB RAM vs 16-32GB for ELK/OpenShift)
+- **Promtail Agent**: Automatic Docker container log collection via Docker socket
+- **Infrastructure Logs Dashboard**: Real-time error/warning detection across all containers
+  - ERRORS panel with color-coded thresholds (green/yellow/red)
+  - WARNINGS panel for review items
+  - TOTAL LOGS counter
+  - CONTAINERS count showing active services
+  - Timeline chart showing log volume by container
+  - Error Logs stream for diagnostics
+  - All Logs stream with container filter
+- **CLI Health Check**: `npm run infra:check` for quick infrastructure status
+  - Supports time range: `--time=1h`
+  - Supports container filter: `--container=postgres`
+- **Dashboard Command**: `npm run infra:logs` opens Infrastructure Logs dashboard
+
+#### Configuration Files
+- `docker/loki/loki-config.yml`: Loki server configuration (TSDB store, schema v13)
+- `docker/promtail/promtail-config.yml`: Docker service discovery configuration
+- `docker/grafana/dashboards/infrastructure-logs.json`: Professional dashboard
+- `scripts/run-infra-check.mjs`: CLI tool for Loki queries
+
+### Changed
+- Updated `docker-compose.yml` with Loki and Promtail services
+- Updated `datasources.yml` with Loki datasource
+- README.md updated with Phase 7 documentation
+
+---
+
 ## [1.0.0] - 2025-12-05
 
 ### Added
@@ -134,6 +167,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.1.0 | 2025-12-15 | Phase 7: Infrastructure Observability (Loki + Promtail) |
 | 1.0.0 | 2025-12-05 | First stable release with all 6 phases |
 | 0.9.0 | 2025-11-29 | Beta with sigma_analyzer |
 | 0.1.0 | 2025-11-15 | Initial alpha |

@@ -70,6 +70,14 @@
 - **OWASP Top 10**: Detect common vulnerabilities
 - **Severity Metrics**: HIGH, MEDIUM, LOW, INFO in dashboard
 
+### Phase 7: Infrastructure Observability (Loki + Promtail)
+- **Centralized Log Aggregation**: All Docker container logs in one place
+- **Real-time Error Detection**: Automatic error/warning detection across infrastructure
+- **Lightweight Stack**: ~350MB RAM (vs 16-32GB for OpenShift/ELK)
+- **LogQL Queries**: Powerful log querying and filtering
+- **Grafana Integration**: Dedicated Infrastructure Logs dashboard
+- **CLI Health Check**: `npm run infra:check` for quick infrastructure status
+
 ### Unified Dashboard (Grafana)
 - **Centro de Control**: All metrics in one place
 - **Auto-refresh**: 5-second updates
@@ -174,7 +182,20 @@ npm run zap
 node scripts_metricas/send-zap-metrics.mjs
 ```
 
-### STEP 8: View Centro de Control (Grafana)
+### STEP 8: Check Infrastructure Health (Loki)
+
+```bash
+# Quick infrastructure health check
+npm run infra:check
+
+# With options
+npm run infra:check -- --time=1h              # Last hour
+npm run infra:check -- --container=postgres   # Specific container
+```
+
+> Opens Infrastructure Logs dashboard: `npm run infra:logs`
+
+### STEP 9: View Centro de Control (Grafana)
 
 ```
 http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
@@ -182,7 +203,7 @@ http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
 
 **Credentials:** admin / admin
 
-### STEP 9: Publish Reports to GitLab Pages
+### STEP 10: Publish Reports to GitLab Pages
 
 ```bash
 npm run publish
@@ -190,7 +211,7 @@ npm run publish
 
 **Reports URL:** https://sigma-qa-framework-207db7.gitlab.io/
 
-### STEP 10: End of Day - Stop Docker
+### STEP 11: End of Day - Stop Docker
 
 ```bash
 npm run docker:down
@@ -226,13 +247,17 @@ npm run k6 -- --type=stairs --vus=5 --duration=150s
 npm run zap
 node scripts_metricas/send-zap-metrics.mjs
 
-# 8. View Grafana (all metrics visible)
+# 8. Infrastructure Health Check (Loki)
+npm run infra:check
+npm run infra:logs  # Open dashboard
+
+# 9. View Grafana (all metrics visible)
 # http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
 
-# 9. Publish reports
+# 10. Publish reports
 npm run publish
 
-# 10. Stop Docker
+# 11. Stop Docker
 npm run docker:down
 ```
 
@@ -357,10 +382,24 @@ npm run pipeline -- --skip-k6     # Skip performance
 │                    │   (Metrics)     │                                  │
 │                    └────────┬────────┘                                  │
 │                             │                                           │
+│  ┌─────────────────┐        │                                           │
+│  │  PROMTAIL       │────────┤ Collects Docker container logs            │
+│  │ (Log Collector) │        │                                           │
+│  └────────┬────────┘        │                                           │
+│           │                 │                                           │
+│           ▼                 │                                           │
+│  ┌─────────────────┐        │                                           │
+│  │     LOKI        │────────┤ Log aggregation & querying                │
+│  │  (Log Store)    │        │                                           │
+│  └────────┬────────┘        │                                           │
+│           │                 │                                           │
+│           └─────────────────┼───────────────────────────────────────    │
+│                             │                                           │
 │                             ▼                                           │
 │                    ┌─────────────────┐                                  │
 │                    │  GRAFANA        │                                  │
 │                    │ Centro Control  │ Real-time unified dashboard      │
+│                    │ + Infra Logs    │ Infrastructure observability     │
 │                    └─────────────────┘                                  │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -421,7 +460,9 @@ QASL-Framework/
 │   └── README.md                # Usage documentation
 │
 ├── docker/                      # Docker configuration
-│   ├── grafana/dashboards/      # Centro de Control dashboard
+│   ├── grafana/dashboards/      # Centro de Control + Infrastructure Logs
+│   ├── loki/                    # Loki configuration
+│   ├── promtail/                # Promtail configuration
 │   └── postgres/init.sql        # Test data schema
 │
 ├── reports/                     # Generated reports (gitignored)
@@ -446,6 +487,21 @@ Access the unified dashboard at `http://localhost:3001`
 | **API (Newman)** | Pass Rate, Passed, Failed, Requests, Duration | `api_tests` |
 | **Security (ZAP)** | High, Medium, Low, Informational alerts | `zap_security` |
 | **Performance (K6)** | Success Rate, Response Time, VUs, Requests, Errors | Native K6 |
+| **Infrastructure (Loki)** | Errors, Warnings, Total Logs, Active Containers | Loki/Promtail |
+
+### Infrastructure Logs Dashboard
+
+Access at `http://localhost:3001/d/infrastructure-logs`
+
+| Panel | Description |
+|-------|-------------|
+| **ERRORS** | Critical errors across all containers (red = action needed) |
+| **WARNINGS** | Warning messages (yellow = review) |
+| **TOTAL LOGS** | Total log volume in time range |
+| **CONTAINERS** | Number of active containers sending logs |
+| **Timeline** | Log volume over time by container |
+| **Error Logs** | Real-time error stream for diagnostics |
+| **All Logs** | Complete log stream with container filter |
 
 ### Kiosk Mode (Full Screen)
 
@@ -512,6 +568,8 @@ docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStr
 | `npm run k6` | Run performance tests |
 | `npm run k6:reset` | Reset K6 metrics in Grafana |
 | `npm run zap` | Run security scan |
+| `npm run infra:check` | Check infrastructure health via Loki |
+| `npm run infra:logs` | Open Infrastructure Logs dashboard |
 | `npm run pipeline` | Run full pipeline |
 | `npm run publish` | Publish reports to GitLab Pages |
 | `npm run allure:open` | Open Allure report |
