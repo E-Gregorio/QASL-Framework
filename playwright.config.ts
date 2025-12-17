@@ -7,7 +7,7 @@ export default defineConfig({
     retries: process.env.CI ? 2 : 0,
     workers: process.env.CI ? 1 : undefined,
     reporter: [
-        ['html', { outputFolder: 'reports/e2e/html-report' }],
+        ['html', { outputFolder: 'reports/e2e/html-report', open: 'never' }],
         ['json', { outputFile: 'reports/e2e/results.json' }],
         ['allure-playwright', {
             outputFolder: 'reports/e2e/allure-results',

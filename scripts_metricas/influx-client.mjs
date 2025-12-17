@@ -10,7 +10,22 @@
  */
 
 const INFLUX_URL = process.env.INFLUX_URL || 'http://localhost:8086';
-const INFLUX_DB = process.env.INFLUX_DB || 'k6';
+const INFLUX_DB = process.env.INFLUX_DB || 'qa_metrics';
+
+/**
+ * Asegura que la base de datos qa_metrics exista
+ */
+async function ensureDatabase() {
+    try {
+        await fetch(`${INFLUX_URL}/query`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `q=CREATE DATABASE ${INFLUX_DB}`
+        });
+    } catch {
+        // Silently ignore - database may already exist
+    }
+}
 
 /**
  * Envía una métrica a InfluxDB
@@ -19,6 +34,9 @@ const INFLUX_DB = process.env.INFLUX_DB || 'k6';
  * @param {object} fields - Valores numéricos (passed, failed, duration, etc.)
  */
 export async function sendMetric(measurement, tags, fields) {
+    // Asegurar que la base de datos existe antes de enviar
+    await ensureDatabase();
+
     const tagString = Object.entries(tags)
         .map(([k, v]) => `${k}=${String(v).replace(/ /g, '\\ ')}`)
         .join(',');

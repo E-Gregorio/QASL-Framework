@@ -28,7 +28,7 @@
       "type": "text"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -59,7 +59,7 @@
       "type": "gauge"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -81,7 +81,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -103,7 +103,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -125,7 +125,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -157,7 +157,7 @@
       "type": "text"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -188,7 +188,7 @@
       "type": "gauge"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -210,7 +210,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -232,7 +232,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -254,7 +254,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -286,7 +286,7 @@
       "type": "text"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -308,7 +308,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -330,7 +330,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },
@@ -352,7 +352,7 @@
       "type": "stat"
     },
     {
-      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "datasource": { "type": "influxdb", "uid": "influxdb-qa" },
       "fieldConfig": {
         "defaults": {
           "color": { "mode": "thresholds" },

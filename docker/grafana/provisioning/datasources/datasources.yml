@@ -2,12 +2,22 @@ apiVersion: 1
 
 datasources:
   # InfluxDB - Métricas de K6 Performance
-  - name: InfluxDB
+  - name: InfluxDB-K6
     type: influxdb
     uid: influxdb
     access: proxy
     url: http://influxdb:8086
     database: k6
+    isDefault: false
+    editable: true
+
+  # InfluxDB - Métricas de QA (E2E, API, ZAP)
+  - name: InfluxDB-QA
+    type: influxdb
+    uid: influxdb-qa
+    access: proxy
+    url: http://influxdb:8086
+    database: qa_metrics
     isDefault: true
     editable: true
 

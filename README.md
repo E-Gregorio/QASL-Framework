@@ -18,59 +18,67 @@
 
 ## What Makes QASL Unique?
 
-| Feature | Traditional Tools | QASL Framework |
-|---------|------------------|----------------|
-| **Static HU Analysis** | Manual review | AI-powered gap detection |
-| **Unit Testing** | Separate project | Integrated Vitest (128+ tests) |
-| **API Capture** | Manual Postman setup | Auto-capture from E2E |
-| **Test Recording** | Playwright Codegen (5 levels) | Universal Recorder Pro (11 levels + confidence score) |
-| **Unified Dashboard** | Multiple tools | Single Grafana Centro de Control |
-| **Pipeline** | Separate configs | One command: `npm run pipeline` |
+| Feature                      | Traditional Tools             | QASL Framework                                        |
+| ---------------------------- | ----------------------------- | ----------------------------------------------------- |
+| **Static HU Analysis** | Manual review                 | AI-powered gap detection                              |
+| **Unit Testing**       | Separate project              | Integrated Vitest (128+ tests)                        |
+| **API Capture**        | Manual Postman setup          | Auto-capture from E2E                                 |
+| **Test Recording**     | Playwright Codegen (5 levels) | Universal Recorder Pro (11 levels + confidence score) |
+| **Unified Dashboard**  | Multiple tools                | Single Grafana Centro de Control                      |
+| **Pipeline**           | Separate configs              | One command:`npm run pipeline`                      |
 
 ---
 
 ## Features
 
 ### Phase 0: Unit Testing (Vitest)
+
 - **128+ Tests**: Validate automation helpers before E2E
 - **Fast Execution**: Sub-second test runs
 - **Coverage Reports**: 80% threshold configured
 - **Visual UI**: Interactive test browser
 
 ### Phase 1: Static Testing (sigma_analyzer)
+
 - **AI-Powered Analysis**: Detect coverage gaps in User Stories before coding
 - **ISTQB/IEEE Compliance**: Following IEEE 829, IEEE 830, ISO/IEC 27001
 - **Traceability CSVs**: Export to Jira, Xray, Azure DevOps, TestRail
 - **100% Coverage Generation**: Transform incomplete HUs into fully covered ones
 
 ### Phase 2: Universal Recorder Pro
+
 - **11-Level Selector Strategy** (vs 5 in Playwright Codegen)
 - **Real-time Confidence Score**: Know selector reliability instantly
 - **Smart Dynamic Detection**: Avoids UUIDs, timestamps, hashes
 - **Auto-respawn UI**: Persistent recording interface
 
 ### Phase 3: E2E Testing (Playwright + Allure)
+
 - **Automatic API Capture**: Record APIs during E2E for later testing
 - **Allure Integration**: Full traceability with ISTQB decorators
 - **Multi-browser**: Chromium, Firefox, WebKit
 - **Parallel Execution**: Optimized for speed
 
 ### Phase 4: API Testing (Newman)
+
 - **Zero Config**: Uses captured APIs automatically
 - **HTMLExtra Reports**: Professional documentation
 - **Metrics to Grafana**: Real-time visibility
 
 ### Phase 5: Performance Testing (K6)
+
 - **Multiple Test Types**: Load, Stairs, Stress, Spike, Soak
 - **Native InfluxDB**: Direct metrics streaming
 - **Visual in Grafana**: Real-time VUs, response times, errors
 
 ### Phase 6: Security Testing (OWASP ZAP)
+
 - **Automated Scanning**: Baseline security scan
 - **OWASP Top 10**: Detect common vulnerabilities
 - **Severity Metrics**: HIGH, MEDIUM, LOW, INFO in dashboard
 
 ### Phase 7: Infrastructure Observability (Loki + Promtail)
+
 - **Centralized Log Aggregation**: All Docker container logs in one place
 - **Real-time Error Detection**: Automatic error/warning detection across infrastructure
 - **Lightweight Stack**: ~350MB RAM (vs 16-32GB for OpenShift/ELK)
@@ -79,6 +87,7 @@
 - **CLI Health Check**: `npm run infra:check` for quick infrastructure status
 
 ### Unified Dashboard (Grafana)
+
 - **Centro de Control**: All metrics in one place
 - **Auto-refresh**: 5-second updates
 - **Color-coded**: Green/Yellow/Red thresholds
@@ -114,17 +123,60 @@ cd ..
 
 ---
 
-## Execution Flow (Step by Step)
+## Daily Workflow (Flujo Diario)
 
-> **IMPORTANT:** Execute commands in order for Grafana to show all metrics.
+| Momento                   | Comando                 | Qué hace                             |
+| ------------------------- | ----------------------- | ------------------------------------- |
+| **Inicio del día** | `npm run docker:up`   | Levanta Grafana, InfluxDB, Loki, etc. |
+| **Antes de demo**   | `npm run clean`       | Limpia reportes y métricas           |
+| **Ejecutar todo**   | `npm run demo`        | Tests + métricas + abre dashboards   |
+| **Fin del día**    | `npm run docker:down` | Apaga contenedores                    |
 
-### STEP 1: Clean Everything (New Day)
+---
+
+## Demo Mode (One Command)
+
+Para demos y presentaciones, ejecuta TODO automáticamente con un solo comando:
 
 ```bash
-npm run clean
+npm run demo
 ```
 
-### STEP 2: Start Docker Services
+Este comando:
+
+1. Inicia Docker y espera que los servicios estén listos
+2. Crea las bases de datos de métricas (k6 + qa_metrics)
+3. Ejecuta Unit Tests (Vitest)
+4. Ejecuta E2E Tests + envía métricas a Grafana
+5. Ejecuta API Tests + envía métricas a Grafana
+6. Ejecuta K6 Performance Tests
+7. Ejecuta ZAP Security Tests + envía métricas
+8. Abre automáticamente los 2 dashboards de Grafana
+
+**Opciones disponibles:**
+
+| Comando                        | Descripción                          |
+| ------------------------------ | ------------------------------------- |
+| `npm run demo`               | Ejecuta pipeline completo (~5-10 min) |
+| `npm run demo -- --quick`    | Solo E2E + API (~2 min)               |
+| `npm run demo -- --skip-zap` | Sin security scan                     |
+| `npm run demo -- --skip-k6`  | Sin performance tests                 |
+
+**Abrir dashboards manualmente:**
+
+```bash
+npm run dashboard        # Abre Centro de Control
+npm run dashboard:all    # Abre ambos dashboards
+npm run infra:logs       # Abre Infrastructure Logs
+```
+
+---
+
+## Execution Flow (Manual Step by Step)
+
+> **IMPORTANT:** Si prefieres ejecutar paso a paso en vez de `npm run demo`.
+
+### STEP 1: Start Docker Services
 
 ```bash
 npm run docker:up
@@ -132,7 +184,7 @@ npm run docker:up
 
 Wait ~30 seconds. **Verify:** http://localhost:3001 (Grafana)
 
-### STEP 3: Run Unit Tests (Vitest)
+### STEP 2: Run Unit Tests (Vitest)
 
 ```bash
 npm run unit
@@ -140,7 +192,7 @@ npm run unit
 
 > Validates helpers, validators, and data generators work correctly before E2E.
 
-### STEP 4: Run E2E Tests (Playwright) + Send Metrics
+### STEP 3: Run E2E Tests (Playwright) + Send Metrics
 
 ```bash
 npm run e2e:capture
@@ -149,116 +201,92 @@ node scripts_metricas/send-e2e-metrics.mjs
 
 > Runs E2E + captures APIs + sends metrics to Grafana.
 
-### STEP 5: Run API Tests (Newman) + Send Metrics
+### STEP 4: Run API Tests (Newman) + Send Metrics
 
 ```bash
 npm run api
 node scripts_metricas/send-api-metrics.mjs
 ```
 
-### STEP 6: Run Performance Tests (K6)
+### STEP 5: Run Performance Tests (K6)
 
 ```bash
-npm run k6:reset
-npm run k6 -- --type=stairs --vus=5 --duration=150s
+npm run k6 -- --type=stairs --vus=5 --duration=60s
 ```
 
 > K6 sends metrics automatically to InfluxDB/Grafana.
 
 **Available test types:**
 
-| Type | Description | Command |
-|------|-------------|---------|
-| `load` | Normal load (default) | `npm run k6` |
-| `stairs` | Visible staircase in Grafana | `npm run k6 -- --type=stairs --vus=5 --duration=150s` |
-| `stress` | Stress to the limit | `npm run k6 -- --type=stress --vus=50` |
-| `spike` | Sudden load spike | `npm run k6 -- --type=spike --vus=30` |
-| `soak` | Extended endurance | `npm run k6 -- --type=soak --vus=10 --duration=300s` |
+| Type       | Description                  | Command                                                |
+| ---------- | ---------------------------- | ------------------------------------------------------ |
+| `load`   | Normal load (default)        | `npm run k6`                                         |
+| `stairs` | Visible staircase in Grafana | `npm run k6 -- --type=stairs --vus=5 --duration=60s` |
+| `stress` | Stress to the limit          | `npm run k6 -- --type=stress --vus=50`               |
+| `spike`  | Sudden load spike            | `npm run k6 -- --type=spike --vus=30`                |
+| `soak`   | Extended endurance           | `npm run k6 -- --type=soak --vus=10 --duration=300s` |
 
-### STEP 7: Run Security Tests (OWASP ZAP) + Send Metrics
+### STEP 6: Run Security Tests (OWASP ZAP) + Send Metrics
 
 ```bash
 npm run zap
 node scripts_metricas/send-zap-metrics.mjs
 ```
 
-### STEP 8: Check Infrastructure Health (Loki)
+### STEP 7: Open Dashboards
 
 ```bash
-# Quick infrastructure health check
-npm run infra:check
-
-# With options
-npm run infra:check -- --time=1h              # Last hour
-npm run infra:check -- --container=postgres   # Specific container
+npm run dashboard:all
 ```
 
-> Opens Infrastructure Logs dashboard: `npm run infra:logs`
+Or manually:
 
-### STEP 9: View Centro de Control (Grafana)
-
-```
-http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
-```
+- Centro de Control: http://localhost:3001/d/sigma-qa-control
+- Infrastructure Logs: http://localhost:3001/d/infrastructure-logs
 
 **Credentials:** admin / admin
 
-### STEP 10: Publish Reports to GitLab Pages
-
-```bash
-npm run publish
-```
-
-**Reports URL:** https://sigma-qa-framework-207db7.gitlab.io/
-
-### STEP 11: End of Day - Stop Docker
+### STEP 8: End of Day - Stop Docker
 
 ```bash
 npm run docker:down
 ```
+
+### Clean Everything (New Day)
+
+```bash
+npm run clean
+```
+
+> This resets all reports and metrics databases (k6 + qa_metrics).
 
 ---
 
 ## Quick Reference - COPY/PASTE
 
 ```bash
-# 1. Clean everything (new day)
-npm run clean
+# OPCION 1: Demo automática (recomendado)
+npm run demo
 
-# 2. Start Docker services
+# OPCION 2: Demo rápida (solo E2E + API)
+npm run demo -- --quick
+
+# OPCION 3: Manual paso a paso
 npm run docker:up
 
-# 3. Unit Tests (validate helpers before E2E)
+# Esperar 30 segundos, luego:
 npm run unit
+npm run e2e:capture && node scripts_metricas/send-e2e-metrics.mjs
+npm run api && node scripts_metricas/send-api-metrics.mjs
+npm run k6 -- --type=stairs --vus=5 --duration=60s
+npm run zap && node scripts_metricas/send-zap-metrics.mjs
+npm run dashboard:all
 
-# 4. E2E + Metrics to Grafana
-npm run e2e:capture
-node scripts_metricas/send-e2e-metrics.mjs
-
-# 5. API + Metrics to Grafana
-npm run api
-node scripts_metricas/send-api-metrics.mjs
-
-# 6. Performance (K6 sends metrics automatically)
-npm run k6:reset
-npm run k6 -- --type=stairs --vus=5 --duration=150s
-
-# 7. Security + Metrics to Grafana
-npm run zap
-node scripts_metricas/send-zap-metrics.mjs
-
-# 8. Infrastructure Health Check (Loki)
-npm run infra:check
-npm run infra:logs  # Open dashboard
-
-# 9. View Grafana (all metrics visible)
-# http://localhost:3001/d/sigma-qa-control/sigma-qa-centro-de-control?kiosk=true
-
-# 10. Publish reports
-npm run publish
-
-# 11. Stop Docker
+# Fin del día
 npm run docker:down
+
+# Limpiar todo (nuevo día)
+npm run clean
 ```
 
 ---
@@ -288,14 +316,14 @@ npm run unit:coverage     # With code coverage report
 
 ### What Gets Tested
 
-| Module | Function | Purpose |
-|--------|----------|---------|
-| `validators.ts` | `validateCUIT()` | Validates Argentine CUIT before using in forms |
-| `validators.ts` | `validateEmail()` | Validates email format |
-| `validators.ts` | `validateDateFormat()` | Validates DD/MM/YYYY date |
-| `formatters.ts` | `formatCurrency()` | Formats amounts correctly |
-| `test-data-generator.ts` | `generateValidCUIT()` | Generates valid CUIT for tests |
-| `test-data-generator.ts` | `generateTestUser()` | Generates complete fake user |
+| Module                     | Function                 | Purpose                                        |
+| -------------------------- | ------------------------ | ---------------------------------------------- |
+| `validators.ts`          | `validateCUIT()`       | Validates Argentine CUIT before using in forms |
+| `validators.ts`          | `validateEmail()`      | Validates email format                         |
+| `validators.ts`          | `validateDateFormat()` | Validates DD/MM/YYYY date                      |
+| `formatters.ts`          | `formatCurrency()`     | Formats amounts correctly                      |
+| `test-data-generator.ts` | `generateValidCUIT()`  | Generates valid CUIT for tests                 |
+| `test-data-generator.ts` | `generateTestUser()`   | Generates complete fake user                   |
 
 ### Why It Matters
 
@@ -324,6 +352,7 @@ npm run pipeline
 ```
 
 **With options:**
+
 ```bash
 npm run pipeline -- --skip-zap    # Skip security
 npm run pipeline -- --skip-k6     # Skip performance
@@ -481,27 +510,27 @@ Access the unified dashboard at `http://localhost:3001`
 
 ### Panels
 
-| Section | Metrics | Source |
-|---------|---------|--------|
-| **E2E (Playwright)** | Pass Rate, Passed, Failed, Skipped, Duration | `e2e_tests` |
-| **API (Newman)** | Pass Rate, Passed, Failed, Requests, Duration | `api_tests` |
-| **Security (ZAP)** | High, Medium, Low, Informational alerts | `zap_security` |
-| **Performance (K6)** | Success Rate, Response Time, VUs, Requests, Errors | Native K6 |
-| **Infrastructure (Loki)** | Errors, Warnings, Total Logs, Active Containers | Loki/Promtail |
+| Section                         | Metrics                                            | Source           |
+| ------------------------------- | -------------------------------------------------- | ---------------- |
+| **E2E (Playwright)**      | Pass Rate, Passed, Failed, Skipped, Duration       | `e2e_tests`    |
+| **API (Newman)**          | Pass Rate, Passed, Failed, Requests, Duration      | `api_tests`    |
+| **Security (ZAP)**        | High, Medium, Low, Informational alerts            | `zap_security` |
+| **Performance (K6)**      | Success Rate, Response Time, VUs, Requests, Errors | Native K6        |
+| **Infrastructure (Loki)** | Errors, Warnings, Total Logs, Active Containers    | Loki/Promtail    |
 
 ### Infrastructure Logs Dashboard
 
 Access at `http://localhost:3001/d/infrastructure-logs`
 
-| Panel | Description |
-|-------|-------------|
-| **ERRORS** | Critical errors across all containers (red = action needed) |
-| **WARNINGS** | Warning messages (yellow = review) |
-| **TOTAL LOGS** | Total log volume in time range |
-| **CONTAINERS** | Number of active containers sending logs |
-| **Timeline** | Log volume over time by container |
-| **Error Logs** | Real-time error stream for diagnostics |
-| **All Logs** | Complete log stream with container filter |
+| Panel                | Description                                                 |
+| -------------------- | ----------------------------------------------------------- |
+| **ERRORS**     | Critical errors across all containers (red = action needed) |
+| **WARNINGS**   | Warning messages (yellow = review)                          |
+| **TOTAL LOGS** | Total log volume in time range                              |
+| **CONTAINERS** | Number of active containers sending logs                    |
+| **Timeline**   | Log volume over time by container                           |
+| **Error Logs** | Real-time error stream for diagnostics                      |
+| **All Logs**   | Complete log stream with container filter                   |
 
 ### Kiosk Mode (Full Screen)
 
@@ -541,11 +570,11 @@ docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStr
 
 ### Available Data
 
-| Table | Records | Description |
-|-------|---------|-------------|
-| `contribuyente` | ~911 | CUIT, business name, person type |
-| `inconsistencia` | ~911 | Masked tax data |
-| `actividad` | ~173 | Economic activities |
+| Table              | Records | Description                      |
+| ------------------ | ------- | -------------------------------- |
+| `contribuyente`  | ~911    | CUIT, business name, person type |
+| `inconsistencia` | ~911    | Masked tax data                  |
+| `actividad`      | ~173    | Economic activities              |
 
 > See complete documentation in `sigma-sql/README.md`
 
@@ -553,26 +582,30 @@ docker exec sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "MyStr
 
 ## Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run clean` | Clean all reports + reset Grafana metrics |
-| `npm run docker:up` | Start Docker services |
-| `npm run docker:down` | Stop Docker services |
-| `npm run unit` | Run unit tests |
-| `npm run unit:watch` | Unit tests in watch mode |
-| `npm run unit:ui` | Visual Vitest interface |
-| `npm run unit:coverage` | Unit tests with coverage |
-| `npm run e2e` | Run E2E tests |
-| `npm run e2e:capture` | Run E2E with API capture |
-| `npm run api` | Run API tests |
-| `npm run k6` | Run performance tests |
-| `npm run k6:reset` | Reset K6 metrics in Grafana |
-| `npm run zap` | Run security scan |
-| `npm run infra:check` | Check infrastructure health via Loki |
-| `npm run infra:logs` | Open Infrastructure Logs dashboard |
-| `npm run pipeline` | Run full pipeline |
-| `npm run publish` | Publish reports to GitLab Pages |
-| `npm run allure:open` | Open Allure report |
+| Command                     | Description                                |
+| --------------------------- | ------------------------------------------ |
+| <br />`npm run clean`     | Clean all reports + reset Grafana metrics  |
+| `npm run docker:up`       | Start Docker services                      |
+| `npm run docker:down`     | Stop Docker services                       |
+| `npm run unit`            | Run unit tests                             |
+| `npm run unit:watch`      | Unit tests in watch mode                   |
+| `npm run unit:ui`         | Visual Vitest interface                    |
+| `npm run unit:coverage`   | Unit tests with coverage                   |
+| `npm run e2e`             | Run E2E tests                              |
+| `npm run e2e:capture`     | Run E2E with API capture                   |
+| `npm run api`             | Run API tests                              |
+| `npm run k6`              | Run performance tests                      |
+| `npm run k6:reset`        | Reset K6 metrics in Grafana                |
+| `npm run zap`             | Run security scan                          |
+| `npm run demo`            | **Run complete demo (recommended)**  |
+| `npm run demo -- --quick` | Quick demo (E2E + API only, ~2 min)        |
+| `npm run dashboard`       | Open Centro de Control dashboard           |
+| `npm run dashboard:all`   | Open both Grafana dashboards               |
+| `npm run infra:check`     | Check infrastructure health via Loki       |
+| `npm run infra:logs`      | Open Infrastructure Logs dashboard         |
+| `npm run pipeline`        | Run full pipeline (no dashboard auto-open) |
+| `npm run publish`         | Publish reports to GitLab Pages            |
+| `npm run allure:open`     | Open Allure report                         |
 
 ---
 
@@ -603,6 +636,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Author
 
 **Elyer Maldonado**
+
 - QA Tech Lead @ EPIDATA Consulting
 - GitHub: [@E-Gregorio](https://github.com/E-Gregorio)
 
