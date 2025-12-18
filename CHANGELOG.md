@@ -5,6 +5,24 @@ All notable changes to QASL Framework will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+---
+
+## [1.2.0] - 2025-12-18
+
+### Changed
+- **Rebranding**: Project officially named **QASL Framework** (Quality Assurance Shift-Left)
+- Updated README.md with new branding and author badges
+- Updated AUTHOR.md with complete project documentation
+- Updated LICENSE with QASL Framework reference
+- Added reference to INGRID AI Testing Framework
+
+### Added
+- Author badges in README header
+- Link to INGRID framework for AI/LLM testing integration
+- LinkedIn profile in author section
+
+---
+
 ## [1.1.0] - 2025-12-15
 
 ### Added
@@ -144,13 +162,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Roadmap
 
-### [1.1.0] - Planned
+### [1.3.0] - Planned
+- [ ] **INGRID Integration**: Connect QASL with INGRID via API for AI/LLM testing
 - [ ] Visual regression testing integration
 - [ ] Accessibility testing (axe-core)
 - [ ] Mobile testing support (Playwright devices)
 - [ ] Slack/Teams notifications
 
-### [1.2.0] - Planned
+### [1.4.0] - Planned
 - [ ] AI-powered test generation from HU IDEAL
 - [ ] Self-healing selectors
 - [ ] Test impact analysis
@@ -167,7 +186,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.2.0 | 2025-12-18 | Official QASL Framework branding |
 | 1.1.0 | 2025-12-15 | Phase 7: Infrastructure Observability (Loki + Promtail) |
 | 1.0.0 | 2025-12-05 | First stable release with all 6 phases |
 | 0.9.0 | 2025-11-29 | Beta with sigma_analyzer |
 | 0.1.0 | 2025-11-15 | Initial alpha |
+
+---
+
+## Author
+
+**Elyer Maldonado** - QA Tech Lead | Test Automation Architect
+
+- GitHub: [github.com/E-Gregorio](https://github.com/E-Gregorio)
+- LinkedIn: [linkedin.com/in/elyerm](https://linkedin.com/in/elyerm)
+
+---
+
+*QASL Framework - Quality Assurance Shift-Left*
+
+© 2024-2025 Elyer Maldonado. All rights reserved.

@@ -1,14 +1,19 @@
-# QASL Framework - Shift-Left QA Platform
+# QASL Framework - Quality Assurance Shift-Left Platform
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![Author](https://img.shields.io/badge/Author-Elyer%20Maldonado-blue)](https://github.com/E-Gregorio)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-1.1.0-orange)](https://github.com/E-Gregorio/QASL-Framework)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)
 ![Playwright](https://img.shields.io/badge/playwright-latest-orange.svg)
 ![K6](https://img.shields.io/badge/k6-latest-purple.svg)
 
+> **Q**uality **A**ssurance **S**hift-**L**eft
+
 **The first unified Shift-Left Testing Platform that integrates Static Analysis, Unit Testing, E2E, API, Performance, and Security testing in a single workflow.**
+
+**Created by [Elyer Maldonado](https://github.com/E-Gregorio)** - 2024-2025
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Documentation](#-documentation) • [Contributing](#-contributing)
 
@@ -635,10 +640,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-**Elyer Maldonado**
+**Elyer Maldonado** - QA Tech Lead | Test Automation Architect
 
-- QA Tech Lead @ EPIDATA Consulting
 - GitHub: [@E-Gregorio](https://github.com/E-Gregorio)
+- LinkedIn: [linkedin.com/in/elyerm](https://linkedin.com/in/elyerm)
+- Framework: [QASL Framework](https://github.com/E-Gregorio/QASL-Framework)
+
+### Also by the Author
+
+- **[INGRID](https://github.com/E-Gregorio/ingrid-AI-framework)** - AI Testing Framework for LLM/Chatbot validation (OWASP LLM Top 10 2025)
 
 ---
 
@@ -656,5 +666,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Built with care for the QA Community**
 
 *Shift-Left Testing: Catch bugs before they're born*
+
+---
+
+**QASL Framework** © 2024-2025 Elyer Maldonado. All rights reserved.
 
 </div>
