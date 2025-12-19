@@ -4,7 +4,7 @@
 
 [![Author](https://img.shields.io/badge/Author-Elyer%20Maldonado-blue)](https://github.com/E-Gregorio)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-1.1.0-orange)](https://github.com/E-Gregorio/QASL-Framework)
+[![Version](https://img.shields.io/badge/Version-1.2.0-orange)](https://github.com/E-Gregorio/QASL-Framework)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)
 ![Playwright](https://img.shields.io/badge/playwright-latest-orange.svg)
 ![K6](https://img.shields.io/badge/k6-latest-purple.svg)
@@ -23,25 +23,62 @@
 
 ## What Makes QASL Unique?
 
-| Feature                      | Traditional Tools             | QASL Framework                                        |
-| ---------------------------- | ----------------------------- | ----------------------------------------------------- |
-| **Static HU Analysis** | Manual review                 | AI-powered gap detection                              |
-| **Unit Testing**       | Separate project              | Integrated Vitest (128+ tests)                        |
-| **API Capture**        | Manual Postman setup          | Auto-capture from E2E                                 |
-| **Test Recording**     | Playwright Codegen (5 levels) | Universal Recorder Pro (11 levels + confidence score) |
-| **Unified Dashboard**  | Multiple tools                | Single Grafana Centro de Control                      |
-| **Pipeline**           | Separate configs              | One command:`npm run pipeline`                      |
+| Feature | Traditional Tools | QASL Framework |
+|---------|-------------------|----------------|
+| **Unit Testing** | Only app code | **Test your automation code** (validators, generators) |
+| **Infrastructure Logs** | No visibility | **Centralized logs of ALL testing containers** |
+| **Static HU Analysis** | Manual review | AI-powered gap detection |
+| **API Capture** | Manual Postman setup | Auto-capture from E2E |
+| **Test Recording** | Playwright Codegen (5 levels) | Universal Recorder Pro (11 levels + confidence score) |
+| **Unified Dashboard** | Multiple tools | Single Grafana Centro de Control |
+| **Pipeline** | Separate configs | One command: `npm run pipeline` |
+
+### Two Innovations Nobody Else Does
+
+#### 1. Unit Tests for YOUR Automation Code (Not the App)
+
+> **Problem**: If your `generateValidCUIT()` function generates an invalid CUIT, 100 E2E tests fail and you waste hours debugging.
+
+Traditional QA teams only run unit tests on application code (written by developers). **QASL tests your automation framework itself** - validators, data generators, formatters - ensuring your test infrastructure is 100% reliable BEFORE running E2E.
+
+```bash
+npm run unit  # Runs 128+ tests on YOUR automation helpers
+```
+
+#### 2. Infrastructure Observability for Testing
+
+> **Problem**: Your tests fail but you don't know if it's the app, the database, Grafana, or any other container.
+
+QASL collects logs from **ALL Docker containers** (Grafana, InfluxDB, PostgreSQL, ZAP, etc.) into a single dashboard. When tests fail, you instantly see if any infrastructure component had errors.
+
+```bash
+npm run infra:check  # CLI health check via Loki
+npm run infra:logs   # Opens Infrastructure Logs dashboard
+```
+
+**Stack**: Loki + Promtail (~350MB RAM vs 16-32GB for ELK/OpenShift)
 
 ---
 
 ## Features
 
-### Phase 0: Unit Testing (Vitest)
+### Phase 0: Unit Testing of Automation Code (Vitest)
 
-- **128+ Tests**: Validate automation helpers before E2E
-- **Fast Execution**: Sub-second test runs
-- **Coverage Reports**: 80% threshold configured
-- **Visual UI**: Interactive test browser
+> **Revolutionary**: Test YOUR automation code, not the application.
+
+While developers test application code, **QA teams never test their own automation helpers**. QASL changes this paradigm.
+
+| What Gets Tested | Why It Matters |
+|------------------|----------------|
+| `validateCUIT()` | Invalid CUIT = form rejection = false test failure |
+| `generateTestEmail()` | Duplicate emails = database errors = flaky tests |
+| `formatCurrency()` | Wrong format = assertion failures = wasted debug time |
+| `validateDateFormat()` | Invalid dates = API rejections = cascading failures |
+
+- **128+ Tests**: Comprehensive coverage of automation helpers
+- **Fast Execution**: Sub-second test runs (catches bugs before E2E)
+- **80% Coverage**: Minimum threshold enforced
+- **Visual UI**: `npm run unit:ui` for interactive debugging
 
 ### Phase 1: Static Testing (sigma_analyzer)
 
@@ -84,12 +121,32 @@
 
 ### Phase 7: Infrastructure Observability (Loki + Promtail)
 
+> **Game-changer**: See what's happening inside your testing infrastructure.
+
+When tests fail, is it the app? The database? Grafana? InfluxDB? **Without observability, you're debugging blind.**
+
+QASL collects logs from ALL containers in real-time:
+
+| Container | What You See |
+|-----------|--------------|
+| `epidata-grafana` | Dashboard errors, datasource issues |
+| `epidata-influxdb` | Query failures, storage problems |
+| `sigma-postgres` | Connection errors, query timeouts |
+| `epidata-zap` | Security scan issues |
+| `epidata-loki` | Log ingestion problems |
+
+**Why This Matters:**
+```
+❌ Without QASL: "Tests failed" → Hours debugging → Find Postgres was down
+✅ With QASL: "Tests failed" → Check infra:check → See Postgres error → Fix in 2 min
+```
+
 - **Centralized Log Aggregation**: All Docker container logs in one place
-- **Real-time Error Detection**: Automatic error/warning detection across infrastructure
-- **Lightweight Stack**: ~350MB RAM (vs 16-32GB for OpenShift/ELK)
+- **Real-time Error Detection**: Automatic error/warning detection
+- **Lightweight Stack**: ~350MB RAM (vs 16-32GB for ELK/OpenShift)
 - **LogQL Queries**: Powerful log querying and filtering
-- **Grafana Integration**: Dedicated Infrastructure Logs dashboard
-- **CLI Health Check**: `npm run infra:check` for quick infrastructure status
+- **CLI Health Check**: `npm run infra:check` for quick status
+- **Grafana Dashboard**: http://localhost:3001/d/infrastructure-logs
 
 ### Unified Dashboard (Grafana)
 
