@@ -1,0 +1,35 @@
+{
+  "fase": 7,
+  "actor": "QA - Validación Temprana",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:20:58",
+    "input": "Build deployado + 4 CSVs trazables",
+    "criterios": [
+      "Ambiente QA accesible",
+      "Test Cases pre-código disponibles",
+      "Datos de prueba sintéticos preparados"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:20:58",
+    "duracion_segundos": 0,
+    "artefactos": [
+      "Pruebas exploratorias completadas",
+      "Smoke tests OK",
+      "Confirmación HU↔TC alineadas"
+    ],
+    "criterios": [
+      "Smoke tests pasados al 100%",
+      "Sin discrepancias entre HU y Test Cases",
+      "Gate de calidad pasado"
+    ],
+    "metricas": {
+      "smoke_tests_pasados": 12,
+      "smoke_tests_fallidos": 0,
+      "alineacion_hu_tc": "100%"
+    }
+  },
+  "siguiente_actor": "PM / Scrum Master"
+}

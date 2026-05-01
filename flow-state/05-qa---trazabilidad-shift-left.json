@@ -1,0 +1,41 @@
+{
+  "fase": 5,
+  "actor": "QA - Trazabilidad Shift-Left",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-05-01T10:29:03",
+    "input": "static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html",
+    "criterios": [
+      "HU IDEAL aprobada por el Cliente (DoD fase 04 cerrado)",
+      "API Key de Claude AI con saldo disponible",
+      "Plantilla ISTQB validada con cobertura 100%",
+      "Carpeta shift-left-testing/ accesible para escritura"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-05-01T10:30:34",
+    "duracion_segundos": 91,
+    "artefactos": [
+      "shift-left-testing/1_User_Storie.csv",
+      "shift-left-testing/2_Test_Suite.csv",
+      "shift-left-testing/3_Precondition.csv",
+      "shift-left-testing/4_Test_Case.csv"
+    ],
+    "criterios": [
+      "4 CSVs trazables generados con Claude AI (33 filas totales)",
+      "Headers oficiales validados en cada CSV",
+      "Test Cases en formato 1 fila por TC con título 'Validar...'",
+      "Trazabilidad bidireccional US ↔ TS ↔ TC ↔ PRC",
+      "Test Cases generados ANTES del código fuente (Shift-Left puro)"
+    ],
+    "metricas": {
+      "csvs_generados": 4,
+      "filas_user_storie": 1,
+      "filas_test_suite": 3,
+      "filas_precondition": 9,
+      "filas_test_case": 20
+    }
+  },
+  "siguiente_actor": "DevOps - Primer Deploy"
+}

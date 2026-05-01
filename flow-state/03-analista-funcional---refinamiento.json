@@ -1,0 +1,29 @@
+{
+  "fase": 3,
+  "actor": "Analista Funcional - Refinamiento",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:14:39",
+    "input": "static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html",
+    "criterios": [
+      "HU IDEAL recibida del QA con cobertura 100%",
+      "Reporte de gaps disponible para sustento ante el cliente",
+      "Disponibilidad del cliente para sesión de revisión"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:14:40",
+    "duracion_segundos": 1,
+    "artefactos": [
+      "HU IDEAL refinada con feedback del cliente"
+    ],
+    "criterios": [
+      "Escenarios validados con el cliente",
+      "Ajustes finales incorporados",
+      "Sin bloqueos pendientes"
+    ],
+    "metricas": {}
+  },
+  "siguiente_actor": "Cliente"
+}

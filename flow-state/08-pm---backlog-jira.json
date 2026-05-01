@@ -1,0 +1,29 @@
+{
+  "fase": 8,
+  "actor": "PM - Backlog Jira",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:20:58",
+    "input": "HU validada por QA Validación Temprana",
+    "criterios": [
+      "HU con gate de calidad pasado",
+      "4 CSVs disponibles para importar a Jira/Xray",
+      "Capacidad del sprint conocida"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:20:59",
+    "duracion_segundos": 1,
+    "artefactos": [
+      "Ticket Jira con HU + Test Cases linkeados"
+    ],
+    "criterios": [
+      "HU priorizada en el backlog del próximo sprint",
+      "Test Cases importados a Xray",
+      "Asignación tentativa al equipo confirmada"
+    ],
+    "metricas": {}
+  },
+  "siguiente_actor": "Equipo - Planning Poker"
+}

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QASL Framework · Quality Assurance Shift-Left · Public Showcase</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <div class="container">
+    <div class="hero-tag">QASL FRAMEWORK</div>
+    <h1>Quality Assurance Shift-Left</h1>
+    <p class="hero-sub">A 10-phase methodology where the DoD of one actor becomes the DoR of the next, ending with 4 layers of automated defect detection — Functional, API contract, Performance and Security.</p>
+    <div class="hero-meta">
+      <span><strong>Last build:</strong> 1/5/2026, 17:44:00</span>
+      <span><strong>SUT:</strong> automationexercise.com</span>
+      <span><strong>HU:</strong> HU_REG_01 · Registro de Nuevo Usuario</span>
+    </div>
+  </div>
+</header>
+
+<section class="kpis">
+  <div class="container">
+    <h2>Headline KPIs</h2>
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">Layers verified</div>
+        <div class="kpi-value">4</div>
+        <div class="kpi-foot">Functional · API · Performance · Security</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">Defects detected</div>
+        <div class="kpi-value">27</div>
+        <div class="kpi-foot">1 BUG · 26 ZAP findings</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">E2E Pass Rate</div>
+        <div class="kpi-value">85.0%</div>
+        <div class="kpi-foot">17 passed · 3 failed</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">API Assertions</div>
+        <div class="kpi-value">83.8%</div>
+        <div class="kpi-foot">124/148 passed</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">K6 Performance</div>
+        <div class="kpi-value">302<span class="kpi-unit">ms</span></div>
+        <div class="kpi-foot">p95 · 20 iterations · 2 VUs · thresholds 5/5</div>
+      </div>
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-label">Security Alerts</div>
+        <div class="kpi-value">26</div>
+        <div class="kpi-foot">1 High · 5 Medium · 12 Low · 8 Info</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="reports">
+  <div class="container">
+    <h2>Test Reports</h2>
+    <p class="section-sub">Each report is the canonical artifact emitted by its tool, untouched. Click to open.</p>
+    <div class="report-grid">
+      <a class="report-card" href="reports/e2e/index.html">
+        <div class="report-tag">F10.1</div>
+        <h3>Functional · Allure</h3>
+        <p>Playwright + TypeScript suite · 20 TCs traced 1:1 to CSV · Allure native report.</p>
+        <div class="report-stats"><strong>17/20</strong> tests passed</div>
+      </a>
+      <a class="report-card" href="reports/api/index.html">
+        <div class="report-tag">F10.2</div>
+        <h3>API Contract · Newman + HTMLExtra</h3>
+        <p>HAR → Postman Collection v2.1 → Newman with strict assertions · honest pass/fail reporting.</p>
+        <div class="report-stats"><strong>124/148</strong> assertions passed</div>
+      </a>
+      <a class="report-card" href="reports/k6/index.html">
+        <div class="report-tag">F10.3</div>
+        <h3>Performance · K6</h3>
+        <p>Standalone K6 script · dynamic token flow · 2 VUs concurrency · custom HTML report.</p>
+        <div class="report-stats"><strong>5/5</strong> thresholds passed · p95 302 ms</div>
+      </a>
+      <a class="report-card" href="reports/zap/index.html">
+        <div class="report-tag">F10.4</div>
+        <h3>Security · OWASP ZAP</h3>
+        <p>Baseline scan · passive · non-intrusive · native ZAP report with 26 documented findings.</p>
+        <div class="report-stats"><strong>1</strong> High · 5 Medium · 12 Low · 8 Info</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="evidence">
+  <div class="container">
+    <h2>Grafana · QASL Quality Cockpit</h2>
+    <p class="section-sub">All four layers of metrics consolidated in a single dashboard. Live at <code>http://localhost:3001</code> when running locally · static evidence below.</p>
+    <div class="screenshot-grid">
+      <figure>
+        <img src="img/grafana1.png" alt="QASL Quality Cockpit · upper section · E2E + API + ZAP">
+        <figcaption>Upper section · E2E (85%) · API (83.8%) · Security alerts</figcaption>
+      </figure>
+      <figure>
+        <img src="img/grafana2.png" alt="QASL Quality Cockpit · K6 performance section">
+        <figcaption>Performance section · K6 100% success · 302 ms p95 · 2 VUs · 80 requests · 0 failed thresholds</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="defect">
+  <div class="container">
+    <h2>Defect detected · BUG-001</h2>
+    <p class="section-sub">Real defect found by the framework on the SUT, documented per ISTQB / IEEE 1044 / OWASP / CVSS standards.</p>
+    <div class="defect-card">
+      <div class="defect-row"><span class="defect-label">ID</span><span class="defect-value">BUG-001</span></div>
+      <div class="defect-row"><span class="defect-label">Title</span><span class="defect-value">El sistema acepta contraseñas con menos de 6 caracteres y crea la cuenta</span></div>
+      <div class="defect-row"><span class="defect-label">Severity</span><span class="defect-value">S2-Critical</span></div>
+      <div class="defect-row"><span class="defect-label">CWE</span><span class="defect-value">CWE-521 · Weak Password Requirements</span></div>
+      <div class="defect-row"><span class="defect-label">OWASP</span><span class="defect-value">A07:2021 · Identification and Authentication Failures</span></div>
+      <div class="defect-row"><span class="defect-label">CVSS v3.1</span><span class="defect-value">5.3 (Medium) · CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N</span></div>
+      <div class="defect-row"><span class="defect-label">Detected by</span><span class="defect-value">TC-008, TC-009, TC-015 (Playwright E2E suite)</span></div>
+      <div class="defect-row"><span class="defect-label">Traceability</span><span class="defect-value">HU_REG_01 · BR2 · Acceptance criterion E4</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <p><strong>QASL Framework</strong> · Quality Assurance Shift-Left · v1.2</p>
+    <p class="footer-meta">Aligned to ISTQB CTFL v4.0 · ISO/IEC/IEEE 29119-3:2021 · IEEE 1044-2009 · ISO/IEC 25010:2011 · OWASP Top 10:2021 · ISO 31000:2018</p>
+    <p class="footer-meta">Generated automatically from JSON artifacts · Last build 1/5/2026, 17:44:00</p>
+  </div>
+</footer>
+</body>
+</html>

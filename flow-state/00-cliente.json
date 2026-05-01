@@ -1,0 +1,30 @@
+{
+  "fase": 0,
+  "actor": "Cliente",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:13:28",
+    "input": "Necesidad de negocio: módulo de Registro de Nuevo Usuario para el e-commerce",
+    "criterios": [
+      "Visión de negocio definida",
+      "Stakeholders identificados",
+      "Restricciones técnicas conocidas"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:13:28",
+    "duracion_segundos": 0,
+    "artefactos": [
+      "Brief del cliente",
+      "Sesiones de descubrimiento"
+    ],
+    "criterios": [
+      "Requerimientos funcionales comunicados",
+      "Requerimientos no funcionales mínimos definidos",
+      "Reglas de negocio iniciales identificadas (BR1-BR4)"
+    ],
+    "metricas": {}
+  },
+  "siguiente_actor": "Analista Funcional"
+}

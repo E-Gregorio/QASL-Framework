@@ -1,0 +1,40 @@
+{
+  "fase": 2,
+  "actor": "QA - Pruebas Estaticas",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:13:42",
+    "input": "static_analyzer/hu-originales/HU_REG_01.html",
+    "criterios": [
+      "HU original recibida del Analista Funcional",
+      "Plantilla ISTQB / ISO 29148 validada",
+      "API Key de Claude AI disponible (.env)",
+      "Dependencias Python instaladas (anthropic, beautifulsoup4)"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:14:08",
+    "duracion_segundos": 26,
+    "artefactos": [
+      "static_analyzer/reportes/HU_REG_01_REPORT.md",
+      "static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html"
+    ],
+    "criterios": [
+      "Análisis estático completado con Claude AI",
+      "5 gaps detectados (0 críticos)",
+      "Cobertura 25.0% → 100%",
+      "HU IDEAL generada con escenarios Original + Agregado",
+      "Reporte de gaps disponible para sustento ante el cliente"
+    ],
+    "metricas": {
+      "cobertura_inicial": 25.0,
+      "cobertura_final": 100.0,
+      "gaps_detectados": 5,
+      "gaps_criticos": 0,
+      "brs_analizadas": 4,
+      "escenarios_originales": 2
+    }
+  },
+  "siguiente_actor": "Analista Funcional - Refinamiento"
+}

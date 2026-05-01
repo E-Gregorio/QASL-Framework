@@ -1,0 +1,33 @@
+{
+  "fase": 6,
+  "actor": "DevOps - Primer Deploy",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:20:57",
+    "input": "Trazabilidad lista (4 CSVs en shift-left-testing/)",
+    "criterios": [
+      "Pipeline CI/CD operativo",
+      "Ambiente QA disponible",
+      "Build artefacto generado"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:20:58",
+    "duracion_segundos": 1,
+    "artefactos": [
+      "Build deployado en ambiente QA"
+    ],
+    "criterios": [
+      "Servicios up (smoke de infraestructura)",
+      "URL del ambiente QA accesible",
+      "Logs disponibles en Loki"
+    ],
+    "metricas": {
+      "ambiente": "QA",
+      "url": "https://automationexercise.com",
+      "build_status": "OK"
+    }
+  },
+  "siguiente_actor": "QA - Validación Temprana"
+}

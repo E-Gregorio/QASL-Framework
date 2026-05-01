@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QASL · Engranaje DoR/DoD entre 6 actores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:           #14110F;
+  --ink-2:         #2A2520;
+  --paper:         #FAF6F0;
+  --paper-2:       #FFFFFF;
+  --paper-3:       #F3ECE0;
+  --rule:          #E5DCCB;
+  --rule-strong:   #C9BBA8;
+  --text-1:        #14110F;
+  --text-2:        #524A40;
+  --text-3:        #8B8170;
+  --accent:        #B33A1F;
+  --accent-2:      #8E2A12;
+  --accent-soft:   #FBEEE7;
+  --gold:          #B8860B;
+  --gold-soft:     #FBF4E3;
+  --c-cliente:     #B8860B;
+  --c-analista:    #6B3FA0;
+  --c-qa:          #1F3A5F;
+  --c-devops:      #2D5F3F;
+  --c-pm:          #B33A1F;
+  --c-equipo:      #0E6B7C;
+  --c-dor:         #1F3A5F;
+  --c-dor-soft:    #E5ECF4;
+  --c-dod:         #2D5F3F;
+  --c-dod-soft:    #E8F0E9;
+  --serif: 'Newsreader', Georgia, serif;
+  --sans:  'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --mono:  'JetBrains Mono', 'SF Mono', Consolas, monospace;
+  --shadow-sm: 0 1px 2px rgba(20,17,15,.04), 0 0 0 1px rgba(20,17,15,.04);
+  --shadow-md: 0 8px 20px -4px rgba(20,17,15,.10), 0 0 0 1px rgba(20,17,15,.05);
+  --shadow-lg: 0 24px 60px -12px rgba(20,17,15,.20), 0 0 0 1px rgba(20,17,15,.06);
+}
+
+html, body {
+  background: var(--paper);
+  color: var(--text-1);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.serif { font-family: var(--serif); }
+.mono  { font-family: var(--mono); }
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgba(20,17,15,.045) 1px, transparent 0);
+  background-size: 24px 24px;
+  z-index: 0;
+}
+
+.lamina {
+  position: relative;
+  z-index: 1;
+  max-width: 1480px;
+  margin: 0 auto;
+  padding: 24px 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bar {
+  display: flex; align-items: center; gap: 18px;
+  padding: 10px 18px;
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 8px; box-shadow: var(--shadow-sm);
+}
+.bar-brand {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--serif); font-size: 16px; font-weight: 600;
+  letter-spacing: -0.01em; color: var(--ink);
+}
+.bar-mark {
+  width: 28px; height: 28px;
+  background: var(--accent); border-radius: 5px;
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 13px; font-weight: 800;
+}
+.bar-brand .sub {
+  color: var(--text-2); font-weight: 500;
+  font-family: var(--sans); font-size: 13.5px; margin-left: 4px;
+}
+.bar-meta {
+  margin-left: auto; display: flex; gap: 22px;
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text-3); letter-spacing: 0.04em; align-items: center;
+}
+.bar-meta strong { color: var(--ink); font-weight: 700; }
+.bar-meta .ok { color: var(--c-dod); font-weight: 700; }
+.bar-cta {
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  color: #fff; background: var(--ink); padding: 7px 14px; border-radius: 999px;
+}
+
+.hero {
+  display: grid; grid-template-columns: 1fr 420px;
+  gap: 36px; align-items: stretch;
+}
+.hero-left { padding: 18px 4px 4px; }
+.hero-eyebrow {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 16px;
+  display: inline-flex; align-items: center; gap: 12px;
+}
+.hero-eyebrow::before {
+  content: ""; display: inline-block;
+  width: 32px; height: 1.5px; background: var(--accent);
+}
+.hero-h1 {
+  font-family: var(--serif); font-weight: 500;
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1.04; letter-spacing: -0.025em; color: var(--ink);
+}
+.hero-h1 em { font-style: italic; color: var(--accent); }
+.hero-h1 .underline {
+  position: relative; display: inline-block; font-style: italic;
+}
+.hero-h1 .underline::after {
+  content: ""; position: absolute;
+  left: 0; right: 0; bottom: 4px; height: 8px;
+  background: var(--gold-soft); z-index: -1;
+}
+
+.hero-card {
+  background: var(--ink); color: #fff;
+  padding: 22px 24px; border-radius: 8px;
+  position: relative; box-shadow: var(--shadow-md);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.hero-card::before {
+  content: ""; position: absolute;
+  top: 0; left: 24px; right: 24px; height: 4px;
+  background: linear-gradient(90deg, var(--c-dod) 0%, var(--accent) 50%, var(--c-dor) 100%);
+  border-radius: 0 0 4px 4px;
+}
+.hero-card-eyebrow {
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(255,255,255,.5); margin-bottom: 10px;
+}
+.hero-quote {
+  font-family: var(--serif); font-style: italic;
+  font-size: 19px; line-height: 1.35; font-weight: 400;
+  margin-bottom: 12px; letter-spacing: -0.012em;
+}
+.hero-quote .hi   { color: var(--c-dod-soft); font-style: normal; font-weight: 600; padding: 0 4px; background: rgba(45,95,63,.42); border-radius: 2px; }
+.hero-quote .hi-2 { color: var(--c-dor-soft); font-style: normal; font-weight: 600; padding: 0 4px; background: rgba(31,58,95,.55); border-radius: 2px; }
+.hero-attr {
+  font-family: var(--mono); font-size: 10px;
+  color: rgba(255,255,255,.55); letter-spacing: 0.06em;
+  border-top: 1px solid rgba(255,255,255,.12); padding-top: 10px;
+}
+
+.diagram-card {
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 12px; box-shadow: var(--shadow-lg); overflow: hidden;
+}
+.diagram-band {
+  background: var(--ink); color: #fff;
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; border-bottom: 4px solid var(--accent); flex-wrap: wrap;
+}
+.diagram-band-title {
+  font-family: var(--serif); font-weight: 500;
+  font-size: 17px; letter-spacing: -0.01em;
+}
+.diagram-band-title em { color: var(--accent); font-style: italic; }
+.diagram-band-meta {
+  display: flex; gap: 18px;
+  font-family: var(--mono); font-size: 10.5px;
+  color: rgba(255,255,255,.6); letter-spacing: 0.04em; flex-wrap: wrap;
+}
+.diagram-band-meta strong { color: #fff; font-weight: 700; }
+
+.diagram-svg-wrap {
+  padding: 18px 22px 6px; background: var(--paper-2);
+}
+.diagram-svg { display: block; width: 100%; height: auto; }
+
+.diagram-legend {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 10px 22px; padding: 10px 24px 14px;
+  background: var(--paper); border-top: 1px solid var(--rule);
+  font-size: 12px; color: var(--text-2);
+}
+.diagram-legend .leg { display: inline-flex; align-items: center; gap: 8px; }
+.leg-dot-r, .leg-dot-d {
+  width: 18px; height: 18px; border-radius: 50%;
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 10px; font-weight: 800;
+}
+.leg-dot-r { background: var(--c-dor); }
+.leg-dot-d { background: var(--c-dod); }
+.leg-tag {
+  display: inline-block; padding: 3px 8px;
+  background: var(--ink); color: #fff; border-radius: 3px;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.04em;
+}
+.leg-star {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--gold); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+.leg-divider { width: 1px; height: 18px; background: var(--rule-strong); }
+
+.bottom { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+.stats-row {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 8px; box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.stat {
+  padding: 14px 14px 12px;
+  border-right: 1px solid var(--rule); position: relative;
+}
+.stat:last-child { border-right: none; }
+.stat::before {
+  content: ""; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px; background: var(--rule-strong);
+}
+.stat.green::before  { background: var(--c-dod); }
+.stat.accent::before { background: var(--accent); }
+.stat.gold::before   { background: var(--gold); }
+
+.stat-tag {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 6px;
+}
+.stat-val {
+  font-family: var(--serif); font-weight: 500;
+  font-size: 28px; line-height: 1;
+  letter-spacing: -0.025em; color: var(--ink);
+  font-feature-settings: "lnum", "tnum";
+  display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap;
+}
+.stat-val .from  { font-size: 16px; color: var(--text-3); font-style: italic; font-weight: 400; }
+.stat-val .arrow { font-family: var(--sans); font-size: 13px; color: var(--accent); font-weight: 700; }
+.stat.green  .stat-val { color: var(--c-dod); }
+.stat.gold   .stat-val { color: var(--gold); }
+.stat.accent .stat-val { color: var(--accent); }
+.stat-cap {
+  font-size: 11px; color: var(--text-2);
+  line-height: 1.4; margin-top: 4px;
+}
+.stat-cap strong { color: var(--ink); font-weight: 600; }
+
+.side-card {
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 8px; box-shadow: var(--shadow-sm);
+  padding: 14px 18px 12px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
+}
+.side-eyebrow {
+  font-family: var(--mono); font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 4px;
+}
+.standards-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.std-pill {
+  font-family: var(--mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.04em; padding: 5px 10px; border-radius: 999px;
+  background: var(--paper); color: var(--text-2);
+  border: 1px solid var(--rule); white-space: nowrap;
+}
+.std-pill strong { color: var(--ink); font-weight: 700; }
+
+.side-footer {
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+  padding-top: 10px; border-top: 1px solid var(--rule);
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text-3); letter-spacing: 0.04em;
+}
+.side-footer strong { color: var(--ink); font-weight: 600; }
+.side-footer .brand-tail {
+  font-family: var(--serif); font-style: italic;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--ink); letter-spacing: -0.01em;
+}
+.side-footer .brand-tail em { color: var(--accent); }
+
+@media (max-width: 1180px) {
+  .hero { grid-template-columns: 1fr; }
+  .bottom { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .lamina { padding: 16px 14px 24px; }
+  .bar-meta { display: none; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .stat { border-right: none; border-bottom: 1px solid var(--rule); }
+}
+@media print {
+  body::before { display: none; }
+  body { background: #fff; }
+  .lamina { padding: 8mm 8mm; }
+  .diagram-card, .stats-row, .side-card, .hero-card, .bar { box-shadow: none; }
+  @page { size: A3 landscape; margin: 8mm; }
+}
+</style>
+</head>
+<body>
+
+<div class="lamina">
+
+  <div class="bar">
+    <span class="bar-brand">
+      <span class="bar-mark">Q</span>
+      QASL Framework
+      <span class="sub">/ Master View · DoR/DoD encadenado</span>
+    </span>
+    <div class="bar-meta">
+      <span><strong>HU_REG_01</strong></span>
+      <span class="ok">10 / 10 fases ✓</span>
+      <span>2m 16s</span>
+      <span>2026-05-01</span>
+    </div>
+    <span class="bar-cta">Cobertura 100%</span>
+  </div>
+
+  <header class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow">QASL · Quality Assurance Shift-Left</div>
+      <h1 class="hero-h1 serif">
+        Calidad no es una <em>herramienta</em>.<br>
+        Es un <span class="underline">engranaje</span> entre <em>seis actores</em><br>
+        donde nadie trabaja solo.
+      </h1>
+    </div>
+    <aside class="hero-card">
+      <div class="hero-card-eyebrow">La regla del framework</div>
+      <p class="hero-quote serif">
+        El <span class="hi">DoD</span> de un actor <em>es</em> el <span class="hi-2">DoR</span> del siguiente. Sin DoD cerrado, no hay avance.
+      </p>
+      <div class="hero-attr">
+        — QASL · contrato blindado entre roles
+      </div>
+    </aside>
+  </header>
+
+  <section class="diagram-card">
+    <div class="diagram-band">
+      <div class="diagram-band-title serif">
+        Engranaje DoR/DoD <em>—</em> 6 actores · 10 fases · 9 handoffs blindados
+      </div>
+      <div class="diagram-band-meta">
+        <span>HU · <strong>HU_REG_01</strong></span>
+        <span>Cobertura · <strong>25 % → 100 %</strong></span>
+        <span>Decisión · <strong>VCR = 11 → Auto</strong></span>
+      </div>
+    </div>
+
+    <div class="diagram-svg-wrap">
+      <svg class="diagram-svg" viewBox="0 0 1340 540" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="cap-shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.10"/>
+          </filter>
+          <filter id="port-shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.20"/>
+          </filter>
+          <filter id="tag-shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.16"/>
+          </filter>
+          <marker id="arrow-dark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#14110F"/>
+          </marker>
+        </defs>
+
+        <g transform="translate(0, 18)">
+          <text x="0" y="14" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#B33A1F" letter-spacing="0.22em">SHIFT-LEFT  ←</text>
+          <line x1="0" y1="34" x2="1340" y2="34" stroke="#C9BBA8" stroke-width="1" stroke-dasharray="3 4"/>
+          <path d="M 122 26 L 122 34 L 1240 34 L 1240 26" fill="none" stroke="#14110F" stroke-width="1.5"/>
+          <text x="681" y="20" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#14110F" letter-spacing="0.2em">PRE-CÓDIGO  ·  REQUERIMIENTOS Y CRITERIOS DE PRUEBA</text>
+          <text x="1340" y="14" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#8B8170" letter-spacing="0.22em">→  CÓDIGO</text>
+        </g>
+
+        <g stroke="#B33A1F" stroke-width="2.5"><line x1="154" y1="220" x2="226" y2="220" stroke-linecap="round"/><line x1="394" y1="220" x2="466" y2="220" stroke-linecap="round"/><line x1="634" y1="220" x2="706" y2="220" stroke-linecap="round"/><line x1="874" y1="220" x2="946" y2="220" stroke-linecap="round"/><line x1="1114" y1="220" x2="1186" y2="220" stroke-linecap="round"/></g>
+
+        <g transform="translate(0, 70)"><rect width="140" height="300" rx="10" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="140" height="6" fill="#B8860B"/><g transform="translate(70, 30)"><rect x="-22" y="-12" width="44" height="22" rx="4" fill="#B8860B"/><text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F00</text></g><circle cx="70" cy="80" r="24" fill="#FBF4E3" stroke="#B8860B" stroke-width="2"/><circle cx="70" cy="74" r="6" fill="#B8860B"/><path d="M 56 96 C 56 84, 84 84, 84 96 L 84 99 L 56 99 Z" fill="#B8860B"/><text x="70" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="17" font-weight="600" font-style="italic" fill="#14110F">Cliente</text><text x="70" y="151" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.14em">NEGOCIO</text><line x1="20" y1="170" x2="120" y2="170" stroke="#E5DCCB"/><text x="70" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700" fill="#8B8170" letter-spacing="0.16em">CICLO INTERNO</text><g transform="translate(0, 200)"><rect x="14" y="0" width="32" height="18" rx="9" fill="#1F3A5F"/><text x="30" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoR</text><line x1="50" y1="9" x2="60" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><circle cx="70" cy="9" r="9" fill="#FBF4E3" stroke="#14110F" stroke-width="1.5"/><path d="M 65 9 L 69 13 L 76 5" fill="none" stroke="#14110F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="80" y1="9" x2="90" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><rect x="94" y="0" width="32" height="18" rx="9" fill="#2D5F3F"/><text x="110" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoD</text></g><text x="70" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#14110F">Comunica negocio</text><text x="70" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8B8170">brief · sesiones</text></g><g transform="translate(240, 70)"><rect width="140" height="300" rx="10" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="140" height="6" fill="#6B3FA0"/><g transform="translate(70, 30)"><rect x="-22" y="-12" width="44" height="22" rx="4" fill="#6B3FA0"/><text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F01</text></g><circle cx="70" cy="80" r="24" fill="#F1EBF7" stroke="#6B3FA0" stroke-width="2"/><path d="M 62 70 L 78 70 L 78 92 L 62 92 Z" fill="#6B3FA0"/><line x1="65" y1="76" x2="75" y2="76" stroke="#FFFFFF" stroke-width="1.4"/><line x1="65" y1="81" x2="75" y2="81" stroke="#FFFFFF" stroke-width="1.4"/><line x1="65" y1="86" x2="72" y2="86" stroke="#FFFFFF" stroke-width="1.4"/><text x="70" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="17" font-weight="600" font-style="italic" fill="#14110F">Analista</text><text x="70" y="151" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.14em">FUNCIONAL</text><line x1="20" y1="170" x2="120" y2="170" stroke="#E5DCCB"/><text x="70" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700" fill="#8B8170" letter-spacing="0.16em">CICLO INTERNO</text><g transform="translate(0, 200)"><rect x="14" y="0" width="32" height="18" rx="9" fill="#1F3A5F"/><text x="30" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoR</text><line x1="50" y1="9" x2="60" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><circle cx="70" cy="9" r="9" fill="#F1EBF7" stroke="#14110F" stroke-width="1.5"/><path d="M 65 9 L 69 13 L 76 5" fill="none" stroke="#14110F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="80" y1="9" x2="90" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><rect x="94" y="0" width="32" height="18" rx="9" fill="#2D5F3F"/><text x="110" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoD</text></g><text x="70" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#14110F">Redacta la HU</text><text x="70" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8B8170">INVEST · borrador</text></g><g transform="translate(480, 70)"><rect x="-3" y="-3" width="146" height="306" rx="12" fill="#FBF4E3" opacity="0.6"/><rect width="140" height="300" rx="10" fill="#FFFFFF" stroke="#B8860B" stroke-width="2" filter="url(#cap-shadow)"/><rect width="140" height="6" fill="#B8860B"/><g transform="translate(70, 30)"><rect x="-22" y="-12" width="44" height="22" rx="4" fill="#1F3A5F"/><text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F02</text></g><g transform="translate(120, 14)"><circle r="11" fill="#B8860B" filter="url(#tag-shadow)"/><text y="4" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">★</text></g><circle cx="70" cy="80" r="24" fill="#E5ECF4" stroke="#1F3A5F" stroke-width="2"/><circle cx="67" cy="77" r="8" fill="none" stroke="#1F3A5F" stroke-width="2.2"/><line x1="74" y1="84" x2="80" y2="90" stroke="#1F3A5F" stroke-width="2.5" stroke-linecap="round"/><text x="70" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="17" font-weight="600" font-style="italic" fill="#14110F">QA · Estático</text><text x="70" y="151" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#B8860B" letter-spacing="0.14em">CLAUDE AI</text><line x1="20" y1="170" x2="120" y2="170" stroke="#E5DCCB"/><text x="70" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700" fill="#B8860B" letter-spacing="0.16em">CICLO INTERNO ★</text><g transform="translate(0, 200)"><rect x="14" y="0" width="32" height="18" rx="9" fill="#1F3A5F"/><text x="30" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoR</text><line x1="50" y1="9" x2="60" y2="9" stroke="#B8860B" stroke-width="1.5" marker-end="url(#arrow-dark)"/><circle cx="70" cy="9" r="9" fill="#E5ECF4" stroke="#B8860B" stroke-width="1.5"/><path d="M 65 9 L 69 13 L 76 5" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="80" y1="9" x2="90" y2="9" stroke="#B8860B" stroke-width="1.5" marker-end="url(#arrow-dark)"/><rect x="94" y="0" width="32" height="18" rx="9" fill="#2D5F3F"/><text x="110" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoD</text></g><text x="70" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#14110F">Detecta gaps</text><text x="70" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8B8170">25 % → 100 % · 5 gaps</text></g><g transform="translate(720, 70)"><rect width="140" height="300" rx="10" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="140" height="6" fill="#6B3FA0"/><g transform="translate(70, 30)"><rect x="-22" y="-12" width="44" height="22" rx="4" fill="#6B3FA0"/><text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F03</text></g><circle cx="70" cy="80" r="24" fill="#F1EBF7" stroke="#6B3FA0" stroke-width="2"/><path d="M 62 70 L 78 70 L 78 92 L 62 92 Z" fill="#6B3FA0"/><line x1="65" y1="76" x2="75" y2="76" stroke="#FFFFFF" stroke-width="1.4"/><line x1="65" y1="81" x2="75" y2="81" stroke="#FFFFFF" stroke-width="1.4"/><line x1="65" y1="86" x2="72" y2="86" stroke="#FFFFFF" stroke-width="1.4"/><circle cx="80" cy="71" r="4" fill="#B8860B"/><text x="70" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="17" font-weight="600" font-style="italic" fill="#14110F">Analista</text><text x="70" y="151" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.14em">REFINA</text><line x1="20" y1="170" x2="120" y2="170" stroke="#E5DCCB"/><text x="70" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700" fill="#8B8170" letter-spacing="0.16em">CICLO INTERNO</text><g transform="translate(0, 200)"><rect x="14" y="0" width="32" height="18" rx="9" fill="#1F3A5F"/><text x="30" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoR</text><line x1="50" y1="9" x2="60" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><circle cx="70" cy="9" r="9" fill="#F1EBF7" stroke="#14110F" stroke-width="1.5"/><path d="M 65 9 L 69 13 L 76 5" fill="none" stroke="#14110F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="80" y1="9" x2="90" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><rect x="94" y="0" width="32" height="18" rx="9" fill="#2D5F3F"/><text x="110" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoD</text></g><text x="70" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#14110F">Refina con cliente</text><text x="70" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8B8170">HU IDEAL refinada</text></g><g transform="translate(960, 70)"><rect width="140" height="300" rx="10" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="140" height="6" fill="#B8860B"/><g transform="translate(70, 30)"><rect x="-22" y="-12" width="44" height="22" rx="4" fill="#B8860B"/><text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F04</text></g><circle cx="70" cy="80" r="24" fill="#FBF4E3" stroke="#B8860B" stroke-width="2"/><circle cx="70" cy="80" r="11" fill="#B8860B"/><path d="M 64 80 L 68 84 L 76 75" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><text x="70" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="17" font-weight="600" font-style="italic" fill="#14110F">Cliente</text><text x="70" y="151" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.14em">SIGN-OFF</text><line x1="20" y1="170" x2="120" y2="170" stroke="#E5DCCB"/><text x="70" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700" fill="#8B8170" letter-spacing="0.16em">CICLO INTERNO</text><g transform="translate(0, 200)"><rect x="14" y="0" width="32" height="18" rx="9" fill="#1F3A5F"/><text x="30" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoR</text><line x1="50" y1="9" x2="60" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><circle cx="70" cy="9" r="9" fill="#FBF4E3" stroke="#14110F" stroke-width="1.5"/><path d="M 65 9 L 69 13 L 76 5" fill="none" stroke="#14110F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="80" y1="9" x2="90" y2="9" stroke="#14110F" stroke-width="1.5" marker-end="url(#arrow-dark)"/><rect x="94" y="0" width="32" height="18" rx="9" fill="#2D5F3F"/><text x="110" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoD</text></g><text x="70" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#14110F">Aprobación formal</text><text x="70" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8B8170">HU aprobada · sign-off</text></g><g transform="translate(1200, 70)"><rect x="-3" y="-3" width="146" height="306" rx="12" fill="#FBF4E3" opacity="0.6"/><rect width="140" height="300" rx="10" fill="#FFFFFF" stroke="#B8860B" stroke-width="2" filter="url(#cap-shadow)"/><rect width="140" height="6" fill="#B8860B"/><g transform="translate(70, 30)"><rect x="-22" y="-12" width="44" height="22" rx="4" fill="#1F3A5F"/><text x="0" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F05</text></g><g transform="translate(120, 14)"><circle r="11" fill="#B8860B" filter="url(#tag-shadow)"/><text y="4" text-anchor="middle" font-size="13" font-weight="700" fill="#FFFFFF">★</text></g><circle cx="70" cy="80" r="24" fill="#E5ECF4" stroke="#1F3A5F" stroke-width="2"/><rect x="58" y="68" width="24" height="4" fill="#1F3A5F"/><rect x="58" y="74" width="24" height="4" fill="#1F3A5F" opacity="0.78"/><rect x="58" y="80" width="24" height="4" fill="#1F3A5F" opacity="0.55"/><rect x="58" y="86" width="24" height="4" fill="#1F3A5F" opacity="0.32"/><text x="70" y="135" text-anchor="middle" font-family="Newsreader, serif" font-size="17" font-weight="600" font-style="italic" fill="#14110F">QA · Trazab.</text><text x="70" y="151" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#B8860B" letter-spacing="0.14em">CLAUDE AI</text><line x1="20" y1="170" x2="120" y2="170" stroke="#E5DCCB"/><text x="70" y="185" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8.5" font-weight="700" fill="#B8860B" letter-spacing="0.16em">CICLO INTERNO ★</text><g transform="translate(0, 200)"><rect x="14" y="0" width="32" height="18" rx="9" fill="#1F3A5F"/><text x="30" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoR</text><line x1="50" y1="9" x2="60" y2="9" stroke="#B8860B" stroke-width="1.5" marker-end="url(#arrow-dark)"/><circle cx="70" cy="9" r="9" fill="#E5ECF4" stroke="#B8860B" stroke-width="1.5"/><path d="M 65 9 L 69 13 L 76 5" fill="none" stroke="#B8860B" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="80" y1="9" x2="90" y2="9" stroke="#B8860B" stroke-width="1.5" marker-end="url(#arrow-dark)"/><rect x="94" y="0" width="32" height="18" rx="9" fill="#2D5F3F"/><text x="110" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="800" fill="#FFFFFF" letter-spacing="0.04em">DoD</text></g><text x="70" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#14110F">Genera 4 CSVs</text><text x="70" y="270" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#8B8170">US → TS → PRC → TC</text></g>
+
+        <g transform="translate(140, 220)"><circle cx="0" cy="0" r="14" fill="#2D5F3F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">D</text></g><g transform="translate(240, 220)"><circle cx="0" cy="0" r="14" fill="#1F3A5F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">R</text></g><g transform="translate(190, 200)" filter="url(#tag-shadow)"><rect x="-46" y="-9" width="92" height="18" rx="3" fill="#14110F"/><text y="4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#FFFFFF">brief.cliente</text></g><text x="190" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" fill="#B33A1F" letter-spacing="0.16em">PASA →</text><g transform="translate(380, 220)"><circle cx="0" cy="0" r="14" fill="#2D5F3F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">D</text></g><g transform="translate(480, 220)"><circle cx="0" cy="0" r="14" fill="#1F3A5F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">R</text></g><g transform="translate(430, 200)" filter="url(#tag-shadow)"><rect x="-46" y="-9" width="92" height="18" rx="3" fill="#14110F"/><text y="4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#FFFFFF">HU_REG_01.html</text></g><text x="430" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" fill="#B33A1F" letter-spacing="0.16em">PASA →</text><g transform="translate(620, 220)"><circle cx="0" cy="0" r="14" fill="#2D5F3F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">D</text></g><g transform="translate(720, 220)"><circle cx="0" cy="0" r="14" fill="#1F3A5F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">R</text></g><g transform="translate(670, 200)" filter="url(#tag-shadow)"><rect x="-46" y="-9" width="92" height="18" rx="3" fill="#14110F"/><text y="4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#FFFFFF">REPORT.md</text></g><text x="670" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" fill="#B33A1F" letter-spacing="0.16em">PASA →</text><g transform="translate(860, 220)"><circle cx="0" cy="0" r="14" fill="#2D5F3F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">D</text></g><g transform="translate(960, 220)"><circle cx="0" cy="0" r="14" fill="#1F3A5F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">R</text></g><g transform="translate(910, 200)" filter="url(#tag-shadow)"><rect x="-46" y="-9" width="92" height="18" rx="3" fill="#14110F"/><text y="4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#FFFFFF">HU IDEAL ref.</text></g><text x="910" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" fill="#B33A1F" letter-spacing="0.16em">PASA →</text><g transform="translate(1100, 220)"><circle cx="0" cy="0" r="14" fill="#2D5F3F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">D</text></g><g transform="translate(1200, 220)"><circle cx="0" cy="0" r="14" fill="#1F3A5F" stroke="#FFFFFF" stroke-width="2.5" filter="url(#port-shadow)"/><text y="4" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="800" fill="#FFFFFF" letter-spacing="0.02em">R</text></g><g transform="translate(1150, 200)" filter="url(#tag-shadow)"><rect x="-46" y="-9" width="92" height="18" rx="3" fill="#14110F"/><text y="4" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" font-weight="600" fill="#FFFFFF">sign-off</text></g><text x="1150" y="184" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" font-weight="700" fill="#B33A1F" letter-spacing="0.16em">PASA →</text>
+
+        <g transform="translate(0, 400)">
+          <line x1="0" y1="0" x2="1340" y2="0" stroke="#E5DCCB" stroke-width="1"/>
+          <text x="0" y="20" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#B33A1F" letter-spacing="0.18em">CONTINÚA EN POST-CÓDIGO  →</text>
+          <text x="1340" y="20" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#8B8170" letter-spacing="0.18em">PREPARACIÓN AL DEV</text>
+        </g>
+
+        <g transform="translate(64, 440)">
+          <g transform="translate(0, 0)"><rect width="240" height="72" rx="6" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="240" height="4" fill="#2D5F3F"/><g transform="translate(20, 30)"><rect x="-16" y="-11" width="40" height="20" rx="3" fill="#2D5F3F"/><text x="4" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F06</text></g><text x="52" y="32" font-family="Newsreader, serif" font-size="15" font-weight="600" font-style="italic" fill="#14110F">DevOps</text><text x="52" y="50" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.1em">PRIMER DEPLOY EN QA</text><text x="52" y="63" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#8B8170">build deployado · 1s</text><g transform="translate(192, 36)"><circle cx="-14" cy="0" r="9" fill="#1F3A5F"/><text x="-14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">R</text><text x="0" y="3" text-anchor="middle" font-size="11" font-weight="700" fill="#B33A1F">→</text><circle cx="14" cy="0" r="9" fill="#2D5F3F"/><text x="14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">D</text></g></g><g transform="translate(324, 0)"><rect width="240" height="72" rx="6" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="240" height="4" fill="#1F3A5F"/><g transform="translate(20, 30)"><rect x="-16" y="-11" width="40" height="20" rx="3" fill="#1F3A5F"/><text x="4" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F07</text></g><text x="52" y="32" font-family="Newsreader, serif" font-size="15" font-weight="600" font-style="italic" fill="#14110F">QA · Smoke</text><text x="52" y="50" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.1em">VALIDACIÓN TEMPRANA</text><text x="52" y="63" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#8B8170">HU ↔ TC alineadas · 0s</text><g transform="translate(192, 36)"><circle cx="-14" cy="0" r="9" fill="#1F3A5F"/><text x="-14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">R</text><text x="0" y="3" text-anchor="middle" font-size="11" font-weight="700" fill="#B33A1F">→</text><circle cx="14" cy="0" r="9" fill="#2D5F3F"/><text x="14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">D</text></g></g><g transform="translate(648, 0)"><rect width="240" height="72" rx="6" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="240" height="4" fill="#B33A1F"/><g transform="translate(20, 30)"><rect x="-16" y="-11" width="40" height="20" rx="3" fill="#B33A1F"/><text x="4" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F08</text></g><text x="52" y="32" font-family="Newsreader, serif" font-size="15" font-weight="600" font-style="italic" fill="#14110F">PM · Scrum</text><text x="52" y="50" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.1em">BACKLOG JIRA</text><text x="52" y="63" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#8B8170">ticket priorizado · 1s</text><g transform="translate(192, 36)"><circle cx="-14" cy="0" r="9" fill="#1F3A5F"/><text x="-14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">R</text><text x="0" y="3" text-anchor="middle" font-size="11" font-weight="700" fill="#B33A1F">→</text><circle cx="14" cy="0" r="9" fill="#2D5F3F"/><text x="14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">D</text></g></g><g transform="translate(972, 0)"><rect width="240" height="72" rx="6" fill="#FFFFFF" stroke="#E5DCCB" stroke-width="1" filter="url(#cap-shadow)"/><rect width="240" height="4" fill="#0E6B7C"/><g transform="translate(20, 30)"><rect x="-16" y="-11" width="40" height="20" rx="3" fill="#0E6B7C"/><text x="4" y="3" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#FFFFFF" letter-spacing="0.06em">F09</text></g><text x="52" y="32" font-family="Newsreader, serif" font-size="15" font-weight="600" font-style="italic" fill="#14110F">Equipo completo</text><text x="52" y="50" font-family="JetBrains Mono, monospace" font-size="9" font-weight="700" fill="#8B8170" letter-spacing="0.1em">PLANNING POKER · VCR</text><text x="52" y="63" font-family="JetBrains Mono, monospace" font-size="8.5" fill="#8B8170">VCR=11 → automatizar</text><g transform="translate(192, 36)"><circle cx="-14" cy="0" r="9" fill="#1F3A5F"/><text x="-14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">R</text><text x="0" y="3" text-anchor="middle" font-size="11" font-weight="700" fill="#B33A1F">→</text><circle cx="14" cy="0" r="9" fill="#2D5F3F"/><text x="14" y="3" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#FFFFFF">D</text></g></g>
+          <text x="262" y="42" font-size="20" fill="#B33A1F" font-weight="700">→</text><text x="586" y="42" font-size="20" fill="#B33A1F" font-weight="700">→</text><text x="910" y="42" font-size="20" fill="#B33A1F" font-weight="700">→</text>
+        </g>
+
+        <g transform="translate(0, 530)">
+          <text x="0" y="0" font-family="Newsreader, serif" font-style="italic" font-size="13" fill="#14110F">
+            <tspan font-weight="700" fill="#B33A1F">10 fases</tspan> · <tspan font-weight="700">6 actores</tspan> · <tspan font-weight="700">9 handoffs DoD→DoR</tspan> · ejecutados en <tspan font-weight="700" font-family="JetBrains Mono, monospace" font-size="12">2m 16s</tspan>
+          </text>
+          <text x="1340" y="0" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#8B8170" letter-spacing="0.16em">QASL · MASTER VIEW</text>
+        </g>
+
+      </svg>
+    </div>
+
+    <div class="diagram-legend">
+      <div class="leg"><span class="leg-dot-d">D</span><span><strong>DoD</strong> — Definition of Done · <em>se cierra al entregar el artefacto</em></span></div>
+      <div class="leg-divider"></div>
+      <div class="leg"><span class="leg-dot-r">R</span><span><strong>DoR</strong> — Definition of Ready · <em>se abre al recibir el artefacto válido</em></span></div>
+      <div class="leg-divider"></div>
+      <div class="leg"><span class="leg-tag">artefacto</span><span>lo que efectivamente <strong>cambia de manos</strong></span></div>
+      <div class="leg-divider"></div>
+      <div class="leg"><span class="leg-star">★</span><span>fase ejecutada por el <strong>QA con Claude AI</strong></span></div>
+    </div>
+  </section>
+
+  <div class="bottom">
+    <div class="stats-row">
+      <div class="stat green">
+        <div class="stat-tag">Cobertura BR</div>
+        <div class="stat-val"><span class="from">25%</span><span class="arrow">→</span>100%</div>
+        <div class="stat-cap"><strong>+75 pts</strong> antes del primer commit</div>
+      </div>
+      <div class="stat accent">
+        <div class="stat-tag">Gaps detectados</div>
+        <div class="stat-val">5</div>
+        <div class="stat-cap">Brechas <strong>invisibles al ojo humano</strong></div>
+      </div>
+      <div class="stat">
+        <div class="stat-tag">Test Cases pre-código</div>
+        <div class="stat-val">23</div>
+        <div class="stat-cap">Trazables <strong>US → TS → PRC → TC</strong></div>
+      </div>
+      <div class="stat gold">
+        <div class="stat-tag">VCR (ISO 31000)</div>
+        <div class="stat-val">11</div>
+        <div class="stat-cap"><strong>≥ 9 → Automatizar</strong></div>
+      </div>
+      <div class="stat">
+        <div class="stat-tag">Actores · fases</div>
+        <div class="stat-val">6 <span class="from">·</span> 10</div>
+        <div class="stat-cap">Cada uno con <strong>su propio ciclo DoR/DoD</strong></div>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div>
+        <div class="side-eyebrow">Alineado a estándares públicos vigentes</div>
+        <div class="standards-row">
+          <span class="std-pill"><strong>ISTQB</strong> CTFL v4.0</span>
+          <span class="std-pill"><strong>ISO/IEC/IEEE</strong> 29119-3</span>
+          <span class="std-pill"><strong>ISO/IEC/IEEE</strong> 29148</span>
+          <span class="std-pill"><strong>OWASP</strong> Top 10</span>
+          <span class="std-pill"><strong>ISO 31000</strong> Risk Mgmt</span>
+          <span class="std-pill"><strong>IEEE</strong> 1028</span>
+        </div>
+      </div>
+      <div class="side-footer">
+        <span class="brand-tail">QASL · <em>Quality Assurance Shift-Left</em></span>
+        <span><strong>HU_REG_01</strong> · 2026-05-01 · MIT</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

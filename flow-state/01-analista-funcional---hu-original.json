@@ -1,0 +1,30 @@
+{
+  "fase": 1,
+  "actor": "Analista Funcional - HU Original",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:13:28",
+    "input": "Requerimientos del cliente recibidos",
+    "criterios": [
+      "Brief del cliente revisado",
+      "Plantilla ISTQB / ISO 29148 disponible",
+      "Conocimiento del dominio confirmado"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:13:29",
+    "duracion_segundos": 1,
+    "artefactos": [
+      "static_analyzer/hu-originales/HU_REG_01.html"
+    ],
+    "criterios": [
+      "HU escrita en formato Como/Quiero/Para",
+      "BR1-BR4 documentadas",
+      "Mínimo 2 escenarios iniciales (positivos del happy path)",
+      "Estado: Borrador - Pendiente de Análisis Estático"
+    ],
+    "metricas": {}
+  },
+  "siguiente_actor": "QA - Pruebas Estáticas"
+}

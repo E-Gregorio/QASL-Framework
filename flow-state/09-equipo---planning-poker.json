@@ -1,0 +1,39 @@
+{
+  "fase": 9,
+  "actor": "Equipo - Planning Poker",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-04-30T22:20:59",
+    "input": "HU priorizada en el backlog Jira",
+    "criterios": [
+      "HU al tope del backlog",
+      "Equipo presente en la ceremonia",
+      "Framework VCR conocido por todos"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-04-30T22:20:59",
+    "duracion_segundos": 0,
+    "artefactos": [
+      "Estimación VCR registrada",
+      "Decisión automatizar/manual tomada",
+      "Asignación al QA confirmada"
+    ],
+    "criterios": [
+      "VCR calculado: V=3 + C=2 + R=(P=2 × I=3)=6 → Total=11",
+      "VCR ≥ 9 → Deuda técnica → AUTOMATIZAR + REGRESIÓN",
+      "QA Senior asignado para ejecutar pruebas E2E/API/K6/ZAP"
+    ],
+    "metricas": {
+      "vcr_valor": 3,
+      "vcr_costo": 2,
+      "vcr_probabilidad": 2,
+      "vcr_impacto": 3,
+      "vcr_riesgo": 6,
+      "vcr_total": 11,
+      "decision": "DEUDA_TECNICA_AUTOMATIZAR"
+    }
+  },
+  "siguiente_actor": "QA + Devs - Ejecución de Pruebas"
+}

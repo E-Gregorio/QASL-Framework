@@ -313,6 +313,4 @@ Avoid extensions interfering with recording.
 
 ## Credits
 
-Created by Elyer Maldonado as part of the QASL Framework.
-
-Part of the Shift-Left Testing Platform for comprehensive QA automation.
+Part of the QASL Framework — Shift-Left Testing Platform for comprehensive QA automation.

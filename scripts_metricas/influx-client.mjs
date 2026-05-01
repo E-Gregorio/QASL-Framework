@@ -117,6 +117,42 @@ export async function sendAPIMetrics({ collection, passed, failed, total_request
 }
 
 /**
+ * Envía métricas de K6 Performance (alto nivel, para tiles de Grafana).
+ * Las métricas streaming detalladas las manda K6 directo via --out influxdb=...
+ */
+export async function sendK6Metrics({
+    test_name,
+    iterations,
+    http_requests,
+    http_failed_rate,
+    p95_response_time,
+    p99_response_time,
+    max_vus,
+    duration_seconds,
+    thresholds_passed,
+    thresholds_failed,
+    checks_passed,
+    checks_failed,
+}) {
+    return sendMetric('k6_performance',
+        { test_name: test_name || 'default', type: 'performance' },
+        {
+            iterations: iterations || 0,
+            http_requests: http_requests || 0,
+            http_failed_rate: http_failed_rate || 0,
+            p95_response_time: p95_response_time || 0,
+            p99_response_time: p99_response_time || 0,
+            max_vus: max_vus || 0,
+            duration_seconds: duration_seconds || 0,
+            thresholds_passed: thresholds_passed || 0,
+            thresholds_failed: thresholds_failed || 0,
+            checks_passed: checks_passed || 0,
+            checks_failed: checks_failed || 0,
+        }
+    );
+}
+
+/**
  * Envía métricas de ZAP Security
  */
 export async function sendZAPMetrics({ target, high, medium, low, informational }) {
@@ -139,5 +175,6 @@ export default {
     checkInfluxConnection,
     sendE2EMetrics,
     sendAPIMetrics,
+    sendK6Metrics,
     sendZAPMetrics
 };

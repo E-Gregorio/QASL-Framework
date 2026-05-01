@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historia de Usuario — {{ID_HU}}</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+  .us-container { max-width: 900px; margin: 0 auto; }
+  .us-header { background: #5C85D6; color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 20px; margin-bottom: 0; }
+  .us-table { width: 100%; border-collapse: collapse; margin: 0; }
+  .us-table td, .us-table th { border: 1px solid #000; padding: 12px; vertical-align: top; text-align: left; }
+  .label { background: #5C85D6; color: white; font-weight: bold; width: 200px; }
+  .content { background: white; }
+  .link-ref { color: #2196F3; text-decoration: underline; font-style: italic; }
+  .description-format { margin: 5px 0; }
+  .scenario-title { font-weight: bold; margin-top: 10px; }
+  .scenario-content { margin-bottom: 10px; font-family: 'Courier New', monospace; background: #f5f5f5; padding: 10px; border-left: 3px solid #5C85D6; }
+  .scenario-nuevo { border-left: 3px solid #4CAF50; background: #f1f8e9; }
+  .bullet-point { margin-left: 0; margin-bottom: 5px; }
+  .out-scope-item { margin-bottom: 10px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 11px; margin-left: 8px; }
+  .badge-original { background: #5C85D6; color: white; }
+  .badge-agregado { background: #4CAF50; color: white; }
+  .badge-br { background: #FF9800; color: white; }
+  .br-item { margin: 5px 0; }
+  .cobertura-info { background: #e3f2fd; padding: 10px; margin-top: 10px; border-radius: 5px; font-size: 12px; }
+</style>
+</head>
+<body>
+<!--
+  ============================================================================
+  PLANTILLA OFICIAL — HISTORIA DE USUARIO
+  Estándares: ISTQB CTFL v4.0 (2023) / ISO/IEC/IEEE 29119-3:2021 / ISO/IEC/IEEE 29148:2018 / OWASP Top 10:2021
+  ============================================================================
+  Esta es la estructura única que deben respetar TODAS las HU generadas:
+    1. HU ORIGINAL  → escrita por el Analista Funcional (con gaps típicos)
+    2. HU IDEAL     → output del Static Analyzer (cobertura 100%)
+
+  Convención de placeholders:
+    {{VARIABLE}}        → valor a reemplazar
+    [opcional: ...]     → bloque opcional según el estado
+
+  Estados posibles del campo "Estado":
+    - Borrador - Pendiente de Análisis Estático       (HU ORIGINAL)
+    - Análisis Estático Completado - Cobertura: X% → 100%   (HU IDEAL)
+
+  Badges en escenarios:
+    .badge-original   → escenario que ya estaba en la HU original (azul)
+    .badge-agregado   → escenario nuevo agregado por el analyzer (verde)
+    .badge-br         → indica a qué BR cubre el escenario agregado (naranja)
+
+  Clase scenario-nuevo en escenarios agregados (fondo verde claro).
+  ============================================================================
+-->
+<div class="us-container">
+  <div class="us-header">HISTORIA DE USUARIO</div>
+  <table class="us-table">
+    <tr>
+      <th scope="row" class="label">ID</th>
+      <td class="content">{{ID_HU}}</td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Nombre</th>
+      <td class="content">{{NOMBRE_HU}}</td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Épica</th>
+      <td class="content">
+        {{NOMBRE_EPICA}}<br>
+        <span class="link-ref">{{LINK_DOCUMENTACION_EPICA}}</span>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Prioridad</th>
+      <td class="content">{{PRIORIDAD}}</td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Estado</th>
+      <td class="content">{{ESTADO}}</td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Descripción</th>
+      <td class="content">
+        <div class="description-format"><strong>Como</strong> {{ROL_USUARIO}}</div>
+        <div class="description-format"><strong>Quiero</strong> {{ACCION_DESEADA}}</div>
+        <div class="description-format"><strong>Para</strong> {{BENEFICIO_OBJETIVO}}</div>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Usuarios / Roles</th>
+      <td class="content">{{USUARIOS_Y_ROLES}}</td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Reglas de Negocio</th>
+      <td class="content">
+        <!-- Repetir <div class="br-item"> tantas veces como BRs tenga la HU -->
+        <div class="br-item"><strong>BR1:</strong> {{REGLA_NEGOCIO_1}}</div>
+        <div class="br-item"><strong>BR2:</strong> {{REGLA_NEGOCIO_2}}</div>
+        <div class="br-item"><strong>BR3:</strong> {{REGLA_NEGOCIO_3}}</div>
+        <div class="br-item"><strong>BR4:</strong> {{REGLA_NEGOCIO_4}}</div>
+        <span class="link-ref">{{LINK_CASOS_DE_USO}}</span>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Precondiciones</th>
+      <td class="content">
+        • {{PRECONDICION_1}}<br>
+        • {{PRECONDICION_2}}<br>
+        • {{PRECONDICION_3}}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Dependencias</th>
+      <td class="content">
+        • {{DEPENDENCIA_1}}<br>
+        • {{DEPENDENCIA_2}}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Estimaciones</th>
+      <td class="content">
+        Story Points (SP): {{SP}}<br>
+        Valor (V 1–3): {{V}}<br>
+        Costo (C 1–3): {{C}}<br>
+        Probabilidad (P 1–3): {{P}}<br>
+        Impacto (I 1–3): {{I}}<br>
+        <strong>Riesgo (R) = P × I = {{P}} × {{I}} = {{R}}</strong><br>
+        <strong>Total VCR = V + C + R = {{V}} + {{C}} + {{R}} = {{VCR_TOTAL}}</strong><br>
+        <em>Política:</em> si <strong>VCR ≥ 9</strong> → Deuda técnica (automatizar y pasa a regresión); si es menor → Pruebas manuales.
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Escenarios de Prueba (Criterios de Aceptación)</th>
+      <td class="content">
+
+<!--
+  ESCENARIOS ORIGINALES (badge azul "Original")
+  Provienen de la HU escrita por el Analista Funcional.
+  En la HU ORIGINAL: NO llevan badge (porque aún no hay análisis comparativo).
+  En la HU IDEAL:    llevan <span class="badge badge-original">Original</span>.
+-->
+<div class="scenario-title">E1: {{TITULO_ESCENARIO_1}} <span class="badge badge-original">Original</span></div>
+<div class="scenario-content">
+  <strong>DADO</strong> {{CONTEXTO_E1}}<br>
+  <strong>CUANDO</strong> {{ACCION_E1}}<br>
+  <strong>ENTONCES</strong> {{RESULTADO_ESPERADO_E1}}
+</div>
+
+<!--
+  ESCENARIOS AGREGADOS POR EL ANALYZER (badge verde "Agregado" + badge naranja con la BR cubierta)
+  Solo aparecen en la HU IDEAL. Llevan clase "scenario-nuevo" (fondo verde claro).
+-->
+<div class="scenario-title">EN: {{TITULO_ESCENARIO_AGREGADO}} <span class="badge badge-agregado">Agregado</span> <span class="badge badge-br">BR{{N}}</span></div>
+<div class="scenario-content scenario-nuevo">
+  <strong>DADO</strong> {{CONTEXTO}}<br>
+  <strong>CUANDO</strong> {{ACCION}}<br>
+  <strong>ENTONCES</strong> {{RESULTADO_ESPERADO}}
+</div>
+
+        <!--
+          Bloque de cobertura: SOLO se incluye en la HU IDEAL (lo agrega el analyzer).
+          En la HU ORIGINAL este bloque NO existe.
+        -->
+        <div class="cobertura-info">
+          <strong>Análisis de Cobertura:</strong> {{N_ESCENARIOS_ORIGINALES}} escenarios originales + {{N_ESCENARIOS_AGREGADOS}} escenarios agregados = {{N_TOTAL_ESCENARIOS}} total<br>
+          <strong>Cobertura:</strong> {{COBERTURA_INICIAL}}% inicial → {{COBERTURA_FINAL}}% final
+        </div>
+
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Dentro del Alcance</th>
+      <td class="content">
+        • {{ITEM_DENTRO_ALCANCE_1}}<br>
+        • {{ITEM_DENTRO_ALCANCE_2}}<br>
+        • {{ITEM_DENTRO_ALCANCE_3}}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Fuera del Alcance</th>
+      <td class="content">
+        <div class='out-scope-item'>• {{ITEM_FUERA_ALCANCE_1}}<br>* Cubierto por: <span class='link-ref'>{{HU_RELACIONADA_1}}</span></div>
+        <div class='out-scope-item'>• {{ITEM_FUERA_ALCANCE_2}}<br>* {{NOTA_2}}</div>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Referencias</th>
+      <td class="content">
+        <span class="link-ref">Documento de Requerimientos</span><br>
+        <span class="link-ref">Casos de Uso asociados</span><br>
+        <span class="link-ref">ISO/IEC/IEEE 29119-3:2021 — Test Documentation</span><br>
+        <span class="link-ref">ISO/IEC/IEEE 29148:2018 — Requirements Engineering</span><br>
+        <span class="link-ref">ISTQB CTFL v4.0 (2023) — Certified Tester Foundation Level</span><br>
+        <span class="link-ref">OWASP Top 10:2021 — Web Application Security Risks</span>
+      </td>
+    </tr>
+    <tr>
+      <th scope="row" class="label">Notas / Comentarios</th>
+      <td class="content">
+        <!--
+          HU ORIGINAL: notas del analista funcional (estado borrador, pendientes, etc.)
+          HU IDEAL:    resumen del analyzer (gaps detectados, cobertura final, fecha)
+                       Ej: "Análisis Estático: N gaps identificados y corregidos.
+                            Cobertura Final: 100% de las reglas de negocio cubiertas.
+                            Generado por: Static Analyzer (QASL Framework) | YYYY-MM-DD HH:MM"
+        -->
+        {{NOTAS_O_RESUMEN_ANALYZER}}
+      </td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>

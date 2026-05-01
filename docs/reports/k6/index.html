@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QASL Framework · K6 Performance Report · HU_REG_01</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, system-ui, sans-serif;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .container { max-width: 1280px; margin: 0 auto; padding: 32px 40px; }
+  .header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+    display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;
+  }
+  .header h1 { margin: 0; font-size: 24px; font-weight: 600; color: #111827; }
+  .header h1 .accent { color: #2563eb; }
+  .header .subtitle { font-size: 13px; color: #6b7280; margin-top: 4px; }
+  .header .meta { text-align: right; font-size: 12px; color: #6b7280; }
+  .header .meta strong { color: #1f2937; font-weight: 600; }
+
+  .badge {
+    display: inline-block; padding: 4px 10px; border-radius: 4px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .badge-pass { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+  .badge-fail { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+  h2 {
+    font-size: 14px; font-weight: 600; color: #111827;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin: 40px 0 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+  }
+  .kpi-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 18px 20px;
+  }
+  .kpi-card .label {
+    font-size: 11px; color: #6b7280; text-transform: uppercase;
+    letter-spacing: 0.04em; font-weight: 500; margin-bottom: 8px;
+  }
+  .kpi-card .value { font-size: 26px; font-weight: 600; color: #111827; line-height: 1.1; }
+  .kpi-card .unit { font-size: 13px; color: #6b7280; margin-left: 4px; font-weight: 400; }
+  .kpi-card.accent { border-left: 3px solid #2563eb; }
+  .kpi-card.pass .value { color: #059669; }
+  .kpi-card.fail .value { color: #dc2626; }
+
+  .chart-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  }
+  .chart-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 20px;
+  }
+  .chart-card .chart-title {
+    font-size: 13px; font-weight: 600; color: #374151;
+    margin-bottom: 12px;
+  }
+  .chart-card .chart-subtitle {
+    font-size: 11px; color: #6b7280; margin-bottom: 16px;
+  }
+  .chart-card canvas { max-height: 240px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }
+  th {
+    background: #f9fafb; font-weight: 600; color: #374151;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  .table-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  code {
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    font-size: 12px;
+    background: #f3f4f6;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #374151;
+  }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 11px;
+    color: #9ca3af;
+    text-align: center;
+  }
+  .footer .stack {
+    display: inline-flex; gap: 16px; align-items: center;
+  }
+  .footer strong { color: #6b7280; font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div>
+      <h1><span class="accent">QASL</span> Framework · K6 Performance Report</h1>
+      <div class="subtitle">HU_REG_01 · Concurrency demo · Token-acquisition flow · Generated 1/5/2026, 14:23:48</div>
+    </div>
+    <div class="meta">
+      <div><strong>Status:</strong> <span class="badge badge-pass">ALL THRESHOLDS PASSED</span></div>
+      <div style="margin-top:6px"><strong>Test type:</strong> Concurrency · 2 VUs (demo)</div>
+      <div><strong>Endpoint base:</strong> automationexercise.com</div>
+    </div>
+  </div>
+
+  <h2>Key Performance Indicators</h2>
+  <div class="kpi-grid">
+    <div class="kpi-card accent">
+      <div class="label">Iterations completed</div>
+      <div class="value">20</div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="label">HTTP requests</div>
+      <div class="value">80<span class="unit">total</span></div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="label">Throughput</div>
+      <div class="value">3.79<span class="unit">req/s</span></div>
+    </div>
+    <div class="kpi-card pass">
+      <div class="label">HTTP failure rate</div>
+      <div class="value">0.00%</div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Response time · p50</div>
+      <div class="value">242<span class="unit">ms</span></div>
+    </div>
+    <div class="kpi-card pass">
+      <div class="label">Response time · p95</div>
+      <div class="value">302<span class="unit">ms</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Response time · p99</div>
+      <div class="value">0<span class="unit">ms</span></div>
+    </div>
+    <div class="kpi-card accent">
+      <div class="label">Max VUs reached</div>
+      <div class="value">2</div>
+    </div>
+  </div>
+
+  <h2>Thresholds (SLOs)</h2>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Threshold expression</th>
+          <th style="text-align:right">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td><code>token_acquisition_ms</code></td>
+            <td><code>p(95)<2000</code></td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><code>auth_verify_login_success</code></td>
+            <td><code>rate>0.50</code></td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><code>http_req_duration</code></td>
+            <td><code>p(95)<3000</code></td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><code>setup_create_account_success</code></td>
+            <td><code>rate>0.50</code></td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><code>http_req_failed</code></td>
+            <td><code>rate<0.50</code></td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Time-series</h2>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Response time</div>
+      <div class="chart-subtitle">Average and p95 across the test duration · ms</div>
+      <canvas id="chartRespTime"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Virtual users</div>
+      <div class="chart-subtitle">Concurrency profile across the test</div>
+      <canvas id="chartVUs"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Request volume</div>
+      <div class="chart-subtitle">Requests per bucket · proxy for throughput</div>
+      <canvas id="chartReqRate"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Business success rates</div>
+      <div class="chart-subtitle">Per-step success rate of the registration flow</div>
+      <canvas id="chartBusiness"></canvas>
+    </div>
+  </div>
+
+  <h2>Business flow steps (HU_REG_01)</h2>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Step</th>
+          <th>Endpoint</th>
+          <th style="text-align:right">Success rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1 · SETUP</td><td><code>POST /api/createAccount</code></td><td style="text-align:right">100.00%</td></tr>
+        <tr><td>2 · AUTH (token acquisition)</td><td><code>POST /api/verifyLogin</code></td><td style="text-align:right">100.00%</td></tr>
+        <tr><td>3 · AUTHENTICATED</td><td><code>POST /api/searchProduct</code> (con <code>X-Auth-Token</code>)</td><td style="text-align:right">100.00%</td></tr>
+        <tr><td>4 · TEARDOWN</td><td><code>DELETE /api/deleteAccount</code></td><td style="text-align:right">100.00%</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Custom metrics</h2>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Description</th>
+          <th class="num">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>token_acquisition_ms (p95)</code></td><td>Tiempo de adquisición del token simulado vía /api/verifyLogin</td><td class="num">325.6 ms</td></tr>
+        <tr><td><code>business_transactions_completed</code></td><td>Iteraciones que completaron setup + auth + búsqueda autenticada</td><td class="num">20</td></tr>
+        <tr><td><code>data_sent</code></td><td>Bytes enviados</td><td class="num">17718 B</td></tr>
+        <tr><td><code>data_received</code></td><td>Bytes recibidos</td><td class="num">89640 B</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Checks (180/180 passed)</h2>
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>Check</th>
+          <th class="num">Passed</th>
+          <th class="num">Failed</th>
+          <th style="text-align:right">Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+          <tr>
+            <td>SETUP · Create account (POST /api/createAccount) › HTTP 200</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>SETUP · Create account (POST /api/createAccount) › responseCode 201 (created)</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>AUTH · Verify login (token acquisition) › HTTP 200</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>AUTH · Verify login (token acquisition) › responseCode 200 (user exists)</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>AUTHENTICATED · Search products (uses simulated token) › HTTP 200</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>AUTHENTICATED · Search products (uses simulated token) › responseCode 200 (products returned)</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>AUTHENTICATED · Search products (uses simulated token) › token sent in header</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>TEARDOWN · Delete account (cleanup) › HTTP 200</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td>TEARDOWN · Delete account (cleanup) › responseCode 200 (account deleted)</td>
+            <td class="num">20</td>
+            <td class="num">0</td>
+            <td style="text-align:right"><span class="badge badge-pass">PASS</span></td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <div class="stack">
+      <strong>QASL Framework</strong> · F10.3 Performance · K6 v0.57 · Chart.js v4 · Generated 1/5/2026, 14:23:48
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const COLOR_ACCENT = '#2563eb';
+  const COLOR_ACCENT_SOFT = 'rgba(37, 99, 235, 0.10)';
+  const COLOR_GRAY = '#9ca3af';
+  const COLOR_PASS = '#059669';
+  const COLOR_FAIL = '#dc2626';
+
+  const baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: '#374151', font: { size: 11 } } } },
+    scales: {
+      x: { grid: { color: '#f3f4f6' }, ticks: { color: '#6b7280', font: { size: 10 } } },
+      y: { grid: { color: '#f3f4f6' }, ticks: { color: '#6b7280', font: { size: 10 } }, beginAtZero: true },
+    },
+  };
+
+  new Chart(document.getElementById('chartRespTime'), {
+    type: 'line',
+    data: {
+      labels: ["0s","1s","1s","2s","3s","3s","4s","4s","5s","6s","6s","7s","8s","8s","9s","10s","10s","11s","12s","12s","13s","13s","14s","15s","15s","16s","17s","17s","18s","19s"],
+      datasets: [
+        { label: 'avg (ms)', data: [541.3,436.4,241.4,238.1,241.9,241.5,246.9,251.4,249.4,243.4,246,236.9,303,240.6,252.5,240,254,247.9,242.5,245.3,241.1,256.3,237.5,267.6,0,254.8,244.8,0,236.9,237.4], borderColor: COLOR_ACCENT, backgroundColor: COLOR_ACCENT_SOFT, fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+        { label: 'p95 (ms)', data: [841.4,811.1,241.4,249.7,252.7,241.5,270.5,260.7,249.4,252,264,236.9,305.6,253.2,269.3,240,296.1,263.6,242.5,265.6,247.7,256.3,252.3,301.6,0,283.1,256.9,0,241.2,250.1], borderColor: COLOR_GRAY, borderDash: [4, 4], borderWidth: 1.5, pointRadius: 0, fill: false },
+      ],
+    },
+    options: baseOpts,
+  });
+
+  new Chart(document.getElementById('chartVUs'), {
+    type: 'line',
+    data: {
+      labels: ["0s","1s","1s","2s","3s","3s","4s","5s","5s","6s","7s","7s","8s","9s","9s","10s","11s","11s","12s","13s","13s","14s","15s","15s","16s","17s","17s","18s","19s","19s"],
+      datasets: [{ label: 'VUs', data: [2,2,0,2,2,0,2,2,0,2,2,0,2,2,0,2,2,0,2,2,0,2,2,0,2,2,0,2,2,1], borderColor: COLOR_ACCENT, backgroundColor: COLOR_ACCENT_SOFT, fill: true, stepped: true, borderWidth: 2, pointRadius: 0 }],
+    },
+    options: baseOpts,
+  });
+
+  new Chart(document.getElementById('chartReqRate'), {
+    type: 'bar',
+    data: {
+      labels: ["0s","1s","1s","2s","3s","3s","4s","4s","5s","6s","6s","7s","8s","8s","9s","10s","10s","11s","12s","12s","13s","13s","14s","15s","15s","16s","17s","17s","18s","19s"],
+      datasets: [{ label: 'requests', data: [4,3,1,3,4,1,3,4,1,2,5,1,2,4,2,1,5,2,1,5,2,1,4,3,0,4,4,0,4,4], backgroundColor: COLOR_ACCENT_SOFT, borderColor: COLOR_ACCENT, borderWidth: 1 }],
+    },
+    options: baseOpts,
+  });
+
+  new Chart(document.getElementById('chartBusiness'), {
+    type: 'bar',
+    data: {
+      labels: ['Setup', 'Auth (token)', 'Authd request', 'Teardown'],
+      datasets: [{
+        label: 'success rate (%)',
+        data: [100.0, 100.0, 100.0, 100.0],
+        backgroundColor: [COLOR_ACCENT_SOFT, COLOR_ACCENT_SOFT, COLOR_ACCENT_SOFT, COLOR_ACCENT_SOFT],
+        borderColor: COLOR_ACCENT, borderWidth: 1.5,
+      }],
+    },
+    options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, max: 100, ticks: { ...baseOpts.scales.y.ticks, callback: (v) => v + '%' } } } },
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "ultima_actualizacion": "2026-04-30 22:14:08",
+  "total_hus_analizadas": 1,
+  "total_gaps_encontrados": 5,
+  "total_gaps_criticos": 0,
+  "cobertura_promedio": 25.0,
+  "hus": {
+    "HU_REG_01": {
+      "nombre": "Registro de Nuevo Usuario",
+      "epica": "Módulo de Onboarding",
+      "cobertura": 25.0,
+      "gaps": 5,
+      "gaps_criticos": 0,
+      "brs": 4,
+      "escenarios_originales": 2,
+      "fecha_analisis": "2026-04-30 22:14",
+      "reporte": "HU_REG_01_REPORT.md",
+      "hu_actualizada": "HU_REG_01_ACTUALIZADA.html"
+    }
+  }
+}

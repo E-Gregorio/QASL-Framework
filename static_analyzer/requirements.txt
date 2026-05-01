@@ -1,0 +1,11 @@
+# Static Analyzer - Dependencies
+# Python 3.8+
+
+# Análisis semántico con Claude AI
+anthropic>=0.18.0
+
+# Variables de entorno (.env con ANTHROPIC_API_KEY)
+python-dotenv>=1.0.0
+
+# Parsing de HU en formato HTML
+beautifulsoup4>=4.12.0

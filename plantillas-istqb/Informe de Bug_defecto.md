@@ -1,5 +1,5 @@
 🐞 INFORME DE DEFECTO – PLANTILLA FINAL
-EPIDATA · Oficina de Calidad — Plantilla alineada a ISTQB / ISO 29119
+Plantilla alineada a ISTQB / ISO 29119
 Normas de referencia: ISTQB Foundation v4.0 (Cap. 5 – Evaluación y Reporte de Defectos), ISO/IEC/IEEE 29119-3 (Test Incident Report) y IEEE 829
 ID: BUG-____
 Título: __________________________________________

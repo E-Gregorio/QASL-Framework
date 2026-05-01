@@ -30,7 +30,7 @@ scrape_configs:
 
       # Solo recolectar contenedores en la red qa-network
       - source_labels: ['__meta_docker_network_name']
-        regex: 'qa-hu-template_qa-network'
+        regex: 'qasl-framework_qa-network'
         action: keep
 
       # Etiqueta para identificar el proyecto

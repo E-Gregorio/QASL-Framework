@@ -1,10 +1,10 @@
 version: '3.8'
 
 services:
-  # Grafana - Dashboard de métricas
+  # Grafana - Dashboard de métricas (pin a 11.4.0 · soporta schemaVersion 38 nativo · evita bugs de :latest)
   grafana:
-    image: grafana/grafana:latest
-    container_name: epidata-grafana
+    image: grafana/grafana:11.4.0
+    container_name: qasl-grafana
     ports:
       - "3001:3000"
     environment:
@@ -15,6 +15,7 @@ services:
       - GF_INSTALL_PLUGINS=grafana-k6-app
       - GF_RENDERING_SERVER_URL=http://renderer:8081/render
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
+      - GF_RENDERING_RENDERER_TOKEN=qasl-renderer-secret-2026
       - GF_LOG_FILTERS=rendering:debug
     volumes:
       - ./docker/grafana/provisioning:/etc/grafana/provisioning
@@ -29,7 +30,7 @@ services:
   # Grafana Image Renderer - Para generar PDFs y PNGs
   renderer:
     image: grafana/grafana-image-renderer:latest
-    container_name: epidata-grafana-renderer
+    container_name: qasl-grafana-renderer
     ports:
       - "8081:8081"
     environment:
@@ -37,6 +38,7 @@ services:
       - RENDERING_MODE=default
       - RENDERING_CLUSTERING_MODE=default
       - RENDERING_CLUSTERING_MAX_CONCURRENCY=5
+      - AUTH_TOKEN=qasl-renderer-secret-2026
     networks:
       - qa-network
     restart: unless-stopped
@@ -44,7 +46,7 @@ services:
   # InfluxDB - Base de datos para métricas K6 (v1.8 compatible con K6 nativo)
   influxdb:
     image: influxdb:1.8
-    container_name: epidata-influxdb
+    container_name: qasl-influxdb
     ports:
       - "8086:8086"
     environment:
@@ -59,7 +61,7 @@ services:
   # n8n - Automatización de workflows
   n8n:
     image: n8nio/n8n:latest
-    container_name: epidata-n8n
+    container_name: qasl-n8n
     ports:
       - "5678:5678"
     environment:
@@ -82,7 +84,7 @@ services:
   # Allure - Servidor de reportes
   allure:
     image: frankescobar/allure-docker-service:latest
-    container_name: epidata-allure
+    container_name: qasl-allure
     ports:
       - "4040:4040"
       - "5050:5050"
@@ -101,17 +103,16 @@ services:
   # PostgreSQL - Base de datos para Testing QA
   postgres:
     image: postgres:15-alpine
-    container_name: sigma-postgres
+    container_name: qasl-postgres
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=sigma_qa
-      - POSTGRES_PASSWORD=sigma_qa_2024
-      - POSTGRES_DB=sigma_test
+      - POSTGRES_USER=qasl_user
+      - POSTGRES_PASSWORD=qasl_pass
+      - POSTGRES_DB=qasl_test
       - TZ=America/Argentina/Buenos_Aires
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - qa-network
     restart: unless-stopped
@@ -119,7 +120,7 @@ services:
   # Adminer - GUI Web para PostgreSQL/SQL Server
   adminer:
     image: adminer:latest
-    container_name: sigma-adminer
+    container_name: qasl-adminer
     ports:
       - "8083:8080"
     environment:
@@ -134,7 +135,7 @@ services:
   # Redis - Cache para n8n (opcional)
   redis:
     image: redis:7-alpine
-    container_name: epidata-redis
+    container_name: qasl-redis
     ports:
       - "6379:6379"
     volumes:
@@ -146,7 +147,7 @@ services:
   # SQL Server - Base de datos para testing
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: epidata-sqlserver
+    container_name: qasl-sqlserver
     ports:
       - "1433:1433"
     environment:
@@ -162,7 +163,7 @@ services:
   # OWASP ZAP - Security Testing
   zap:
     image: zaproxy/zap-stable
-    container_name: epidata-zap
+    container_name: qasl-zap
     ports:
       - "8082:8080"
       - "8090:8090"
@@ -180,7 +181,7 @@ services:
   # Loki - Agregador de Logs (ligero, no indexa texto completo)
   loki:
     image: grafana/loki:latest
-    container_name: epidata-loki
+    container_name: qasl-loki
     ports:
       - "3100:3100"
     volumes:
@@ -194,7 +195,7 @@ services:
   # Promtail - Recolector de Logs de contenedores Docker
   promtail:
     image: grafana/promtail:latest
-    container_name: epidata-promtail
+    container_name: qasl-promtail
     volumes:
       - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro

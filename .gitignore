@@ -1,10 +1,15 @@
 # Dependencies
 node_modules/
 
-# Reports (generated)
+# Reports (generated · local-only)
 reports/
 allure-results/
 .api-captures/
+
+# docs/ es la versión publicada (GitHub Pages) y SÍ va al repo
+!docs/
+!docs/reports/
+!docs/reports/**
 
 # Temp files
 .temp-k6/
@@ -42,8 +47,9 @@ playwright-report/
 .zap-last-results.json
 .k6-last-results.json
 
-# Allure report (generated)
+# Allure report (generated · local-only · docs/ es la versión publicada)
 allure-report/
+!docs/reports/e2e/
 
 # Windows
 nul
@@ -58,7 +64,3 @@ docker/influxdb/data/
 *.rar
 *.zip
 *.tar.gz
-
-# Sigma analyzer cache
-sigma_analyzer/__pycache__/
-sigma_analyzer/*.pyc
