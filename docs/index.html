@@ -4,55 +4,160 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QASL Framework · Quality Assurance Shift-Left · Public Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="hero">
+  <div class="hero-bg-grid"></div>
   <div class="container">
-    <div class="hero-tag">QASL FRAMEWORK</div>
-    <h1>Quality Assurance Shift-Left</h1>
-    <p class="hero-sub">A 10-phase methodology where the DoD of one actor becomes the DoR of the next, ending with 4 layers of automated defect detection — Functional, API contract, Performance and Security.</p>
+    <div class="hero-tag">QASL FRAMEWORK · v1.2</div>
+    <h1>Quality Assurance <span class="hero-accent">Shift-Left</span></h1>
+    <p class="hero-sub">Una metodología de 10 fases donde el <strong>DoD de un actor es el DoR del siguiente</strong>. Termina con 4 capas de detección automatizada de defectos: <strong>Functional</strong>, <strong>API contract</strong>, <strong>Performance</strong> y <strong>Security</strong>.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="27">27</div>
+        <div class="hero-stat-label">Defects detected on the SUT</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="4">4</div>
+        <div class="hero-stat-label">Verification layers</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="20">20</div>
+        <div class="hero-stat-label">Test cases · auto-traced from HU</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">25<span class="hero-arrow">→</span>100<span class="hero-stat-unit">%</span></div>
+        <div class="hero-stat-label">HU coverage · before / after AI</div>
+      </div>
+    </div>
+
     <div class="hero-meta">
-      <span><strong>Last build:</strong> 1/5/2026, 17:44:00</span>
+      <span><strong>Last build:</strong> 1/5/2026, 18:06:36</span>
       <span><strong>SUT:</strong> automationexercise.com</span>
-      <span><strong>HU:</strong> HU_REG_01 · Registro de Nuevo Usuario</span>
+      <span><strong>HU under test:</strong> HU_REG_01 · Registro de Nuevo Usuario</span>
     </div>
   </div>
 </header>
 
+<section class="phase-journey">
+  <div class="container">
+    <div class="phase-row">
+      <div class="phase-chip"><span class="phase-id">F0</span><span class="phase-name">Cliente · Brief</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F1</span><span class="phase-name">Analista · HU</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F2</span><span class="phase-name">QA · Static (AI)</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F3</span><span class="phase-name">Refinamiento</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F4</span><span class="phase-name">Sign-off</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F5</span><span class="phase-name">Trazabilidad (AI)</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F6</span><span class="phase-name">DevOps · Deploy</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F7</span><span class="phase-name">QA · Smoke</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F8</span><span class="phase-name">PM · Backlog</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F9</span><span class="phase-name">Planning · VCR</span><span class="phase-check">✓</span></div><div class="phase-chip"><span class="phase-id">F10</span><span class="phase-name">Execution · 4 layers</span><span class="phase-check">✓</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="shift-left">
+  <div class="container">
+    <div class="section-head">
+      <h2>Shift-Left Phase · AI-driven static analysis</h2>
+      <p class="section-sub">Antes de escribir código de prueba, el framework analiza la HU con Claude AI y genera la trazabilidad completa: Test Suites, Preconditions y Test Cases. Aquí están los resultados de la HU bajo análisis.</p>
+    </div>
+
+    <div class="shift-grid">
+      <div class="shift-card shift-card-hero">
+        <div class="shift-card-tag">F2 · STATIC ANALYSIS</div>
+        <div class="coverage-track">
+          <div class="coverage-from">
+            <div class="coverage-label">HU original</div>
+            <div class="coverage-value">25<span>%</span></div>
+            <div class="coverage-bar"><div class="coverage-bar-fill bar-low" style="width:25%"></div></div>
+          </div>
+          <div class="coverage-arrow">→</div>
+          <div class="coverage-to">
+            <div class="coverage-label">HU IDEAL (post-AI)</div>
+            <div class="coverage-value">100<span>%</span></div>
+            <div class="coverage-bar"><div class="coverage-bar-fill bar-full" style="width:100%"></div></div>
+          </div>
+        </div>
+        <div class="shift-card-foot">
+          <strong>5</strong> gaps detectados por Claude AI
+          <span class="dot"></span>
+          <strong>3</strong> ALTO
+          <span class="dot"></span>
+          <strong>2</strong> MEDIO
+        </div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F2 · BUSINESS RULES</div>
+        <div class="shift-mini-value">4</div>
+        <div class="shift-mini-label">Reglas de negocio analizadas</div>
+        <div class="shift-mini-foot">8 escenarios necesarios · 7 finales tras refinamiento</div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F5 · TEST SUITES</div>
+        <div class="shift-mini-value">3</div>
+        <div class="shift-mini-label">Suites generadas</div>
+        <div class="shift-mini-foot">TS01 positivos · TS02 negativos · TS03 seguridad e integración</div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F5 · PRECONDITIONS</div>
+        <div class="shift-mini-value">9</div>
+        <div class="shift-mini-label">Preconditions reutilizables</div>
+        <div class="shift-mini-foot">Auto-generadas por Claude · referenciadas por TC</div>
+      </div>
+
+      <div class="shift-card shift-card-mini shift-card-highlight">
+        <div class="shift-card-tag">F5 · TEST CASES</div>
+        <div class="shift-mini-value">20</div>
+        <div class="shift-mini-label">Test cases generados pre-código</div>
+        <div class="shift-mini-foot">Trazabilidad <strong>1:1</strong> con la suite Playwright (F10.1)</div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F0 → F9 · DoR/DoD</div>
+        <div class="shift-mini-value">10</div>
+        <div class="shift-mini-label">Handoffs entre 6 actores</div>
+        <div class="shift-mini-foot">Cada DoD bloquea hasta cumplir el DoR del siguiente · gap charts en flow_state</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="kpis">
   <div class="container">
-    <h2>Headline KPIs</h2>
+    <div class="section-head">
+      <h2>Execution Phase · F10 · 4-layer defect detection</h2>
+      <p class="section-sub">Suite ejecutada contra el SUT. Las 4 capas se ejecutan independientemente y consolidan en Grafana. Cada layer es un gate de calidad medible.</p>
+    </div>
     <div class="kpi-grid">
-      <div class="kpi-card kpi-blue">
-        <div class="kpi-label">Layers verified</div>
-        <div class="kpi-value">4</div>
-        <div class="kpi-foot">Functional · API · Performance · Security</div>
-      </div>
-      <div class="kpi-card kpi-blue">
-        <div class="kpi-label">Defects detected</div>
-        <div class="kpi-value">27</div>
-        <div class="kpi-foot">1 BUG · 26 ZAP findings</div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">F10.1 · E2E Pass Rate</div>
+        <div class="kpi-value" data-count="85">85.0%</div>
+        <div class="kpi-foot">17 passed · 3 failed · Playwright</div>
       </div>
       <div class="kpi-card kpi-green">
-        <div class="kpi-label">E2E Pass Rate</div>
-        <div class="kpi-value">85.0%</div>
-        <div class="kpi-foot">17 passed · 3 failed</div>
-      </div>
-      <div class="kpi-card kpi-green">
-        <div class="kpi-label">API Assertions</div>
+        <div class="kpi-label">F10.2 · API Assertions</div>
         <div class="kpi-value">83.8%</div>
-        <div class="kpi-foot">124/148 passed</div>
+        <div class="kpi-foot">124/148 passed · Newman strict</div>
       </div>
       <div class="kpi-card kpi-green">
-        <div class="kpi-label">K6 Performance</div>
+        <div class="kpi-label">F10.3 · K6 Performance p95</div>
         <div class="kpi-value">302<span class="kpi-unit">ms</span></div>
-        <div class="kpi-foot">p95 · 20 iterations · 2 VUs · thresholds 5/5</div>
+        <div class="kpi-foot">20 iters · 2 VUs · thresholds 5/5</div>
       </div>
       <div class="kpi-card kpi-amber">
-        <div class="kpi-label">Security Alerts</div>
-        <div class="kpi-value">26</div>
+        <div class="kpi-label">F10.4 · Security Alerts</div>
+        <div class="kpi-value" data-count="26">26</div>
         <div class="kpi-foot">1 High · 5 Medium · 12 Low · 8 Info</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">F10.5 · Defects detected</div>
+        <div class="kpi-value" data-count="27">27</div>
+        <div class="kpi-foot">1 BUG · 26 ZAP findings · all real on SUT</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">F10.5 · Layers consolidated</div>
+        <div class="kpi-value" data-count="4">4</div>
+        <div class="kpi-foot">Functional · API · Performance · Security · in Grafana</div>
       </div>
     </div>
   </div>
@@ -129,7 +234,7 @@
   <div class="container">
     <p><strong>QASL Framework</strong> · Quality Assurance Shift-Left · v1.2</p>
     <p class="footer-meta">Aligned to ISTQB CTFL v4.0 · ISO/IEC/IEEE 29119-3:2021 · IEEE 1044-2009 · ISO/IEC 25010:2011 · OWASP Top 10:2021 · ISO 31000:2018</p>
-    <p class="footer-meta">Generated automatically from JSON artifacts · Last build 1/5/2026, 17:44:00</p>
+    <p class="footer-meta">Generated automatically from JSON artifacts · Last build 1/5/2026, 18:06:36</p>
   </div>
 </footer>
 </body>

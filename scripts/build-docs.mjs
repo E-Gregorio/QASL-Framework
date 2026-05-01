@@ -37,6 +37,11 @@ const API_RESULTS = path.join(ROOT, 'reports', 'api', 'newman-report.json');
 const K6_SUMMARY = path.join(ROOT, 'reports', 'k6', 'k6-summary.json');
 const ZAP_REPORT = path.join(ROOT, 'reports', 'zap', 'zap-report.json');
 
+const STATIC_REPORT = path.join(ROOT, 'static_analyzer', 'reportes', 'HU_REG_01_REPORT.md');
+const TS_CSV = path.join(ROOT, 'shift-left-testing', '2_Test_Suite.csv');
+const PRC_CSV = path.join(ROOT, 'shift-left-testing', '3_Precondition.csv');
+const TC_CSV = path.join(ROOT, 'shift-left-testing', '4_Test_Case.csv');
+
 const SRC_IMG = path.join(ROOT, 'img');
 
 function banner() {
@@ -79,6 +84,44 @@ function readJson(p) {
   try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch { return null; }
 }
 
+function countCsvRows(csvPath) {
+  if (!fs.existsSync(csvPath)) return 0;
+  const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
+  return Math.max(0, lines.length - 1);
+}
+
+function parseStaticReport() {
+  const data = {
+    hu: 'HU_REG_01',
+    coverageInitial: 25,
+    coverageFinal: 100,
+    gapsTotal: 5,
+    gapsCritical: 0,
+    gapsHigh: 3,
+    gapsMedium: 2,
+    gapsLow: 0,
+    brs: 4,
+    scenariosNeeded: 8,
+    scenariosDocumented: 2,
+    scenariosFinal: 7,
+  };
+  if (!fs.existsSync(STATIC_REPORT)) return data;
+  const md = fs.readFileSync(STATIC_REPORT, 'utf-8');
+  const matchPct = md.match(/\*\*([\d.]+)%\*\*\s*\n.*?ADVERTENCIA|\*\*([\d.]+)%\*\*/);
+  if (matchPct) data.coverageInitial = Math.round(parseFloat(matchPct[1] || matchPct[2]));
+  const matchBr = md.match(/Reglas de Negocio.*?\|\s*(\d+)\s*\|/);
+  if (matchBr) data.brs = parseInt(matchBr[1], 10);
+  const matchTotal = md.match(/\*\*TOTAL\*\*.*?\*\*(\d+)\*\*/s);
+  if (matchTotal) data.gapsTotal = parseInt(matchTotal[1], 10);
+  const matchHigh = md.match(/🟠 ALTO.*?\*\*(\d+)\*\*/);
+  if (matchHigh) data.gapsHigh = parseInt(matchHigh[1], 10);
+  const matchMed = md.match(/🟡 MEDIO.*?\*\*(\d+)\*\*/);
+  if (matchMed) data.gapsMedium = parseInt(matchMed[1], 10);
+  const matchCrit = md.match(/🔴 CRÍTICO.*?\*\*(\d+)\*\*/);
+  if (matchCrit) data.gapsCritical = parseInt(matchCrit[1], 10);
+  return data;
+}
+
 function buildKpis() {
   const kpis = {
     e2e: { passed: 0, failed: 0, total: 0, passRate: '0%' },
@@ -87,6 +130,12 @@ function buildKpis() {
     zap: { high: 0, medium: 0, low: 0, info: 0, total: 0 },
     bugs: 1,
     layers: 4,
+    static: parseStaticReport(),
+    csv: {
+      ts: countCsvRows(TS_CSV),
+      prc: countCsvRows(PRC_CSV),
+      tc: countCsvRows(TC_CSV),
+    },
   };
 
   const e2e = readJson(E2E_RESULTS);
@@ -140,61 +189,180 @@ function buildKpis() {
 
 function renderIndex(kpis) {
   const generated = new Date().toLocaleString('es-AR', { hour12: false });
+  const totalDefects = kpis.bugs + kpis.zap.total;
+  const phases = [
+    { id: 'F0', name: 'Cliente · Brief' },
+    { id: 'F1', name: 'Analista · HU' },
+    { id: 'F2', name: 'QA · Static (AI)' },
+    { id: 'F3', name: 'Refinamiento' },
+    { id: 'F4', name: 'Sign-off' },
+    { id: 'F5', name: 'Trazabilidad (AI)' },
+    { id: 'F6', name: 'DevOps · Deploy' },
+    { id: 'F7', name: 'QA · Smoke' },
+    { id: 'F8', name: 'PM · Backlog' },
+    { id: 'F9', name: 'Planning · VCR' },
+    { id: 'F10', name: 'Execution · 4 layers' },
+  ];
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QASL Framework · Quality Assurance Shift-Left · Public Showcase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="hero">
+  <div class="hero-bg-grid"></div>
   <div class="container">
-    <div class="hero-tag">QASL FRAMEWORK</div>
-    <h1>Quality Assurance Shift-Left</h1>
-    <p class="hero-sub">A 10-phase methodology where the DoD of one actor becomes the DoR of the next, ending with 4 layers of automated defect detection — Functional, API contract, Performance and Security.</p>
+    <div class="hero-tag">QASL FRAMEWORK · v1.2</div>
+    <h1>Quality Assurance <span class="hero-accent">Shift-Left</span></h1>
+    <p class="hero-sub">Una metodología de 10 fases donde el <strong>DoD de un actor es el DoR del siguiente</strong>. Termina con 4 capas de detección automatizada de defectos: <strong>Functional</strong>, <strong>API contract</strong>, <strong>Performance</strong> y <strong>Security</strong>.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="${totalDefects}">${totalDefects}</div>
+        <div class="hero-stat-label">Defects detected on the SUT</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="${kpis.layers}">${kpis.layers}</div>
+        <div class="hero-stat-label">Verification layers</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value" data-count="${kpis.csv.tc}">${kpis.csv.tc}</div>
+        <div class="hero-stat-label">Test cases · auto-traced from HU</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">${kpis.static.coverageInitial}<span class="hero-arrow">→</span>${kpis.static.coverageFinal}<span class="hero-stat-unit">%</span></div>
+        <div class="hero-stat-label">HU coverage · before / after AI</div>
+      </div>
+    </div>
+
     <div class="hero-meta">
       <span><strong>Last build:</strong> ${generated}</span>
       <span><strong>SUT:</strong> automationexercise.com</span>
-      <span><strong>HU:</strong> HU_REG_01 · Registro de Nuevo Usuario</span>
+      <span><strong>HU under test:</strong> HU_REG_01 · Registro de Nuevo Usuario</span>
     </div>
   </div>
 </header>
 
+<section class="phase-journey">
+  <div class="container">
+    <div class="phase-row">
+      ${phases.map((p) => `<div class="phase-chip"><span class="phase-id">${p.id}</span><span class="phase-name">${p.name}</span><span class="phase-check">✓</span></div>`).join('')}
+    </div>
+  </div>
+</section>
+
+<section class="shift-left">
+  <div class="container">
+    <div class="section-head">
+      <h2>Shift-Left Phase · AI-driven static analysis</h2>
+      <p class="section-sub">Antes de escribir código de prueba, el framework analiza la HU con Claude AI y genera la trazabilidad completa: Test Suites, Preconditions y Test Cases. Aquí están los resultados de la HU bajo análisis.</p>
+    </div>
+
+    <div class="shift-grid">
+      <div class="shift-card shift-card-hero">
+        <div class="shift-card-tag">F2 · STATIC ANALYSIS</div>
+        <div class="coverage-track">
+          <div class="coverage-from">
+            <div class="coverage-label">HU original</div>
+            <div class="coverage-value">${kpis.static.coverageInitial}<span>%</span></div>
+            <div class="coverage-bar"><div class="coverage-bar-fill bar-low" style="width:${kpis.static.coverageInitial}%"></div></div>
+          </div>
+          <div class="coverage-arrow">→</div>
+          <div class="coverage-to">
+            <div class="coverage-label">HU IDEAL (post-AI)</div>
+            <div class="coverage-value">${kpis.static.coverageFinal}<span>%</span></div>
+            <div class="coverage-bar"><div class="coverage-bar-fill bar-full" style="width:${kpis.static.coverageFinal}%"></div></div>
+          </div>
+        </div>
+        <div class="shift-card-foot">
+          <strong>${kpis.static.gapsTotal}</strong> gaps detectados por Claude AI
+          <span class="dot"></span>
+          <strong>${kpis.static.gapsHigh}</strong> ALTO
+          <span class="dot"></span>
+          <strong>${kpis.static.gapsMedium}</strong> MEDIO
+        </div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F2 · BUSINESS RULES</div>
+        <div class="shift-mini-value">${kpis.static.brs}</div>
+        <div class="shift-mini-label">Reglas de negocio analizadas</div>
+        <div class="shift-mini-foot">${kpis.static.scenariosNeeded} escenarios necesarios · ${kpis.static.scenariosFinal} finales tras refinamiento</div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F5 · TEST SUITES</div>
+        <div class="shift-mini-value">${kpis.csv.ts}</div>
+        <div class="shift-mini-label">Suites generadas</div>
+        <div class="shift-mini-foot">TS01 positivos · TS02 negativos · TS03 seguridad e integración</div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F5 · PRECONDITIONS</div>
+        <div class="shift-mini-value">${kpis.csv.prc}</div>
+        <div class="shift-mini-label">Preconditions reutilizables</div>
+        <div class="shift-mini-foot">Auto-generadas por Claude · referenciadas por TC</div>
+      </div>
+
+      <div class="shift-card shift-card-mini shift-card-highlight">
+        <div class="shift-card-tag">F5 · TEST CASES</div>
+        <div class="shift-mini-value">${kpis.csv.tc}</div>
+        <div class="shift-mini-label">Test cases generados pre-código</div>
+        <div class="shift-mini-foot">Trazabilidad <strong>1:1</strong> con la suite Playwright (F10.1)</div>
+      </div>
+
+      <div class="shift-card shift-card-mini">
+        <div class="shift-card-tag">F0 → F9 · DoR/DoD</div>
+        <div class="shift-mini-value">10</div>
+        <div class="shift-mini-label">Handoffs entre 6 actores</div>
+        <div class="shift-mini-foot">Cada DoD bloquea hasta cumplir el DoR del siguiente · gap charts en flow_state</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="kpis">
   <div class="container">
-    <h2>Headline KPIs</h2>
+    <div class="section-head">
+      <h2>Execution Phase · F10 · 4-layer defect detection</h2>
+      <p class="section-sub">Suite ejecutada contra el SUT. Las 4 capas se ejecutan independientemente y consolidan en Grafana. Cada layer es un gate de calidad medible.</p>
+    </div>
     <div class="kpi-grid">
-      <div class="kpi-card kpi-blue">
-        <div class="kpi-label">Layers verified</div>
-        <div class="kpi-value">${kpis.layers}</div>
-        <div class="kpi-foot">Functional · API · Performance · Security</div>
-      </div>
-      <div class="kpi-card kpi-blue">
-        <div class="kpi-label">Defects detected</div>
-        <div class="kpi-value">${kpis.bugs + kpis.zap.total}</div>
-        <div class="kpi-foot">${kpis.bugs} BUG · ${kpis.zap.total} ZAP findings</div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">F10.1 · E2E Pass Rate</div>
+        <div class="kpi-value" data-count="${parseFloat(kpis.e2e.passRate)}">${kpis.e2e.passRate}</div>
+        <div class="kpi-foot">${kpis.e2e.passed} passed · ${kpis.e2e.failed} failed · Playwright</div>
       </div>
       <div class="kpi-card kpi-green">
-        <div class="kpi-label">E2E Pass Rate</div>
-        <div class="kpi-value">${kpis.e2e.passRate}</div>
-        <div class="kpi-foot">${kpis.e2e.passed} passed · ${kpis.e2e.failed} failed</div>
-      </div>
-      <div class="kpi-card kpi-green">
-        <div class="kpi-label">API Assertions</div>
+        <div class="kpi-label">F10.2 · API Assertions</div>
         <div class="kpi-value">${kpis.api.passRate}</div>
-        <div class="kpi-foot">${kpis.api.passed}/${kpis.api.total} passed</div>
+        <div class="kpi-foot">${kpis.api.passed}/${kpis.api.total} passed · Newman strict</div>
       </div>
       <div class="kpi-card kpi-green">
-        <div class="kpi-label">K6 Performance</div>
+        <div class="kpi-label">F10.3 · K6 Performance p95</div>
         <div class="kpi-value">${kpis.k6.p95}<span class="kpi-unit">ms</span></div>
-        <div class="kpi-foot">p95 · ${kpis.k6.iterations} iterations · ${kpis.k6.vus} VUs · thresholds ${kpis.k6.thresholds}</div>
+        <div class="kpi-foot">${kpis.k6.iterations} iters · ${kpis.k6.vus} VUs · thresholds ${kpis.k6.thresholds}</div>
       </div>
       <div class="kpi-card kpi-amber">
-        <div class="kpi-label">Security Alerts</div>
-        <div class="kpi-value">${kpis.zap.total}</div>
+        <div class="kpi-label">F10.4 · Security Alerts</div>
+        <div class="kpi-value" data-count="${kpis.zap.total}">${kpis.zap.total}</div>
         <div class="kpi-foot">${kpis.zap.high} High · ${kpis.zap.medium} Medium · ${kpis.zap.low} Low · ${kpis.zap.info} Info</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">F10.5 · Defects detected</div>
+        <div class="kpi-value" data-count="${totalDefects}">${totalDefects}</div>
+        <div class="kpi-foot">${kpis.bugs} BUG · ${kpis.zap.total} ZAP findings · all real on SUT</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">F10.5 · Layers consolidated</div>
+        <div class="kpi-value" data-count="${kpis.layers}">${kpis.layers}</div>
+        <div class="kpi-foot">Functional · API · Performance · Security · in Grafana</div>
       </div>
     </div>
   </div>
