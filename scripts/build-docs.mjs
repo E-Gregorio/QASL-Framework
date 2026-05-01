@@ -398,6 +398,13 @@ function renderIndex(kpis) {
         <div class="report-stats"><strong>${kpis.zap.high}</strong> High · ${kpis.zap.medium} Medium · ${kpis.zap.low} Low · ${kpis.zap.info} Info</div>
       </a>
     </div>
+
+    <a class="report-card report-card-featured" href="final-report/index.html">
+      <div class="report-tag report-tag-featured">F10.8 · TEST COMPLETION REPORT</div>
+      <h3>Informe Final de Pruebas · ISO/IEC/IEEE 29119-3:2021</h3>
+      <p>Documento profesional consolidado · alineado a ISTQB CTFL v4.0 + IEEE 1044 + ISO 25010 + OWASP/CWE/CVSS · todas las imágenes embebidas · matriz de trazabilidad HU→BR→TC→Result · sign-off pendiente.</p>
+      <div class="report-stats"><strong>12 secciones</strong> · cobertura completa F0→F10 · ${kpis.bugs + kpis.zap.total} defectos documentados · 14 figuras · listo para entregar al PO</div>
+    </a>
   </div>
 </section>
 

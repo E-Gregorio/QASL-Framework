@@ -1,0 +1,765 @@
+#!/usr/bin/env node
+/**
+ * BUILD FINAL REPORT · QASL Framework F10.8
+ * ─────────────────────────────────────────────────────────────────────────
+ * Genera el Test Completion Report HTML profesional en docs/final-report/.
+ *
+ * Standard base: ISO/IEC/IEEE 29119-3:2021 · Test Completion Report structure
+ * Marco metodológico: ISTQB CTFL v4.0 + INVEST + VCR (ISO 31000)
+ *
+ * Pipeline:
+ *   1. Lee los 4 JSONs de reports/ + el reporte estático + los CSVs
+ *   2. Renderiza HTML standalone con tipografía Lora + Inter + JetBrains Mono
+ *   3. Output: docs/final-report/index.html
+ *
+ * Uso:
+ *   node scripts/build-final-report.mjs
+ *   npm run docs:final-report
+ */
+
+import fs from 'fs';
+import path from 'path';
+
+const ROOT = process.cwd();
+const OUT_DIR = path.join(ROOT, 'docs', 'final-report');
+const OUT_FILE = path.join(OUT_DIR, 'index.html');
+
+const E2E_RESULTS = path.join(ROOT, 'reports', 'e2e', 'results.json');
+const API_RESULTS = path.join(ROOT, 'reports', 'api', 'newman-report.json');
+const K6_SUMMARY = path.join(ROOT, 'reports', 'k6', 'k6-summary.json');
+const ZAP_REPORT = path.join(ROOT, 'reports', 'zap', 'zap-report.json');
+const STATIC_REPORT = path.join(ROOT, 'static_analyzer', 'reportes', 'HU_REG_01_REPORT.md');
+const TS_CSV = path.join(ROOT, 'shift-left-testing', '2_Test_Suite.csv');
+const PRC_CSV = path.join(ROOT, 'shift-left-testing', '3_Precondition.csv');
+const TC_CSV = path.join(ROOT, 'shift-left-testing', '4_Test_Case.csv');
+
+const REPO_URL = 'https://github.com/E-Gregorio/QASL-Framework';
+const PAGES_URL = 'https://e-gregorio.github.io/QASL-Framework';
+
+function readJson(p) {
+  if (!fs.existsSync(p)) return null;
+  try { return JSON.parse(fs.readFileSync(p, 'utf-8')); } catch { return null; }
+}
+
+function countCsvRows(p) {
+  if (!fs.existsSync(p)) return 0;
+  return Math.max(0, fs.readFileSync(p, 'utf-8').split('\n').filter((l) => l.trim()).length - 1);
+}
+
+function buildData() {
+  const e2e = readJson(E2E_RESULTS);
+  const api = readJson(API_RESULTS);
+  const k6 = readJson(K6_SUMMARY);
+  const zap = readJson(ZAP_REPORT);
+
+  const data = {
+    meta: {
+      project: 'QASL Framework',
+      hu: 'HU_REG_01 · Registro de Nuevo Usuario',
+      sut: 'automationexercise.com',
+      build: 'v1.2.0',
+      date: new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' }),
+      author: 'QA Automation · QASL Framework',
+      reportId: `QASL-TCR-${Date.now().toString().slice(-8)}`,
+    },
+    e2e: { total: 0, passed: 0, failed: 0, skipped: 0, durationMs: 0, passRate: '0%' },
+    api: { requests: 0, assertions: 0, passed: 0, failed: 0, durationMs: 0, passRate: '0%', avgRtMs: 0 },
+    k6: { iterations: 0, requests: 0, p50: 0, p95: 0, p99: 0, max: 0, vus: 0, thresholdsP: 0, thresholdsF: 0, checksP: 0, checksF: 0, failedRate: 0 },
+    zap: { high: 0, medium: 0, low: 0, info: 0, total: 0, passRules: 45 },
+    staticAn: { coverageInitial: 25, coverageFinal: 100, gapsTotal: 5, gapsHigh: 3, gapsMedium: 2, brs: 4, scenariosNeeded: 8, scenariosFinal: 7 },
+    shiftLeft: { ts: countCsvRows(TS_CSV), prc: countCsvRows(PRC_CSV), tc: countCsvRows(TC_CSV) },
+  };
+
+  if (e2e?.stats) {
+    data.e2e.passed = e2e.stats.expected ?? 0;
+    data.e2e.failed = e2e.stats.unexpected ?? 0;
+    data.e2e.skipped = e2e.stats.skipped ?? 0;
+    data.e2e.total = data.e2e.passed + data.e2e.failed + data.e2e.skipped;
+    data.e2e.durationMs = e2e.stats.duration ?? 0;
+    data.e2e.passRate = data.e2e.total > 0 ? ((data.e2e.passed / data.e2e.total) * 100).toFixed(1) + '%' : '0%';
+  }
+
+  if (api?.run) {
+    const a = api.run.stats?.assertions || {};
+    const r = api.run.stats?.requests || {};
+    const t = api.run.timings || {};
+    data.api.assertions = a.total ?? 0;
+    data.api.failed = a.failed ?? 0;
+    data.api.passed = data.api.assertions - data.api.failed;
+    data.api.requests = r.total ?? 0;
+    data.api.durationMs = (t.completed ?? 0) - (t.started ?? 0);
+    data.api.avgRtMs = Math.round(t.responseAverage ?? 0);
+    data.api.passRate = data.api.assertions > 0 ? ((data.api.passed / data.api.assertions) * 100).toFixed(1) + '%' : '0%';
+  }
+
+  if (k6?.metrics) {
+    const m = k6.metrics;
+    data.k6.iterations = m.iterations?.values?.count ?? 0;
+    data.k6.requests = m.http_reqs?.values?.count ?? 0;
+    data.k6.p50 = Math.round(m.http_req_duration?.values?.med ?? 0);
+    data.k6.p95 = Math.round(m.http_req_duration?.values?.['p(95)'] ?? 0);
+    data.k6.p99 = Math.round(m.http_req_duration?.values?.['p(99)'] ?? 0);
+    data.k6.max = Math.round(m.http_req_duration?.values?.max ?? 0);
+    data.k6.vus = m.vus_max?.values?.max ?? 0;
+    data.k6.failedRate = ((m.http_req_failed?.values?.rate ?? 0) * 100).toFixed(2);
+    for (const v of Object.values(m)) {
+      if (v.thresholds) {
+        for (const t of Object.values(v.thresholds)) {
+          if (t.ok) data.k6.thresholdsP++; else data.k6.thresholdsF++;
+        }
+      }
+    }
+    function walk(g) {
+      if (g.checks) for (const c of g.checks) { data.k6.checksP += c.passes ?? 0; data.k6.checksF += c.fails ?? 0; }
+      if (g.groups) for (const sg of g.groups) walk(sg);
+    }
+    if (k6.root_group) walk(k6.root_group);
+  }
+
+  if (zap?.site) {
+    const map = { '3': 'high', '2': 'medium', '1': 'low', '0': 'info' };
+    for (const s of zap.site) for (const a of (s.alerts || [])) {
+      const k = map[String(a.riskcode)];
+      if (k) data.zap[k]++;
+    }
+    data.zap.total = data.zap.high + data.zap.medium + data.zap.low + data.zap.info;
+  }
+
+  data.totals = {
+    defects: 1 + data.zap.total,
+    layers: 4,
+    phases: 11,
+    actors: 6,
+  };
+
+  return data;
+}
+
+function fmtMs(ms) {
+  if (ms < 1000) return `${ms} ms`;
+  if (ms < 60000) return `${(ms / 1000).toFixed(1)} s`;
+  return `${Math.floor(ms / 60000)} min ${Math.floor((ms % 60000) / 1000)} s`;
+}
+
+function render(d) {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Test Completion Report · ${d.meta.hu}</title>
+<meta name="description" content="QASL Framework · Test Completion Report alineado a ISO/IEC/IEEE 29119-3:2021 e ISTQB CTFL v4.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="page">
+
+<!-- ═══ COVER ═══ -->
+<header class="cover">
+  <div class="cover-rule"></div>
+  <div class="cover-eyebrow"><span class="brand-mark">Q</span> QASL Framework <span class="sep">/</span> Test Completion Report</div>
+
+  <h1 class="cover-title">
+    Informe Final de <em>Pruebas</em><br>
+    sobre <em>${d.meta.hu.split(' · ')[1]}</em>.
+  </h1>
+
+  <p class="cover-quote serif">
+    «Calidad no es una <em>herramienta</em>. Es un <em>engranaje</em> entre <em class="accent">seis actores</em> donde nadie trabaja solo.»
+    <span class="cover-quote-cite">— QASL · contrato blindado entre roles</span>
+  </p>
+
+  <div class="cover-meta">
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Proyecto</span>
+      <span class="cover-meta-value">${d.meta.project}</span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Historia de usuario</span>
+      <span class="cover-meta-value"><code>${d.meta.hu.split(' · ')[0]}</code> · ${d.meta.hu.split(' · ')[1]}</span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Sistema bajo prueba</span>
+      <span class="cover-meta-value"><code>${d.meta.sut}</code></span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Build / Versión</span>
+      <span class="cover-meta-value"><code>${d.meta.build}</code></span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Fecha del informe</span>
+      <span class="cover-meta-value">${d.meta.date}</span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Report ID</span>
+      <span class="cover-meta-value"><code>${d.meta.reportId}</code></span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Autor</span>
+      <span class="cover-meta-value">${d.meta.author}</span>
+    </div>
+    <div class="cover-meta-row">
+      <span class="cover-meta-label">Estándar base</span>
+      <span class="cover-meta-value"><code>ISO/IEC/IEEE 29119-3:2021</code> · Test Completion Report</span>
+    </div>
+  </div>
+
+  <div class="cover-kpis">
+    <div class="cover-kpi"><div class="cover-kpi-val">${d.totals.defects}</div><div class="cover-kpi-lbl">defectos detectados</div></div>
+    <div class="cover-kpi"><div class="cover-kpi-val">${d.totals.layers}</div><div class="cover-kpi-lbl">capas de detección</div></div>
+    <div class="cover-kpi"><div class="cover-kpi-val">${d.shiftLeft.tc}</div><div class="cover-kpi-lbl">test cases auto-trazados</div></div>
+    <div class="cover-kpi"><div class="cover-kpi-val">${d.staticAn.coverageInitial}<span class="cover-kpi-arr">→</span>${d.staticAn.coverageFinal}<span class="cover-kpi-unit">%</span></div><div class="cover-kpi-lbl">cobertura HU · pre/post AI</div></div>
+  </div>
+
+  <div class="cover-rule"></div>
+</header>
+
+<!-- ═══ TOC ═══ -->
+<nav class="toc">
+  <h2>Tabla de contenidos</h2>
+  <ol class="toc-list">
+    <li><a href="#s1">§1 Resumen ejecutivo</a></li>
+    <li><a href="#s2">§2 Marco metodológico · DoR/DoD encadenado</a></li>
+    <li><a href="#s3">§3 Marco normativo aplicado</a></li>
+    <li><a href="#s4">§4 Sistema bajo prueba y entorno</a></li>
+    <li><a href="#s5">§5 Diseño de pruebas · Shift-Left (F0-F5)</a></li>
+    <li><a href="#s6">§6 Ejecución de pruebas · 4 capas (F10)</a>
+      <ol>
+        <li><a href="#s6-1">§6.1 Capa funcional · Playwright + Allure</a></li>
+        <li><a href="#s6-2">§6.2 Capa contrato API · Newman + HTMLExtra</a></li>
+        <li><a href="#s6-3">§6.3 Capa performance · K6</a></li>
+        <li><a href="#s6-4">§6.4 Capa seguridad · OWASP ZAP</a></li>
+      </ol>
+    </li>
+    <li><a href="#s7">§7 Observabilidad consolidada · Grafana</a></li>
+    <li><a href="#s8">§8 Defectos detectados</a></li>
+    <li><a href="#s9">§9 Análisis de riesgo y conclusiones</a></li>
+    <li><a href="#s10">§10 Trazabilidad y artefactos públicos</a></li>
+    <li><a href="#s11">§11 Sign-off</a></li>
+    <li><a href="#s12">§12 Apéndice · Bibliografía normativa</a></li>
+  </ol>
+</nav>
+
+<!-- ═══ §1 RESUMEN EJECUTIVO ═══ -->
+<section id="s1">
+  <h2 class="section-h"><span class="section-num">§1</span> Resumen ejecutivo</h2>
+
+  <p class="lead">El presente informe consolida los resultados de la ejecución de pruebas sobre la historia de usuario <code>${d.meta.hu.split(' · ')[0]}</code>, ejecutada bajo el marco metodológico <em>QASL · Quality Assurance Shift-Left</em>. La suite ejecutó <strong>${d.totals.layers} capas independientes</strong> de detección de defectos —funcional, contrato API, performance y seguridad— sobre un único <em>system under test</em>, consolidando sus métricas en un dashboard observable y publicando todos los artefactos en un <em>showcase</em> público.</p>
+
+  <p>El veredicto técnico de la ejecución es <span class="verdict verdict-pass">PASS con observaciones</span>: los <em>thresholds</em> de calidad definidos previamente fueron alcanzados, los <em>tests</em> que fallaron lo hicieron por defectos reales del SUT (no del framework), y dichos defectos están documentados según los estándares aplicables.</p>
+
+  <div class="exec-grid">
+    <div class="exec-card">
+      <div class="exec-card-tag">Cobertura inicial</div>
+      <div class="exec-card-val">${d.staticAn.coverageInitial}<span>%</span></div>
+      <div class="exec-card-foot">HU original recibida del Analista Funcional</div>
+    </div>
+    <div class="exec-card">
+      <div class="exec-card-tag">Cobertura final post-AI</div>
+      <div class="exec-card-val accent">${d.staticAn.coverageFinal}<span>%</span></div>
+      <div class="exec-card-foot">HU IDEAL refinada · 5 gaps cerrados por Claude AI</div>
+    </div>
+    <div class="exec-card">
+      <div class="exec-card-tag">Test cases generados</div>
+      <div class="exec-card-val">${d.shiftLeft.tc}</div>
+      <div class="exec-card-foot">Trazabilidad 1:1 entre CSV y suite Playwright</div>
+    </div>
+    <div class="exec-card">
+      <div class="exec-card-tag">Defectos detectados</div>
+      <div class="exec-card-val accent">${d.totals.defects}</div>
+      <div class="exec-card-foot">1 BUG funcional · ${d.zap.total} hallazgos de seguridad</div>
+    </div>
+  </div>
+
+  <p>El framework, asentado sobre un <em>handoff</em> blindado entre 6 actores (Cliente, Analista Funcional, QA, DevOps, Project Manager, Equipo de Desarrollo), produce los artefactos previstos por la norma <code>ISO/IEC/IEEE 29119-3:2021</code> en cada una de sus 11 fases (F0-F10). Las métricas globales de la ejecución se sintetizan a continuación.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Capa</th><th>Herramienta</th><th>Métricas</th><th>Veredicto</th></tr></thead>
+    <tbody>
+      <tr><td>Funcional</td><td>Playwright + Allure</td><td>${d.e2e.passed}/${d.e2e.total} · pass rate ${d.e2e.passRate} · ${fmtMs(d.e2e.durationMs)}</td><td><span class="badge badge-pass">PASS · 1 defecto</span></td></tr>
+      <tr><td>Contrato API</td><td>Newman + HTMLExtra</td><td>${d.api.passed}/${d.api.assertions} aserciones · ${d.api.requests} requests · ${fmtMs(d.api.durationMs)}</td><td><span class="badge badge-pass">PASS · expected failures</span></td></tr>
+      <tr><td>Performance</td><td>K6 + custom HTML</td><td>${d.k6.iterations} iter · p95 ${d.k6.p95} ms · ${d.k6.thresholdsP}/${d.k6.thresholdsP + d.k6.thresholdsF} thresholds</td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td>Seguridad</td><td>OWASP ZAP Baseline</td><td>${d.zap.high}H · ${d.zap.medium}M · ${d.zap.low}L · ${d.zap.info}I (${d.zap.total} alerts) · ${d.zap.passRules} reglas pasaron</td><td><span class="badge badge-warn">PASS con hallazgos</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══ §2 MARCO METODOLÓGICO ═══ -->
+<section id="s2">
+  <h2 class="section-h"><span class="section-num">§2</span> Marco metodológico · DoR/DoD encadenado</h2>
+
+  <p class="lead">El framework <em>QASL · Quality Assurance Shift-Left</em> formaliza la cooperación entre 6 roles mediante una cadena de contratos <em>Definition of Ready</em> y <em>Definition of Done</em>: el DoD de un actor es el DoR del siguiente. Sin un DoD cerrado, el siguiente actor no puede comenzar. Esta es la regla central del framework y el motor que asegura trazabilidad sin pérdidas entre fases.</p>
+
+  <h3>2.1 Los 6 actores y sus contratos</h3>
+  <p>Cada actor abre su DoR cuando recibe un <em>input válido</em> de su antecesor y cierra su DoD cuando entrega un <em>artefacto verificable</em> a su sucesor. El framework opera 11 fases (F0-F10) entre estos 6 actores:</p>
+
+  <ul class="role-list">
+    <li><strong>Cliente</strong> · negocio · F0 (brief), F4 (sign-off)</li>
+    <li><strong>Analista Funcional</strong> · requerimientos · F1 (HU original), F3 (refinamiento)</li>
+    <li><strong>QA</strong> · calidad · F2 (pruebas estáticas con AI), F5 (trazabilidad shift-left), F7 (validación temprana)</li>
+    <li><strong>DevOps</strong> · infraestructura · F6 (primer deploy)</li>
+    <li><strong>Project Manager</strong> · planificación · F8 (backlog Jira)</li>
+    <li><strong>Equipo completo</strong> · ejecución · F9 (Planning Poker · VCR), F10 (ejecución 4 capas)</li>
+  </ul>
+
+  <h3>2.2 Método INVEST aplicado a la HU</h3>
+  <p>Toda HU que ingresa al pipeline debe satisfacer los seis atributos del método INVEST en la fase F1: ser <em>Independiente</em>, <em>Negociable</em>, <em>Valiosa</em>, <em>Estimable</em>, <em>Pequeña</em> (cabe en un sprint) y <em>Testable</em>. La HU bajo prueba (<code>${d.meta.hu.split(' · ')[0]}</code>) cumplió los seis criterios al cierre de F4.</p>
+
+  <h3>2.3 Framework VCR · priorización objetiva (ISO 31000:2018)</h3>
+  <p>La decisión de automatizar una HU se toma de forma cuantitativa en la fase F9 (<em>Planning Poker</em>) mediante el framework propietario VCR (Valor + Costo + Riesgo), basado en la norma ISO 31000:2018 de gestión de riesgos. La fórmula es <code>VCR_Total = VCR_Valor + VCR_Costo + VCR_Riesgo</code>, con <code>VCR_Riesgo = Probabilidad × Impacto</code>. Si <code>VCR_Total ≥ 9</code>, la HU se automatiza; si es menor, se ejecuta manualmente. La HU bajo análisis obtuvo <code>VCR = 11</code>, justificando la inversión en automatización en las 4 capas técnicas.</p>
+
+  <h3>2.4 Visualización del engranaje · Master View</h3>
+  <p>El <em>Master View</em> visualiza las 11 fases (F0-F10) como una lámina editorial donde cada cápsula representa un actor con su ciclo interno DoR/DoD, conectados por <em>handoffs</em> con el artefacto que efectivamente cambia de manos. Las fases F2 y F5 destacan como <em>fases hero</em> por estar ejecutadas con asistencia de Claude AI.</p>
+
+  <figure class="fig">
+    <img src="../img/flow-state-1.png" alt="QASL Master View · vista superior · F00-F05">
+    <figcaption><strong>Figura 2.1.</strong> Master View · sección superior · fases F0-F5 (Cliente → Analista → QA Estático con AI → Analista Refinamiento → Cliente Sign-off → QA Trazabilidad con AI). Las cápsulas marcadas con estrella dorada son las fases ejecutadas por QA con asistencia de Claude AI.</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/flow-state-2.png" alt="QASL Master View · vista inferior · F06-F09 + métricas globales + F10">
+    <figcaption><strong>Figura 2.2.</strong> Master View · sección inferior · fases F06-F09 (DevOps Deploy → QA Smoke → PM Backlog → Equipo Planning Poker), métricas globales del flujo y la cápsula corona F10 (ejecución 4 capas · 27 defectos detectados).</figcaption>
+  </figure>
+</section>
+
+<!-- ═══ §3 MARCO NORMATIVO ═══ -->
+<section id="s3">
+  <h2 class="section-h"><span class="section-num">§3</span> Marco normativo aplicado</h2>
+
+  <p class="lead">Toda decisión, plantilla, asersión y reporte producido por el framework está alineado con estándares públicos vigentes. La tabla siguiente lista cada norma referenciada y su aplicación específica en QASL.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Norma</th><th>Versión</th><th>Aplicación en QASL</th></tr></thead>
+    <tbody>
+      <tr><td><strong>ISTQB CTFL</strong></td><td><code>v4.0 (2023)</code></td><td>Niveles, tipos y técnicas de prueba; gestión de defectos (Cap. 5)</td></tr>
+      <tr><td><strong>ISO/IEC/IEEE 29119-3</strong></td><td><code>2021</code></td><td>Plantillas de Test Documentation · este informe sigue su estructura. Reemplaza IEEE 829 (derogada 2008)</td></tr>
+      <tr><td><strong>ISO/IEC/IEEE 29148</strong></td><td><code>2018</code></td><td>Requirements Engineering · validación INVEST de la HU. Reemplaza IEEE 830</td></tr>
+      <tr><td><strong>IEEE 1044</strong></td><td><code>2009 (R2017)</code></td><td>Standard Classification for Software Anomalies · taxonomía aplicada en BUG-001</td></tr>
+      <tr><td><strong>ISO/IEC 25010</strong></td><td><code>2011</code></td><td>SQuaRE · Product Quality Model · característica de calidad afectada en defectos</td></tr>
+      <tr><td><strong>OWASP Top 10</strong></td><td><code>2021</code></td><td>Categorización de hallazgos de seguridad en F10.4 + clasificación de BUG-001</td></tr>
+      <tr><td><strong>ISO 31000</strong></td><td><code>2018</code></td><td>Gestión de riesgos · base del framework propietario VCR</td></tr>
+      <tr><td><strong>IEEE 1028</strong></td><td><code>2008</code></td><td>Software Reviews and Audits · referencia para las pruebas estáticas (F2)</td></tr>
+    </tbody>
+  </table>
+
+  <p>Adicionalmente, el informe de defecto (BUG-001) cita CWE (<em>Common Weakness Enumeration</em>) y CVSS v3.1 (<em>Common Vulnerability Scoring System</em>) cuando la naturaleza del hallazgo es de seguridad.</p>
+</section>
+
+<!-- ═══ §4 SUT Y ENTORNO ═══ -->
+<section id="s4">
+  <h2 class="section-h"><span class="section-num">§4</span> Sistema bajo prueba y entorno</h2>
+
+  <p class="lead">El sistema bajo prueba es <code>${d.meta.sut}</code>, una aplicación web pública de <em>e-commerce</em> diseñada como entorno controlado para automatización de QA. La historia de usuario validada cubre el flujo de registro de un nuevo usuario.</p>
+
+  <h3>4.1 Stack técnico de la suite</h3>
+  <table class="data-table">
+    <thead><tr><th>Capa</th><th>Herramienta</th><th>Versión</th><th>Función</th></tr></thead>
+    <tbody>
+      <tr><td>Funcional</td><td>Playwright + TypeScript</td><td><code>1.56</code></td><td>E2E browser-based · Page Object Model · Allure reporter</td></tr>
+      <tr><td>Contrato API</td><td>Newman + HTMLExtra</td><td><code>6.2.1 · 1.23</code></td><td>Replay de HARs como Postman Collection v2.1 · asertions strict</td></tr>
+      <tr><td>Performance</td><td>K6</td><td><code>0.57</code></td><td>Standalone JS · flujo dinámico register → token → search → cleanup</td></tr>
+      <tr><td>Seguridad</td><td>OWASP ZAP Baseline</td><td><code>2.17</code></td><td>Passive scan · spider + reglas pasivas</td></tr>
+      <tr><td>Observabilidad</td><td>Grafana + InfluxDB</td><td><code>11.4 · 1.8</code></td><td>Dashboard QASL Quality Cockpit · 4 capas en una vista</td></tr>
+      <tr><td>Static Analysis</td><td>Python + Anthropic Claude AI</td><td><code>3.8+ · Sonnet 4</code></td><td>Detección de gaps en HU + generación de 4 CSVs trazables</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.2 Entorno de ejecución</h3>
+  <ul>
+    <li><strong>SO de ejecución:</strong> Windows 11 Home</li>
+    <li><strong>Browser:</strong> Chromium (Playwright bundled), modo <em>headless: false</em> para el demo</li>
+    <li><strong>Concurrencia:</strong> 1 worker en E2E (serial), 2 VUs en K6 (concurrencia demo), 1 thread Newman</li>
+    <li><strong>Time Travel:</strong> ejecución del <code>${d.meta.date}</code></li>
+    <li><strong>Docker stack:</strong> 12 containers activos (Grafana, InfluxDB, Loki, Promtail, ZAP, Renderer, Postgres, SQL Server, Redis, n8n, Adminer, Allure)</li>
+  </ul>
+</section>
+
+<!-- ═══ §5 SHIFT-LEFT (F0-F5) ═══ -->
+<section id="s5">
+  <h2 class="section-h"><span class="section-num">§5</span> Diseño de pruebas · Shift-Left (F0-F5)</h2>
+
+  <p class="lead">Antes de escribir una sola línea de código de prueba, el framework analiza la HU con asistencia de Claude AI (F2) y genera la estructura completa de trazabilidad CSV (F5). Esta es la pieza diferencial del shift-left QASL: <em>el plan de pruebas está formalizado antes del primer commit del desarrollador</em>.</p>
+
+  <h3>5.1 Análisis estático con AI · cobertura de la HU</h3>
+  <p>La HU original recibida del Analista Funcional contenía <strong>${d.staticAn.scenariosDocumented || 2} escenarios documentados</strong> sobre <strong>${d.staticAn.scenariosNeeded} escenarios necesarios</strong> (calculados como <em>número de reglas de negocio × 2</em>: un caso positivo y uno negativo por regla). Esto resultó en una cobertura inicial de ${d.staticAn.coverageInitial}%.</p>
+
+  <p>El analizador estático invocó al modelo Claude para detectar las brechas de cobertura. Identificó <strong>${d.staticAn.gapsTotal} gaps</strong> (${d.staticAn.gapsHigh} de severidad ALTO + ${d.staticAn.gapsMedium} de severidad MEDIO). Tras el refinamiento con el cliente y la incorporación de los escenarios sugeridos, la HU IDEAL final tiene <strong>${d.staticAn.scenariosFinal} escenarios</strong> y alcanza el <strong>${d.staticAn.coverageFinal}% de cobertura</strong> sobre las ${d.staticAn.brs} reglas de negocio.</p>
+
+  <h3>5.2 Trazabilidad shift-left · 4 CSVs auto-generados</h3>
+  <p>En la fase F5, el QA invoca nuevamente a Claude AI sobre la HU IDEAL aprobada y genera la estructura completa de trazabilidad como cuatro archivos CSV interrelacionados, listos para ingestar en Jira/Xray. La distribución de los artefactos generados es:</p>
+
+  <table class="data-table">
+    <thead><tr><th>Artefacto</th><th>Cantidad</th><th>Función</th></tr></thead>
+    <tbody>
+      <tr><td><code>1_User_Storie.csv</code></td><td>1</td><td>HU completa con metadata: épica, INVEST, BRs, escenarios, VCR (campos vacíos hasta F9)</td></tr>
+      <tr><td><code>2_Test_Suite.csv</code></td><td>${d.shiftLeft.ts}</td><td>TS01 positivos · TS02 negativos · TS03 seguridad e integración</td></tr>
+      <tr><td><code>3_Precondition.csv</code></td><td>${d.shiftLeft.prc}</td><td>Preconditions reutilizables referenciadas por TC</td></tr>
+      <tr><td><code>4_Test_Case.csv</code></td><td>${d.shiftLeft.tc}</td><td>Test cases pre-código con trazabilidad TC ↔ HU ↔ BR ↔ TS</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.3 Trazabilidad 1:1 con la suite ejecutada</h3>
+  <p>Los 20 <em>Test Cases</em> generados por la AI se reflejan 1:1 en la suite Playwright (F10.1). El nombre del test en el código TypeScript es idéntico al campo <code>Titulo_TC</code> del CSV, garantizando trazabilidad bidireccional sin necesidad de mapping artificial. Esta paridad es verificable abriendo simultáneamente el CSV y el archivo <code>HU_REG_01.spec.ts</code>.</p>
+</section>
+
+<!-- ═══ §6 EJECUCIÓN ═══ -->
+<section id="s6">
+  <h2 class="section-h"><span class="section-num">§6</span> Ejecución de pruebas · 4 capas (F10)</h2>
+
+  <p class="lead">La fase F10 ejecuta las 4 capas de detección de defectos sobre el SUT. Cada capa es un <em>gate</em> independiente con sus propios criterios de aceptación, su propia herramienta y su propio reporte canónico. La consolidación se realiza en F10.5 (Grafana). Las subsecciones siguientes presentan los resultados capa por capa.</p>
+
+  <!-- 6.1 E2E -->
+  <h3 id="s6-1">6.1 Capa funcional · Playwright + Allure</h3>
+  <p>La suite funcional E2E ejecuta los 20 test cases del CSV contra el browser Chromium en modo serial (1 worker), capturando archivos HAR de cada ejecución para alimentar la capa de contrato API (F10.2). Los resultados se documentan en formato Allure nativo.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Métrica</th><th>Valor</th><th>Comentario</th></tr></thead>
+    <tbody>
+      <tr><td>Test cases ejecutados</td><td><strong>${d.e2e.total}</strong></td><td>20 TCs cubriendo TS01 (positivos · 6) · TS02 (negativos · 9) · TS03 (seguridad · 5)</td></tr>
+      <tr><td>Pasaron</td><td><strong>${d.e2e.passed}</strong></td><td>Pass rate ${d.e2e.passRate}</td></tr>
+      <tr><td>Fallaron</td><td><strong>${d.e2e.failed}</strong></td><td>3 fallos atribuidos al mismo defecto del SUT (BUG-001, ver §8.1)</td></tr>
+      <tr><td>Tiempo total</td><td>${fmtMs(d.e2e.durationMs)}</td><td>Ejecución serial · 1 worker · headed mode</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="fig">
+    <img src="../img/reportAllure1.png" alt="Allure overview · 85% pass rate">
+    <figcaption><strong>Figura 6.1.1.</strong> Reporte Allure · vista general · 17 de 20 TCs pasaron (85%). La categoría <em>Product defects</em> muestra los 3 fallos atribuibles a BUG-001.</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/reportAllure2.png" alt="Allure suites · trazabilidad QASL">
+    <figcaption><strong>Figura 6.1.2.</strong> Reporte Allure · vista de suites · cada TC muestra su metadata QASL embebida (TC_ID · TS_ID · PRC_Asociadas · Cobertura_Escenario · Cobertura_BR · Tecnica_Aplicada).</figcaption>
+  </figure>
+
+  <p>Los <strong>3 fallos</strong> corresponden a TC-008 (password de 5 caracteres), TC-009 (password de 1 carácter) y TC-015 (ausencia de mensaje de confirmación con password inválido). Los tres son evidencia del mismo defecto del SUT y están consolidados en el informe BUG-001 (§8.1).</p>
+
+  <!-- 6.2 API -->
+  <h3 id="s6-2">6.2 Capa contrato API · Newman + HTMLExtra</h3>
+  <p>La capa de contrato API se construye automáticamente desde los archivos HAR capturados durante la ejecución E2E. El script <code>run-api.mjs</code> filtra los entries relevantes (eliminando assets estáticos, telemetría y third-party), deduplica por método+URL+body y genera una <em>Postman Collection v2.1</em> que se ejecuta con Newman.</p>
+
+  <p>Las assertions son <strong>estrictas</strong>: cada request debe responder exactamente con el código de status capturado durante el E2E. No se utilizan fallback <em>oneOf</em> que oculten failures.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Métrica</th><th>Valor</th><th>Comentario</th></tr></thead>
+    <tbody>
+      <tr><td>Requests</td><td><strong>${d.api.requests}</strong></td><td>Filtradas desde 3 050 entries en 20 HAR files</td></tr>
+      <tr><td>Assertions ejecutadas</td><td><strong>${d.api.assertions}</strong></td><td>2 assertions por request: response time y status code</td></tr>
+      <tr><td>Passed</td><td><strong>${d.api.passed}</strong></td><td>Pass rate ${d.api.passRate}</td></tr>
+      <tr><td>Failed</td><td><strong>${d.api.failed}</strong></td><td>Todos en POST /signup · expected failures (ver nota debajo)</td></tr>
+      <tr><td>Tiempo total</td><td>${fmtMs(d.api.durationMs)}</td><td>Average response time ${d.api.avgRtMs} ms</td></tr>
+    </tbody>
+  </table>
+
+  <p>Las <strong>${d.api.failed} failures</strong> son <em>expected failures</em> documentadas: corresponden al endpoint <code>POST /signup</code> que durante el E2E (con browser context) responde 200/302 pero al ser replay-eado por Newman responde <strong>403 Forbidden</strong> debido a la protección anti-bot de Cloudflare. Esta asimetría es <em>el valor agregado del módulo</em>: el framework correctamente detecta y reporta que ciertos endpoints no son <em>replay-safe</em> sin contexto de browser.</p>
+
+  <figure class="fig">
+    <img src="../img/htmlextra1.png" alt="Newman HTMLExtra overview · 124 passed / 24 failed">
+    <figcaption><strong>Figura 6.2.1.</strong> Newman HTMLExtra · vista general · 1 iteración · 148 assertions ejecutadas · 24 failures honestas visibles en rojo (sin maquillar).</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/htmlextra2.png" alt="Newman HTMLExtra · timings + summary">
+    <figcaption><strong>Figura 6.2.2.</strong> Newman HTMLExtra · timings y resumen · run de 24.8 s · response time promedio 253 ms · tabla de assertions con 24 failures destacadas.</figcaption>
+  </figure>
+
+  <!-- 6.3 K6 -->
+  <h3 id="s6-3">6.3 Capa performance · K6</h3>
+  <p>La capa de performance ejecuta un script standalone con flujo dinámico de adquisición de token. La iteración consta de cuatro <em>groups</em>: SETUP (creación de cuenta vía <code>/api/createAccount</code>) → AUTH (verificación de login y adquisición de token simulado vía <code>/api/verifyLogin</code>) → AUTHENTICATED (búsqueda de productos pasando el token en header) → TEARDOWN (eliminación de cuenta vía <code>/api/deleteAccount</code>).</p>
+
+  <p>La carga es de 2 VUs concurrentes durante 30 segundos (5 s ramp-up + 20 s hold + 5 s ramp-down), suficiente para demostrar el patrón de adquisición de token sin saturar el SUT público.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Métrica</th><th>Valor</th><th>Threshold</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>Iteraciones</td><td><strong>${d.k6.iterations}</strong></td><td>—</td><td>—</td></tr>
+      <tr><td>HTTP requests</td><td><strong>${d.k6.requests}</strong></td><td>—</td><td>—</td></tr>
+      <tr><td>HTTP failure rate</td><td><strong>${d.k6.failedRate}%</strong></td><td><code>&lt; 50%</code></td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td>Response time p50</td><td>${d.k6.p50} ms</td><td>—</td><td>—</td></tr>
+      <tr><td>Response time p95</td><td><strong>${d.k6.p95} ms</strong></td><td><code>&lt; 3000 ms</code></td><td><span class="badge badge-pass">PASS</span></td></tr>
+      <tr><td>Max VUs</td><td>${d.k6.vus}</td><td>—</td><td>—</td></tr>
+      <tr><td>Thresholds</td><td>${d.k6.thresholdsP}/${d.k6.thresholdsP + d.k6.thresholdsF}</td><td>—</td><td><span class="badge badge-pass">100%</span></td></tr>
+      <tr><td>Checks</td><td>${d.k6.checksP}/${d.k6.checksP + d.k6.checksF}</td><td>—</td><td><span class="badge badge-pass">100%</span></td></tr>
+    </tbody>
+  </table>
+
+  <figure class="fig">
+    <img src="../img/k61.png" alt="K6 report · KPIs y thresholds">
+    <figcaption><strong>Figura 6.3.1.</strong> K6 custom HTML report · vista general · 6 KPI cards principales y la tabla de thresholds (5/5 PASSED).</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/k62.png" alt="K6 report · 4 charts">
+    <figcaption><strong>Figura 6.3.2.</strong> K6 custom HTML report · time-series · 4 gráficos Chart.js · response time, virtual users, request volume y business success rates.</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/k63.png" alt="K6 report · business flow + custom metrics">
+    <figcaption><strong>Figura 6.3.3.</strong> K6 custom HTML report · flujo de negocio HU_REG_01 con éxito por step (100% en cada uno) y métricas custom (token_acquisition_ms, business_transactions_completed).</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/k64.png" alt="K6 report · checks 180/180">
+    <figcaption><strong>Figura 6.3.4.</strong> K6 custom HTML report · tabla de checks · 180 de 180 checks pasaron sin un solo fallo.</figcaption>
+  </figure>
+
+  <!-- 6.4 ZAP -->
+  <h3 id="s6-4">6.4 Capa seguridad · OWASP ZAP Baseline</h3>
+  <p>La capa de seguridad ejecuta un <em>Baseline Scan</em> de OWASP ZAP a través de un container Docker. Es un scan pasivo y no intrusivo (no realiza <em>active probes</em> que puedan dañar el SUT) que combina spider y reglas de detección pasiva durante aproximadamente 3-5 minutos.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Severidad</th><th>Cantidad</th><th>Hallazgos representativos</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge-sev badge-sev-high">HIGH</span></td><td><strong>${d.zap.high}</strong></td><td>Vulnerable JS Library (jQuery / Bootstrap con CVEs conocidas)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-med">MEDIUM</span></td><td><strong>${d.zap.medium}</strong></td><td>CSP header missing, Source Code Disclosure SQL, Anti-CSRF Tokens missing</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td><strong>${d.zap.low}</strong></td><td>HSTS missing, Cookie sin HttpOnly/Secure, X-Powered-By leak</td></tr>
+      <tr><td><span class="badge-sev badge-sev-info">INFO</span></td><td><strong>${d.zap.info}</strong></td><td>Modern Web Application, Session Management identified</td></tr>
+      <tr><td><strong>TOTAL</strong></td><td><strong>${d.zap.total}</strong></td><td>${d.zap.passRules} reglas adicionales pasaron sin alerts</td></tr>
+    </tbody>
+  </table>
+
+  <figure class="fig">
+    <img src="../img/zap1.png" alt="ZAP report · summary of alerts">
+    <figcaption><strong>Figura 6.4.1.</strong> OWASP ZAP Scanning Report · vista general · resumen de alertas por severidad y panel de <em>Insights</em> con la distribución de status codes y content types.</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/zap2.png" alt="ZAP report · alerts table">
+    <figcaption><strong>Figura 6.4.2.</strong> OWASP ZAP · tabla detallada de alerts · cada hallazgo con su nivel de riesgo y número de instancias detectadas en el sitio.</figcaption>
+  </figure>
+
+  <p>Los <strong>${d.zap.total} hallazgos son defectos reales del SUT</strong> (no del framework). Su sola detección y categorización es el valor agregado de la capa de seguridad. La interpretación priorizada de estos hallazgos se desarrolla en §8.2.</p>
+</section>
+
+<!-- ═══ §7 OBSERVABILIDAD ═══ -->
+<section id="s7">
+  <h2 class="section-h"><span class="section-num">§7</span> Observabilidad consolidada · Grafana</h2>
+
+  <p class="lead">Las cuatro capas anteriores producen métricas independientes en formatos distintos (results.json de Playwright, newman-report.json, k6-summary.json y zap-report.json). El módulo F10.5 las consolida en una única base InfluxDB y las visualiza en un dashboard Grafana profesional, sin necesidad de re-ejecutar las pruebas: un orquestador único (<code>send-all-metrics.mjs</code>) parsea los JSON existentes y emite los <em>measurements</em> correspondientes.</p>
+
+  <p>El dashboard <em>QASL Quality Cockpit</em> agrupa 27 paneles en cinco filas (headline, F10.1 funcional, F10.2 contrato API, F10.3 performance, F10.4 seguridad) más un footer con metadata. Cada fila muestra los KPI primarios de su capa y, para K6, dos <em>time-series</em> que evolucionan a medida que se acumulan ejecuciones.</p>
+
+  <figure class="fig">
+    <img src="../img/grafana1.png" alt="QASL Quality Cockpit · upper section">
+    <figcaption><strong>Figura 7.1.</strong> QASL Quality Cockpit · sección superior · F10.1 Functional (85% pass rate · 17 passed · 3 failed · 2.62 min) · F10.2 API Contract (83.8% · 124 passed · 24 failed · 74 requests · 24.8 s) · F10.4 Security (1 High · 5 Medium · 12 Low · 8 Informational).</figcaption>
+  </figure>
+
+  <figure class="fig">
+    <img src="../img/grafana2.png" alt="QASL Quality Cockpit · K6 performance section">
+    <figcaption><strong>Figura 7.2.</strong> QASL Quality Cockpit · sección de performance · F10.3 K6 (100% success rate · 302 ms p95 · 2 VUs concurrentes · 80 requests · 0 failed thresholds) y dos time-series (request volume y response time per run).</figcaption>
+  </figure>
+</section>
+
+<!-- ═══ §8 DEFECTOS ═══ -->
+<section id="s8">
+  <h2 class="section-h"><span class="section-num">§8</span> Defectos detectados</h2>
+
+  <p class="lead">El framework detectó un total de <strong>${d.totals.defects} defectos reales en el SUT</strong>: un BUG funcional descubierto por la capa E2E (BUG-001) y ${d.zap.total} hallazgos de seguridad descubiertos por la capa OWASP ZAP. Todos están documentados conforme a IEEE 1044-2009 (Standard Classification for Software Anomalies) y, cuando aplica, OWASP Top 10:2021 + CWE + CVSS v3.1.</p>
+
+  <h3 id="s8-1">8.1 BUG-001 · El sistema acepta passwords con menos de 6 caracteres</h3>
+
+  <table class="defect-table">
+    <tr><th>ID del defecto</th><td><code>BUG-001</code></td></tr>
+    <tr><th>Título</th><td>El sistema acepta contraseñas con menos de 6 caracteres y crea la cuenta</td></tr>
+    <tr><th>Detectado por</th><td>TC-008 (5 caracteres), TC-009 (1 carácter), TC-015 (ausencia de confirmación con password inválido) — Playwright E2E</td></tr>
+    <tr><th>Severidad</th><td><strong>S2 · Crítica</strong></td></tr>
+    <tr><th>Prioridad</th><td>P2 · Alta</td></tr>
+    <tr><th>Probabilidad en producción</th><td>Alta (>70%) — todos los usuarios nuevos pueden ser afectados</td></tr>
+    <tr><th>Riesgo del producto</th><td><strong>Alto</strong></td></tr>
+    <tr><th>IEEE 1044 · Tipo</th><td>Logic (validación faltante en lógica de negocio)</td></tr>
+    <tr><th>IEEE 1044 · Origen</th><td>Diseño + Código (regla declarada en HU pero no implementada)</td></tr>
+    <tr><th>ISO 25010 · Calidad afectada</th><td>Functional Suitability (Correctness) + Security (Confidentiality)</td></tr>
+    <tr><th>OWASP Top 10:2021</th><td>A07:2021 · Identification and Authentication Failures</td></tr>
+    <tr><th>CWE</th><td>CWE-521 · Weak Password Requirements</td></tr>
+    <tr><th>CVSS v3.1</th><td>5.3 (Medium) · <code>CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N</code></td></tr>
+    <tr><th>Trazabilidad QASL</th><td><code>HU_REG_01</code> · BR2 · criterio de aceptación E4</td></tr>
+    <tr><th>Acción correctiva sugerida</th><td>(1) Backend: validar <code>len &lt; 6</code> en <code>POST /api/createAccount</code> y devolver HTTP 400 con mensaje descriptivo. (2) Frontend: agregar atributos <code>minlength="6"</code> y <code>pattern="[A-Za-z0-9]{6,}"</code> al input. (3) Mensaje de error: claro y consistente en español.</td></tr>
+  </table>
+
+  <p>El informe completo del defecto (con pasos de reproducción, evidencia, hipótesis de causa raíz y plan de regresión) está disponible como documento markdown referenciado en §10 (link a GitHub).</p>
+
+  <h3 id="s8-2">8.2 Hallazgos de seguridad · OWASP ZAP</h3>
+
+  <p>La tabla siguiente categoriza los ${d.zap.total} hallazgos detectados por el scan ZAP, agrupados por severidad y con la cantidad de instancias detectadas en el SUT.</p>
+
+  <table class="data-table">
+    <thead><tr><th>Severidad</th><th>Hallazgo</th><th>Instancias</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge-sev badge-sev-high">HIGH</span></td><td>Vulnerable JS Library</td><td>1</td></tr>
+      <tr><td><span class="badge-sev badge-sev-med">MEDIUM</span></td><td>Absence of Anti-CSRF Tokens</td><td>2</td></tr>
+      <tr><td><span class="badge-sev badge-sev-med">MEDIUM</span></td><td>Content Security Policy (CSP) Header Not Set</td><td>5 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-med">MEDIUM</span></td><td>Source Code Disclosure - SQL</td><td>2</td></tr>
+      <tr><td><span class="badge-sev badge-sev-med">MEDIUM</span></td><td>Sub Resource Integrity Attribute Missing</td><td>5 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-med">MEDIUM</span></td><td>Vulnerable JS Library (instancias adicionales)</td><td>2</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>Application Error Disclosure</td><td>2</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>Cookie No HttpOnly Flag</td><td>5 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>Cookie Without Secure Flag</td><td>5 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>Strict-Transport-Security Header Not Set</td><td>5</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>X-Powered-By Information Leak</td><td>5 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>Cross-Domain JavaScript Source File Inclusion</td><td>5 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>Cross-Origin Embedder/Opener/Resource-Policy Missing</td><td>15 (sistémico)</td></tr>
+      <tr><td><span class="badge-sev badge-sev-low">LOW</span></td><td>X-Content-Type-Options Header Missing</td><td>2</td></tr>
+      <tr><td><span class="badge-sev badge-sev-info">INFO</span></td><td>Session Management Response Identified</td><td>12</td></tr>
+      <tr><td><span class="badge-sev badge-sev-info">INFO</span></td><td>Modern Web Application + 6 más</td><td>varios</td></tr>
+    </tbody>
+  </table>
+
+  <p>El hallazgo HIGH (<em>Vulnerable JS Library</em>) requiere remediación inmediata: las dependencias jQuery y Bootstrap utilizadas presentan CVEs públicas. Los hallazgos MEDIUM apuntan a configuraciones de hardening web ausentes (CSP, anti-CSRF, SRI) y un caso particular de <em>SQL source code disclosure</em> en <code>/test_cases</code> que merece revisión específica.</p>
+</section>
+
+<!-- ═══ §9 RIESGO Y CONCLUSIONES ═══ -->
+<section id="s9">
+  <h2 class="section-h"><span class="section-num">§9</span> Análisis de riesgo y conclusiones</h2>
+
+  <h3>9.1 Veredicto por capa</h3>
+  <table class="data-table">
+    <thead><tr><th>Capa</th><th>Veredicto</th><th>Justificación</th></tr></thead>
+    <tbody>
+      <tr><td>F10.1 Funcional</td><td><span class="badge badge-pass">PASS con observación</span></td><td>17/20 TCs pasaron · 3 fallos consolidados en BUG-001 (defecto del SUT, no del framework)</td></tr>
+      <tr><td>F10.2 Contrato API</td><td><span class="badge badge-pass">PASS con expected failures</span></td><td>124/148 assertions pasaron · 24 expected failures documentadas (anti-bot del SUT)</td></tr>
+      <tr><td>F10.3 Performance</td><td><span class="badge badge-pass">PASS</span></td><td>5/5 thresholds respetados · 180/180 checks pasaron · p95 muy debajo de SLO</td></tr>
+      <tr><td>F10.4 Seguridad</td><td><span class="badge badge-warn">PASS con hallazgos</span></td><td>26 hallazgos del SUT documentados · 1 High requiere remediación</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.2 Recomendaciones priorizadas</h3>
+  <ol>
+    <li><strong>Bloquear despliegue a producción</strong> hasta corregir BUG-001 (validación de longitud mínima de password en backend y frontend).</li>
+    <li><strong>Actualizar dependencias JS</strong> identificadas como vulnerables por ZAP (jQuery, Bootstrap).</li>
+    <li><strong>Configurar headers de seguridad</strong> faltantes: CSP, HSTS, X-Content-Type-Options, COOP/COEP/CORP.</li>
+    <li><strong>Remediar disclosure de SQL</strong> en <code>/test_cases</code> (sanitización del response).</li>
+    <li><strong>Implementar tokens anti-CSRF</strong> en formularios de <code>/login</code> y <code>/signup</code>.</li>
+    <li><strong>Agregar atributos a cookies</strong>: <code>HttpOnly</code> y <code>Secure</code> en todas las cookies de sesión.</li>
+  </ol>
+
+  <h3>9.3 Conclusión</h3>
+  <p>El framework QASL ha cumplido su propósito: detectó <strong>${d.totals.defects} defectos reales</strong> del SUT a través de <strong>${d.totals.layers} capas independientes</strong> de prueba, manteniendo trazabilidad bidireccional desde la HU original hasta cada test case ejecutado, y documentando los hallazgos según los estándares públicos vigentes. La metodología de <em>handoff</em> blindado entre ${d.totals.actors} actores garantiza que ningún artefacto se pierda entre fases y que cada actor reciba un input válido antes de comenzar su trabajo.</p>
+
+  <p class="closing-quote serif">«Calidad construida desde el requerimiento, no parchada desde el defecto.» <span class="closing-quote-cite">— QASL · principio fundacional</span></p>
+</section>
+
+<!-- ═══ §10 TRAZABILIDAD Y ARTEFACTOS ═══ -->
+<section id="s10">
+  <h2 class="section-h"><span class="section-num">§10</span> Trazabilidad y artefactos públicos</h2>
+
+  <p class="lead">Todos los artefactos producidos por el framework están disponibles públicamente. La tabla siguiente lista los enlaces canónicos para cada uno.</p>
+
+  <h3>10.1 Repositorio fuente</h3>
+  <ul class="link-list">
+    <li><strong>GitHub repo:</strong> <a href="${REPO_URL}" target="_blank"><code>${REPO_URL}</code></a></li>
+    <li><strong>GitHub Pages · landing:</strong> <a href="${PAGES_URL}/" target="_blank"><code>${PAGES_URL}/</code></a></li>
+    <li><strong>Licencia:</strong> MIT</li>
+  </ul>
+
+  <h3>10.2 Reportes canónicos por capa (F10)</h3>
+  <table class="data-table">
+    <thead><tr><th>Capa</th><th>Herramienta</th><th>URL pública</th></tr></thead>
+    <tbody>
+      <tr><td>Funcional E2E</td><td>Allure</td><td><a href="${PAGES_URL}/reports/e2e/" target="_blank"><code>${PAGES_URL}/reports/e2e/</code></a></td></tr>
+      <tr><td>Contrato API</td><td>Newman + HTMLExtra</td><td><a href="${PAGES_URL}/reports/api/" target="_blank"><code>${PAGES_URL}/reports/api/</code></a></td></tr>
+      <tr><td>Performance</td><td>K6 Custom HTML</td><td><a href="${PAGES_URL}/reports/k6/" target="_blank"><code>${PAGES_URL}/reports/k6/</code></a></td></tr>
+      <tr><td>Seguridad</td><td>OWASP ZAP Native</td><td><a href="${PAGES_URL}/reports/zap/" target="_blank"><code>${PAGES_URL}/reports/zap/</code></a></td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.3 Artefactos de diseño y trazabilidad (F0-F5)</h3>
+  <ul class="link-list">
+    <li><strong>HU original:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/hu-originales/HU_REG_01.html" target="_blank"><code>static_analyzer/hu-originales/HU_REG_01.html</code></a></li>
+    <li><strong>HU IDEAL post-AI:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html" target="_blank"><code>static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html</code></a></li>
+    <li><strong>Reporte de pruebas estáticas:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/reportes/HU_REG_01_REPORT.md" target="_blank"><code>static_analyzer/reportes/HU_REG_01_REPORT.md</code></a></li>
+    <li><strong>4 CSVs trazabilidad:</strong> <a href="${REPO_URL}/tree/main/shift-left-testing" target="_blank"><code>shift-left-testing/{1..4}_*.csv</code></a></li>
+    <li><strong>Master View · Flow State:</strong> <a href="${REPO_URL}/blob/main/flow-state-dashboard.html" target="_blank"><code>flow-state-dashboard.html</code></a></li>
+  </ul>
+
+  <h3>10.4 Defectos documentados</h3>
+  <ul class="link-list">
+    <li><strong>BUG-001 (informe completo):</strong> <a href="${REPO_URL}/blob/main/shift-left-testing/defects/BUG-001-password-min-length-not-validated.md" target="_blank"><code>shift-left-testing/defects/BUG-001-password-min-length-not-validated.md</code></a></li>
+    <li><strong>Plantilla profesional de defecto (ISTQB+ISO+IEEE):</strong> <a href="${REPO_URL}/blob/main/plantillas-istqb/informe%20de%20defecto.md" target="_blank"><code>plantillas-istqb/informe de defecto.md</code></a></li>
+  </ul>
+
+  <h3>10.5 Matriz de trazabilidad (resumida)</h3>
+  <table class="data-table">
+    <thead><tr><th>HU</th><th>BR</th><th>Test Suite</th><th>Test Cases</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="3"><code>HU_REG_01</code></td><td>BR1 · Email único</td><td>TS01 + TS02</td><td>TC-002, TC-007, TC-014</td><td>PASS</td></tr>
+      <tr><td>BR2 · Password ≥ 6 chars</td><td>TS01 + TS02</td><td>TC-003, TC-004, TC-008, TC-009, TC-015</td><td><strong>FAIL → BUG-001</strong></td></tr>
+      <tr><td>BR3 · Campos obligatorios</td><td>TS02</td><td>TC-010, TC-011, TC-012, TC-013</td><td>PASS</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═══ §11 SIGN-OFF ═══ -->
+<section id="s11">
+  <h2 class="section-h"><span class="section-num">§11</span> Sign-off</h2>
+
+  <p class="lead">Conforme a <code>ISO/IEC/IEEE 29119-3:2021</code>, el cierre formal del Test Completion Report requiere la aprobación de los siguientes roles antes de la liberación del informe a stakeholders externos.</p>
+
+  <table class="signoff-table">
+    <tr><th>QA Lead</th><td><span class="signoff-line"></span></td><td class="signoff-date">Fecha: __________</td></tr>
+    <tr><th>Tech Lead</th><td><span class="signoff-line"></span></td><td class="signoff-date">Fecha: __________</td></tr>
+    <tr><th>Product Owner</th><td><span class="signoff-line"></span></td><td class="signoff-date">Fecha: __________</td></tr>
+    <tr><th>Project Manager</th><td><span class="signoff-line"></span></td><td class="signoff-date">Fecha: __________</td></tr>
+  </table>
+</section>
+
+<!-- ═══ §12 BIBLIOGRAFÍA ═══ -->
+<section id="s12">
+  <h2 class="section-h"><span class="section-num">§12</span> Apéndice · Bibliografía normativa</h2>
+
+  <ul class="biblio">
+    <li><strong>ISTQB.</strong> <em>Certified Tester Foundation Level Syllabus v4.0.</em> International Software Testing Qualifications Board, 2023.</li>
+    <li><strong>ISO/IEC/IEEE.</strong> <em>ISO/IEC/IEEE 29119-3:2021 — Software and Systems Engineering — Software Testing — Part 3: Test Documentation.</em> International Organization for Standardization, 2021.</li>
+    <li><strong>ISO/IEC/IEEE.</strong> <em>ISO/IEC/IEEE 29148:2018 — Systems and Software Engineering — Life Cycle Processes — Requirements Engineering.</em> International Organization for Standardization, 2018.</li>
+    <li><strong>IEEE.</strong> <em>IEEE Std 1044-2009 (R2017) — IEEE Standard Classification for Software Anomalies.</em> Institute of Electrical and Electronics Engineers, 2017.</li>
+    <li><strong>ISO/IEC.</strong> <em>ISO/IEC 25010:2011 — Systems and Software Engineering — SQuaRE — System and Software Quality Models.</em> International Organization for Standardization, 2011.</li>
+    <li><strong>OWASP Foundation.</strong> <em>OWASP Top 10:2021.</em> Open Web Application Security Project, 2021.</li>
+    <li><strong>ISO.</strong> <em>ISO 31000:2018 — Risk Management — Guidelines.</em> International Organization for Standardization, 2018.</li>
+    <li><strong>IEEE.</strong> <em>IEEE Std 1028-2008 — IEEE Standard for Software Reviews and Audits.</em> Institute of Electrical and Electronics Engineers, 2008.</li>
+    <li><strong>MITRE.</strong> <em>Common Weakness Enumeration (CWE).</em> The MITRE Corporation. <a href="https://cwe.mitre.org" target="_blank"><code>cwe.mitre.org</code></a></li>
+    <li><strong>FIRST.</strong> <em>Common Vulnerability Scoring System v3.1.</em> Forum of Incident Response and Security Teams. <a href="https://www.first.org/cvss/v3.1/specification-document" target="_blank"><code>first.org/cvss</code></a></li>
+  </ul>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="rep-footer">
+  <div class="rep-footer-rule"></div>
+  <p><strong>QASL Framework</strong> · Quality Assurance Shift-Left · ${d.meta.build}</p>
+  <p class="rep-footer-meta">Test Completion Report alineado a <code>ISO/IEC/IEEE 29119-3:2021</code> · Generado automáticamente desde artefactos JSON · ${d.meta.date}</p>
+  <p class="rep-footer-meta">Report ID <code>${d.meta.reportId}</code> · MIT License</p>
+</footer>
+
+</div>
+
+</body>
+</html>`;
+}
+
+(function main() {
+  console.log('');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('  BUILD FINAL REPORT · F10.8 · Test Completion Report (ISO 29119-3 + ISTQB)');
+  console.log('═══════════════════════════════════════════════════════════════════════════');
+  console.log('');
+
+  const d = buildData();
+  console.log('  Data extracted:');
+  console.log(`  · E2E   ${d.e2e.passed}/${d.e2e.total} (${d.e2e.passRate})`);
+  console.log(`  · API   ${d.api.passed}/${d.api.assertions} (${d.api.passRate})`);
+  console.log(`  · K6    ${d.k6.iterations} iter · p95 ${d.k6.p95}ms · checks ${d.k6.checksP}/${d.k6.checksP + d.k6.checksF}`);
+  console.log(`  · ZAP   ${d.zap.high}H/${d.zap.medium}M/${d.zap.low}L/${d.zap.info}I = ${d.zap.total} alerts`);
+  console.log(`  · Static ${d.staticAn.coverageInitial}% → ${d.staticAn.coverageFinal}% · ${d.staticAn.gapsTotal} gaps detected`);
+  console.log(`  · Shift-Left ${d.shiftLeft.ts} TS · ${d.shiftLeft.prc} PRC · ${d.shiftLeft.tc} TC`);
+  console.log('');
+
+  fs.mkdirSync(OUT_DIR, { recursive: true });
+  fs.writeFileSync(OUT_FILE, render(d), 'utf-8');
+
+  console.log(`  ✓ ${path.relative(ROOT, OUT_FILE)} (${(fs.statSync(OUT_FILE).size / 1024).toFixed(1)} KB)`);
+  console.log('');
+  console.log('  Para abrir local: start docs/final-report/index.html');
+  console.log('');
+})();

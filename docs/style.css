@@ -477,6 +477,41 @@ section h2 {
 }
 .report-stats strong { color: var(--primary); font-weight: 700; }
 
+.report-card-featured {
+  margin-top: 18px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #2563eb 100%);
+  color: #ffffff;
+  border-color: var(--primary-deep);
+  padding: 32px 36px;
+}
+.report-card-featured::before { display: none; }
+.report-card-featured:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(30, 58, 138, 0.25); }
+.report-card-featured h3 {
+  font-size: 22px;
+  color: #ffffff;
+  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.report-card-featured p {
+  color: #dbeafe;
+  font-size: 14px;
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+.report-tag-featured {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(191, 219, 254, 0.25);
+  letter-spacing: 0.18em;
+  padding: 5px 12px !important;
+}
+.report-card-featured .report-stats {
+  border-top-color: rgba(255, 255, 255, 0.15);
+  color: #bfdbfe;
+}
+.report-card-featured .report-stats strong { color: #ffffff; }
+
 /* ─── EVIDENCE ─────────────────────────────────────────────── */
 .evidence { background: var(--bg); }
 .screenshot-grid {

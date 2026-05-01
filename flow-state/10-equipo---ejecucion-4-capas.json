@@ -1,0 +1,67 @@
+{
+  "fase": 10,
+  "actor": "Equipo - Ejecución 4 Capas",
+  "hu_id": "HU_REG_01",
+  "estado": "completado",
+  "dor": {
+    "abierto_en": "2026-05-01T00:00:00",
+    "input": "HU asignada al sprint con VCR ≥ 9 (decisión de automatizar tomada en Planning Poker)",
+    "criterios": [
+      "4 CSVs de trazabilidad disponibles (User Story, Test Suite, Precondition, Test Case)",
+      "20 Test Cases pre-código definidos con trazabilidad 1:1 a HU IDEAL",
+      "VCR_Total ≥ 9 confirmado (automatización justificada)",
+      "Build deployado en QA accesible vía HTTPS",
+      "Stack técnico verificado: Playwright, Newman, K6, OWASP ZAP, Grafana, InfluxDB"
+    ]
+  },
+  "dod": {
+    "cerrado_en": "2026-05-01T17:44:00",
+    "duracion_segundos": 63840,
+    "artefactos": [
+      "F10.1 · 20 specs Playwright + reporte Allure (17 ✅ / 3 ❌ = BUG-001)",
+      "F10.2 · Postman Collection v2.1 + Newman + HTMLExtra (74 reqs / 124-24 assertions strict)",
+      "F10.3 · K6 standalone con flujo dinámico de token + custom HTML (180/180 checks · 5/5 thresholds)",
+      "F10.4 · OWASP ZAP Baseline scan + reportes nativos HTML/JSON/MD (26 hallazgos del SUT)",
+      "F10.5 · Grafana QASL Quality Cockpit consolidando las 4 capas + send-all-metrics.mjs",
+      "F10.6 · GitHub Pages public showcase https://e-gregorio.github.io/QASL-Framework/",
+      "BUG-001 documentado per ISTQB v4.0 + IEEE 1044-2009 + ISO/IEC 25010 + OWASP/CWE/CVSS"
+    ],
+    "criterios": [
+      "4 capas de detección automatizada ejecutadas (Functional + API contract + Performance + Security)",
+      "Trazabilidad 1:1 verificada: 20 TC del CSV ↔ 20 specs Playwright (nombres idénticos)",
+      "Defectos reales del SUT detectados y documentados (1 BUG funcional + 26 hallazgos seguridad)",
+      "Métricas consolidadas en InfluxDB → Grafana visualizando E2E + API + K6 + ZAP en un único dashboard",
+      "Reportes públicos en GitHub Pages con KPIs reales sin maquillaje",
+      "Asserts estrictos (sin oneOf que oculten failures): 24 fails honestos en API documentados como expected"
+    ],
+    "metricas": {
+      "e2e_test_cases": 20,
+      "e2e_passed": 17,
+      "e2e_failed": 3,
+      "e2e_pass_rate_pct": 85.0,
+      "api_requests": 74,
+      "api_assertions_total": 148,
+      "api_assertions_passed": 124,
+      "api_assertions_failed": 24,
+      "api_pass_rate_pct": 83.78,
+      "k6_iterations": 20,
+      "k6_http_requests": 80,
+      "k6_p95_response_time_ms": 302,
+      "k6_max_vus": 2,
+      "k6_thresholds_passed": 5,
+      "k6_thresholds_failed": 0,
+      "k6_checks_passed": 180,
+      "k6_checks_failed": 0,
+      "zap_high": 1,
+      "zap_medium": 5,
+      "zap_low": 12,
+      "zap_informational": 8,
+      "zap_total_alerts": 26,
+      "zap_pass_rules": 45,
+      "defects_detected_total": 27,
+      "layers_verified": 4,
+      "layers_consolidated_in_grafana": 4
+    }
+  },
+  "siguiente_actor": "PM · Sign-off final + Test Completion Report"
+}

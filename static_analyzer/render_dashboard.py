@@ -50,6 +50,7 @@ FASE_META = {
     7: {"actor": "QA · Smoke",       "role": "VALIDACIÓN TEMPRANA",       "color": "#1F3A5F", "soft": "#E5ECF4", "header": "#1F3A5F", "f_pill": "#1F3A5F"},
     8: {"actor": "PM · Scrum",       "role": "BACKLOG JIRA",              "color": "#B33A1F", "soft": "#FBEEE7", "header": "#B33A1F", "f_pill": "#B33A1F"},
     9: {"actor": "Equipo completo",  "role": "PLANNING POKER · VCR",      "color": "#0E6B7C", "soft": "#E0F4F7", "header": "#0E6B7C", "f_pill": "#0E6B7C"},
+   10: {"actor": "Equipo · 4 capas", "role": "E2E · API · K6 · ZAP",      "color": "#B33A1F", "soft": "#FBEEE7", "header": "#B33A1F", "f_pill": "#B33A1F"},
 }
 
 FASE_ACTION = {
@@ -63,6 +64,7 @@ FASE_ACTION = {
     7: ("Validación temprana",   "HU ↔ TC alineadas · 0s"),
     8: ("Backlog Jira",          "ticket priorizado · 1s"),
     9: ("Planning Poker · VCR",  ""),  # dinámico
+   10: ("Ejecución 4 capas",     "27 defectos detectados"),
 }
 
 # Artefactos cortos de los 5 puentes entre cápsulas principales
@@ -676,7 +678,7 @@ def render_html(fases: List[Dict]) -> str:
     </span>
     <div class="bar-meta">
       <span><strong>{html.escape(hu_id)}</strong></span>
-      <span class="ok">10 / 10 fases ✓</span>
+      <span class="ok">{sum(1 for f in fases if f.get("estado") == "completado")} / {len(fases)} fases ✓</span>
       <span>{html.escape(duracion_str)}</span>
       <span>{fecha}</span>
     </div>
@@ -802,8 +804,13 @@ def render_html(fases: List[Dict]) -> str:
       </div>
       <div class="stat">
         <div class="stat-tag">Actores · fases</div>
-        <div class="stat-val">6 <span class="from">·</span> 10</div>
+        <div class="stat-val">6 <span class="from">·</span> 11</div>
         <div class="stat-cap">Cada uno con <strong>su propio ciclo DoR/DoD</strong></div>
+      </div>
+      <div class="stat accent">
+        <div class="stat-tag">F10 · 4 capas ejecutadas</div>
+        <div class="stat-val">27</div>
+        <div class="stat-cap">Defectos detectados · <strong>E2E + API + K6 + ZAP</strong></div>
       </div>
     </div>
 
