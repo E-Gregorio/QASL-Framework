@@ -667,12 +667,13 @@ function render(d) {
   </table>
 
   <h3>10.3 Artefactos de diseño y trazabilidad (F0-F5)</h3>
+  <p>Los siguientes artefactos se sirven directamente desde GitHub Pages (HTMLs renderizados) o GitHub (markdown y CSV con render nativo).</p>
   <ul class="link-list">
-    <li><strong>HU original:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/hu-originales/HU_REG_01.html" target="_blank"><code>static_analyzer/hu-originales/HU_REG_01.html</code></a></li>
-    <li><strong>HU IDEAL post-AI:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html" target="_blank"><code>static_analyzer/hu-actualizadas/HU_REG_01_ACTUALIZADA.html</code></a></li>
-    <li><strong>Reporte de pruebas estáticas:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/reportes/HU_REG_01_REPORT.md" target="_blank"><code>static_analyzer/reportes/HU_REG_01_REPORT.md</code></a></li>
-    <li><strong>4 CSVs trazabilidad:</strong> <a href="${REPO_URL}/tree/main/shift-left-testing" target="_blank"><code>shift-left-testing/{1..4}_*.csv</code></a></li>
-    <li><strong>Master View · Flow State:</strong> <a href="${REPO_URL}/blob/main/flow-state-dashboard.html" target="_blank"><code>flow-state-dashboard.html</code></a></li>
+    <li><strong>HU original:</strong> <a href="../artifacts/hu-original.html" target="_blank"><code>artifacts/hu-original.html</code></a> — la HU recibida del Analista Funcional, con cobertura inicial 25%.</li>
+    <li><strong>HU IDEAL post-AI:</strong> <a href="../artifacts/hu-ideal.html" target="_blank"><code>artifacts/hu-ideal.html</code></a> — la HU IDEAL refinada tras detección de gaps por Claude AI, cobertura 100%.</li>
+    <li><strong>Reporte de pruebas estáticas:</strong> <a href="${REPO_URL}/blob/main/static_analyzer/reportes/HU_REG_01_REPORT.md" target="_blank"><code>static_analyzer/reportes/HU_REG_01_REPORT.md</code></a> — análisis con dashboard de métricas, brechas por severidad y matriz de cobertura por BR.</li>
+    <li><strong>4 CSVs trazabilidad:</strong> <a href="${REPO_URL}/tree/main/shift-left-testing" target="_blank"><code>shift-left-testing/{1..4}_*.csv</code></a> — User Story · Test Suite · Precondition · Test Case · auto-generados por Claude AI con trazabilidad bidireccional.</li>
+    <li><strong>Master View · Flow State:</strong> <a href="../artifacts/flow-state-dashboard.html" target="_blank"><code>artifacts/flow-state-dashboard.html</code></a> — lámina editorial con las 11 fases (F0-F10) y el engranaje DoR/DoD entre 6 actores.</li>
   </ul>
 
   <h3>10.4 Defectos documentados</h3>

@@ -26,11 +26,16 @@ const ROOT = process.cwd();
 const DOCS = path.join(ROOT, 'docs');
 const DOCS_REPORTS = path.join(DOCS, 'reports');
 const DOCS_IMG = path.join(DOCS, 'img');
+const DOCS_ARTIFACTS = path.join(DOCS, 'artifacts');
 
 const SRC_E2E = path.join(ROOT, 'reports', 'e2e', 'allure-report');
 const SRC_API = path.join(ROOT, 'reports', 'api', 'htmlextra-report.html');
 const SRC_K6 = path.join(ROOT, 'reports', 'k6', 'k6-report.html');
 const SRC_ZAP = path.join(ROOT, 'reports', 'zap', 'zap-report.html');
+
+const SRC_HU_ORIGINAL = path.join(ROOT, 'static_analyzer', 'hu-originales', 'HU_REG_01.html');
+const SRC_HU_IDEAL = path.join(ROOT, 'static_analyzer', 'hu-actualizadas', 'HU_REG_01_ACTUALIZADA.html');
+const SRC_FLOW_STATE = path.join(ROOT, 'flow-state-dashboard.html');
 
 const E2E_RESULTS = path.join(ROOT, 'reports', 'e2e', 'results.json');
 const API_RESULTS = path.join(ROOT, 'reports', 'api', 'newman-report.json');
@@ -456,12 +461,14 @@ function renderIndex(kpis) {
 (function main() {
   banner();
 
-  console.log('  Limpiando docs/reports y docs/img...');
+  console.log('  Limpiando docs/reports, docs/img y docs/artifacts...');
   rmDir(DOCS_REPORTS);
   rmDir(DOCS_IMG);
+  rmDir(DOCS_ARTIFACTS);
   ensureDir(DOCS);
   ensureDir(DOCS_REPORTS);
   ensureDir(DOCS_IMG);
+  ensureDir(DOCS_ARTIFACTS);
 
   console.log('');
   console.log('  Copiando reportes...');
@@ -474,6 +481,12 @@ function renderIndex(kpis) {
   console.log('');
   console.log('  Copiando imágenes...');
   if (copyDir(SRC_IMG, DOCS_IMG)) console.log('  ✓ img/ → docs/img/');
+
+  console.log('');
+  console.log('  Copiando artefactos HTML (HU original + IDEAL + Flow State)...');
+  if (copyFile(SRC_HU_ORIGINAL, path.join(DOCS_ARTIFACTS, 'hu-original.html'))) console.log('  ✓ HU original → docs/artifacts/hu-original.html');
+  if (copyFile(SRC_HU_IDEAL, path.join(DOCS_ARTIFACTS, 'hu-ideal.html'))) console.log('  ✓ HU IDEAL post-AI → docs/artifacts/hu-ideal.html');
+  if (copyFile(SRC_FLOW_STATE, path.join(DOCS_ARTIFACTS, 'flow-state-dashboard.html'))) console.log('  ✓ Flow State → docs/artifacts/flow-state-dashboard.html');
 
   console.log('');
   console.log('  Calculando KPIs desde JSONs...');
