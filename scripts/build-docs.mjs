@@ -332,6 +332,33 @@ function renderIndex(kpis) {
   </div>
 </section>
 
+<section class="master-view-section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Master View · DoR/DoD encadenado entre 6 actores</h2>
+      <p class="section-sub">La lámina editorial que materializa el método. Visualiza las 11 fases (F0-F10) con su ciclo interno DoR/DoD, los 9 handoffs entre roles y el artefacto que efectivamente cambia de manos en cada uno. Las fases F2 y F5 (estrella dorada) son las ejecutadas por QA con asistencia de Claude AI.</p>
+    </div>
+
+    <a class="master-view-card" href="artifacts/flow-state-dashboard.html" target="_blank">
+      <div class="master-view-preview">
+        <img src="img/flow-state-1.png" alt="QASL Master View · upper section">
+        <img src="img/flow-state-2.png" alt="QASL Master View · lower section + F10">
+      </div>
+      <div class="master-view-body">
+        <div class="master-view-tag">F0 → F10 · METHODOLOGY · MASTER VIEW</div>
+        <h3 class="master-view-title">Calidad no es una <em>herramienta</em>.<br>Es un <em>engranaje</em> entre <em class="mv-accent">seis actores</em><br>donde nadie trabaja solo.</h3>
+        <p class="master-view-desc">Lámina única HTML/SVG estilo editorial corporativo · paleta papel + tinta + tierra · cada cápsula representa un actor con su ciclo interno DoR/DoD · cada puente lleva el artefacto que pasa de un actor al siguiente · cobertura BR 25% → 100% · 5 gaps detectados · 20 test cases pre-código · VCR ≥ 9 → automatizar.</p>
+        <div class="master-view-meta">
+          <span><strong>11 fases</strong> · F0-F10</span>
+          <span><strong>6 actores</strong> · cliente, analista, QA, devops, PM, equipo</span>
+          <span><strong>9 handoffs</strong> · DoD → DoR blindados</span>
+          <span class="master-view-cta">Abrir lámina ↗</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
 <section class="kpis">
   <div class="container">
     <div class="section-head">
