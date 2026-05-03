@@ -416,6 +416,11 @@ npm run pipeline
 | 25 | **F10.5 · Observabilidad consolidada** Grafana 11.4.0 + InfluxDB 1.8 + Loki + Renderer · dashboard QASL Quality Cockpit con 27 panels (4 capas + footer) sin emojis, naming F10.x corporativo | `docker/grafana/dashboards/qa-control-center.json` |
 | 26 | **Orquestador único de métricas** `send-all-metrics.mjs` · lee 4 JSONs (E2E/API/K6/ZAP) y escribe en InfluxDB en una sola corrida sin re-ejecutar pruebas | `scripts_metricas/send-all-metrics.mjs` |
 | 27 | **Helper InfluxDB compartido** con `sendK6Metrics` agregado · 4 senders standalone + 1 orquestador · todos contra `qa_metrics` database | `scripts_metricas/influx-client.mjs` + `scripts_metricas/send-{e2e,api,k6,zap}-metrics.mjs` |
+| 28 | **F10.6 · GitHub Pages public showcase** · landing editorial con hero gradiente · phase journey F0-F10 · Shift-Left section con coverage 25→100% · Master View card · 4 cards de reportes técnicos · Test Completion Report featured | `docs/index.html` + `docs/style.css` + `scripts/build-docs.mjs` |
+| 29 | **F10.7 · Flow State Master View** actualizado a 11 fases (F0-F10) con cápsula corona F10 · counter dinámico 11/11 · header "11 fases · 10 handoffs blindados" · screenshots embebidas | `flow-state-dashboard.html` + `flow-state/10-equipo---ejecucion-4-capas.json` |
+| 30 | **F10.8 · Test Completion Report** profesional fondo blanco · tipografía Lora editorial · 13 secciones numeradas (ISO/IEC/IEEE 29119-3:2021 + ISTQB v4.0 + IEEE 1044 + ISO 25010 + OWASP/CWE/CVSS) · 14 figuras embebidas · matriz de trazabilidad · bibliografía normativa · sign-off | `docs/final-report/index.html` + `scripts/build-final-report.mjs` |
+| 31 | **F10.9 · GitHub Actions Pipeline** (`qa-pipeline.yml`) · 11 stages secuenciales mapeando 1:1 las fases F00-F10 del Master View · cada step es un gate del DoR/DoD · auto-deploy a GitHub Pages · ejecutado en 26s con 11/11 verdes · decisión consciente documentada de NO atacar SUT público desde runner | `.github/workflows/qa-pipeline.yml` |
+| 32 | **Badges públicos en README** · estado del pipeline live · link al showcase · MIT license | `README.md` (top section) |
 
 ### 🎯 F10.1 · Resultados de la ejecución E2E
 
@@ -893,10 +898,10 @@ F09 ─●─ F08 ─●─ F07 ─●─ F06 ─●─ F05★
 - [x] **F10.3 — K6 performance** · 2 VUs concurrencia · flujo dinámico register→login(token)→search→cleanup · **20 iters / 80 reqs / 180/180 checks / 5/5 thresholds · 0.00% failure · p95 302 ms**
 - [x] **F10.4 — OWASP ZAP Baseline Scan** vía Docker · target `automationexercise.com` · **26 hallazgos detectados** (1 High · 5 Medium · 12 Low · 8 Info · 45 PASS) · reportes nativos HTML/JSON/MD
 - [x] **F10.5 — Observabilidad consolidada** Grafana 11.4.0 + InfluxDB 1.8 · dashboard QASL Quality Cockpit (27 panels, 4 capas) · `send-all-metrics.mjs` lee los 4 JSONs y los manda en bloque sin re-ejecutar pruebas
-- [ ] **F10.6 — Landing page pública en GitHub Pages** con links a los 4 reportes (Allure / Newman / K6 / ZAP) + Flow State + informe profesional final
-- [ ] **F10.7 — Flow State Dashboard** (DoR/DoD master view refinado · render_dashboard.py)
-- [ ] **F10.8 — Informe Profesional Final** (HTML blanco/azul corporativo, all-images, "unique-in-the-world")
-- [ ] **F10.9 — Pipeline de regresión** en GitHub Actions con notificación email
+- [x] **F10.6 — Landing page pública en GitHub Pages** con landing editorial · 4 reportes técnicos · Master View card · BUG-001 + 14 figuras
+- [x] **F10.7 — Flow State Dashboard** (DoR/DoD master view editorial con 11 fases y Card F10 corona · 27 defectos detectados)
+- [x] **F10.8 — Informe Profesional Final** (HTML blanco/Lora · ISO/IEC/IEEE 29119-3:2021 · 13 secciones · 14 figuras embebidas · sign-off)
+- [x] **F10.9 — Pipeline GitHub Actions** · 11 stages narrativos mapeando F00→F10 del DoR/DoD · ejecutado en 26s · 100% verde · auto-deploy a GitHub Pages
 - [ ] **Limpieza del docker-compose** (servicios n8n/sqlserver no usados aún)
 
 ---
@@ -911,13 +916,16 @@ F09 ─●─ F08 ─●─ F07 ─●─ F06 ─●─ F05★
 - [x] **F10.3 · Test K6 standalone con flujo dinámico de token** + reporte HTML profesional fondo blanco + 4 gráficos Chart.js + métricas a InfluxDB nativo
 - [x] **F10.4 · OWASP ZAP Baseline Scan** vía Docker con reportes nativos · 26 hallazgos del SUT documentados · 4ª capa de detección de defectos (funcional + contrato + performance + seguridad)
 - [x] **F10.5 · Observabilidad consolidada en Grafana** · 4 capas en un solo dashboard QASL Quality Cockpit · `send-all-metrics.mjs` orquestador único sin re-ejecución de pruebas
+- [x] **F10.6 · GitHub Pages public showcase** con landing editorial · Master View card · 4 cards de reportes técnicos · Test Completion Report featured
+- [x] **F10.7 · Flow State Master View** actualizado a 11 fases con cápsula corona F10 · counter dinámico · imágenes embebidas
+- [x] **F10.8 · Test Completion Report** profesional ISO/IEC/IEEE 29119-3:2021 · 13 secciones · 14 figuras · sign-off
+- [x] **F10.9 · GitHub Actions Pipeline** · 11 stages mapeando 1:1 las fases F00-F10 · ejecutado en 26s con 11/11 verdes · auto-deploy a GitHub Pages
 - [x] **Plantilla profesional de Informe de Defecto** (ISTQB v4.0 · ISO/IEC/IEEE 29119-3:2021 · IEEE 1044-2009 · ISO/IEC 25010 · OWASP/CWE/CVSS)
 - [x] **BUG-001** documentado formalmente (CWE-521 · OWASP A07:2021 · CVSS 5.3) detectado por la suite E2E
-- [ ] **Master View consolidado refinado** — dashboard visual final con dots DoR/DoD (ver Bitácora arriba)
 - [ ] Integración nativa con Jira/Xray (importación de los 4 CSVs + auto-creación de defectos desde la suite Playwright)
 - [ ] CLI unificado para gestionar el ciclo completo desde una sola consola
 - [ ] Plantillas adicionales: HU de Login, Catálogo, Carrito (e-commerce demo)
-- [ ] Pipeline E2E/API/K6/ZAP completo (F10.2 → F10.7)
+- [ ] Capa SAST adicional (Semgrep / SonarQube) como F10.10
 
 ---
 
