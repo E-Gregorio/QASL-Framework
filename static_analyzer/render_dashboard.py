@@ -708,7 +708,7 @@ def render_html(fases: List[Dict]) -> str:
   <section class="diagram-card">
     <div class="diagram-band">
       <div class="diagram-band-title serif">
-        Engranaje DoR/DoD <em>—</em> 6 actores · 10 fases · 9 handoffs blindados
+        Engranaje DoR/DoD <em>—</em> 6 actores · 11 fases · 10 handoffs blindados
       </div>
       <div class="diagram-band-meta">
         <span>HU · <strong>{html.escape(hu_id)}</strong></span>
@@ -761,7 +761,7 @@ def render_html(fases: List[Dict]) -> str:
 
         <g transform="translate(0, 530)">
           <text x="0" y="0" font-family="Newsreader, serif" font-style="italic" font-size="13" fill="#14110F">
-            <tspan font-weight="700" fill="#B33A1F">10 fases</tspan> · <tspan font-weight="700">6 actores</tspan> · <tspan font-weight="700">9 handoffs DoD→DoR</tspan> · ejecutados en <tspan font-weight="700" font-family="JetBrains Mono, monospace" font-size="12">{html.escape(duracion_str)}</tspan>
+            <tspan font-weight="700" fill="#B33A1F">11 fases</tspan> · <tspan font-weight="700">6 actores</tspan> · <tspan font-weight="700">10 handoffs DoD→DoR</tspan> · ejecutados en <tspan font-weight="700" font-family="JetBrains Mono, monospace" font-size="12">{html.escape(duracion_str)}</tspan>
           </text>
           <text x="1340" y="0" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="10" font-weight="700" fill="#8B8170" letter-spacing="0.16em">QASL · MASTER VIEW</text>
         </g>

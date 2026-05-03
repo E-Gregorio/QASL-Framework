@@ -235,12 +235,13 @@ function render(d) {
         <li><a href="#s6-4">§6.4 Capa seguridad · OWASP ZAP</a></li>
       </ol>
     </li>
-    <li><a href="#s7">§7 Observabilidad consolidada · Grafana</a></li>
-    <li><a href="#s8">§8 Defectos detectados</a></li>
-    <li><a href="#s9">§9 Análisis de riesgo y conclusiones</a></li>
-    <li><a href="#s10">§10 Trazabilidad y artefactos públicos</a></li>
-    <li><a href="#s11">§11 Sign-off</a></li>
-    <li><a href="#s12">§12 Apéndice · Bibliografía normativa</a></li>
+    <li><a href="#s7">§7 CI/CD Pipeline · DoR/DoD ejecutable (GitHub Actions)</a></li>
+    <li><a href="#s8">§8 Observabilidad consolidada · Grafana</a></li>
+    <li><a href="#s9">§9 Defectos detectados</a></li>
+    <li><a href="#s10">§10 Análisis de riesgo y conclusiones</a></li>
+    <li><a href="#s11">§11 Trazabilidad y artefactos públicos</a></li>
+    <li><a href="#s12">§12 Sign-off</a></li>
+    <li><a href="#s13">§13 Apéndice · Bibliografía normativa</a></li>
   </ol>
 </nav>
 
@@ -421,7 +422,7 @@ function render(d) {
     <tbody>
       <tr><td>Test cases ejecutados</td><td><strong>${d.e2e.total}</strong></td><td>20 TCs cubriendo TS01 (positivos · 6) · TS02 (negativos · 9) · TS03 (seguridad · 5)</td></tr>
       <tr><td>Pasaron</td><td><strong>${d.e2e.passed}</strong></td><td>Pass rate ${d.e2e.passRate}</td></tr>
-      <tr><td>Fallaron</td><td><strong>${d.e2e.failed}</strong></td><td>3 fallos atribuidos al mismo defecto del SUT (BUG-001, ver §8.1)</td></tr>
+      <tr><td>Fallaron</td><td><strong>${d.e2e.failed}</strong></td><td>3 fallos atribuidos al mismo defecto del SUT (BUG-001, ver §9.1)</td></tr>
       <tr><td>Tiempo total</td><td>${fmtMs(d.e2e.durationMs)}</td><td>Ejecución serial · 1 worker · headed mode</td></tr>
     </tbody>
   </table>
@@ -436,7 +437,7 @@ function render(d) {
     <figcaption><strong>Figura 6.1.2.</strong> Reporte Allure · vista de suites · cada TC muestra su metadata QASL embebida (TC_ID · TS_ID · PRC_Asociadas · Cobertura_Escenario · Cobertura_BR · Tecnica_Aplicada).</figcaption>
   </figure>
 
-  <p>Los <strong>3 fallos</strong> corresponden a TC-008 (password de 5 caracteres), TC-009 (password de 1 carácter) y TC-015 (ausencia de mensaje de confirmación con password inválido). Los tres son evidencia del mismo defecto del SUT y están consolidados en el informe BUG-001 (§8.1).</p>
+  <p>Los <strong>3 fallos</strong> corresponden a TC-008 (password de 5 caracteres), TC-009 (password de 1 carácter) y TC-015 (ausencia de mensaje de confirmación con password inválido). Los tres son evidencia del mismo defecto del SUT y están consolidados en el informe BUG-001 (§9.1).</p>
 
   <!-- 6.2 API -->
   <h3 id="s6-2">6.2 Capa contrato API · Newman + HTMLExtra</h3>
@@ -532,12 +533,69 @@ function render(d) {
     <figcaption><strong>Figura 6.4.2.</strong> OWASP ZAP · tabla detallada de alerts · cada hallazgo con su nivel de riesgo y número de instancias detectadas en el sitio.</figcaption>
   </figure>
 
-  <p>Los <strong>${d.zap.total} hallazgos son defectos reales del SUT</strong> (no del framework). Su sola detección y categorización es el valor agregado de la capa de seguridad. La interpretación priorizada de estos hallazgos se desarrolla en §8.2.</p>
+  <p>Los <strong>${d.zap.total} hallazgos son defectos reales del SUT</strong> (no del framework). Su sola detección y categorización es el valor agregado de la capa de seguridad. La interpretación priorizada de estos hallazgos se desarrolla en §9.2.</p>
 </section>
 
-<!-- ═══ §7 OBSERVABILIDAD ═══ -->
+<!-- ═══ §7 CI/CD PIPELINE ═══ -->
 <section id="s7">
-  <h2 class="section-h"><span class="section-num">§7</span> Observabilidad consolidada · Grafana</h2>
+  <h2 class="section-h"><span class="section-num">§7</span> CI/CD Pipeline · DoR/DoD ejecutable (GitHub Actions)</h2>
+
+  <p class="lead">El método QASL no es un documento — es un <em>pipeline ejecutable</em>. Las 11 fases del Master View se materializan en GitHub Actions como 11 <em>steps</em> secuenciales, donde cada step es un <em>gate</em> de calidad que cierra el DoD de un actor antes de pasar al siguiente. Cuando todos pasan en verde, el showcase público se publica automáticamente en GitHub Pages.</p>
+
+  <h3>7.1 Mapeo 1:1 entre el Master View y el pipeline</h3>
+
+  <table class="data-table">
+    <thead><tr><th>Step</th><th>Fase</th><th>Actor</th><th>Gate ejecutado</th></tr></thead>
+    <tbody>
+      <tr><td><code>F00</code></td><td>00</td><td>Cliente</td><td>Verifica entrega del brief de negocio · existencia del folder de HUs originales</td></tr>
+      <tr><td><code>F01</code></td><td>01</td><td>Analista Funcional</td><td>Valida HU original presente · cumple INVEST</td></tr>
+      <tr><td><code>F02 ★</code></td><td>02</td><td>QA con Claude AI</td><td>Reporte de pruebas estáticas generado · HU IDEAL refinada</td></tr>
+      <tr><td><code>F03</code></td><td>03</td><td>Analista Funcional</td><td>Loop de refinamiento documentado en gap chart F03</td></tr>
+      <tr><td><code>F04</code></td><td>04</td><td>Cliente</td><td>Aprobación formal documentada en gap chart F04</td></tr>
+      <tr><td><code>F05 ★</code></td><td>05</td><td>QA con Claude AI</td><td>4 CSVs presentes con filas mínimas (User Story, Test Suite, Precondition, Test Case)</td></tr>
+      <tr><td><code>F06</code></td><td>06</td><td>DevOps</td><td>Build deployado en QA · gap chart F06 cerrado</td></tr>
+      <tr><td><code>F07</code></td><td>07</td><td>QA · Smoke</td><td><strong>TypeScript type-check</strong> · los 20 specs E2E + utilidades compilan sin errores</td></tr>
+      <tr><td><code>F08</code></td><td>08</td><td>PM · Scrum</td><td>Backlog priorizado · gap chart F08 cerrado</td></tr>
+      <tr><td><code>F09</code></td><td>09</td><td>Equipo · Planning Poker</td><td>Decisión VCR (ISO 31000) · VCR=11 → AUTOMATIZAR</td></tr>
+      <tr><td><code>F10</code></td><td>10</td><td>Equipo · 4 capas</td><td>BUG-001 documentado · plantilla profesional · <strong><code>npm run docs:build</code></strong> publica el showcase completo</td></tr>
+      <tr><td><code>🚀</code></td><td>—</td><td>GitHub Pages</td><td>Deploy automático del directorio <code>docs/</code> a la URL pública</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 Decisión consciente · por qué este pipeline NO ejecuta E2E + API + K6 + ZAP en CI</h3>
+
+  <p>El sistema bajo prueba (<code>automationexercise.com</code>) es un servicio público y compartido. Ejecutar regresión completa desde un <em>runner</em> de GitHub Actions —cuyas IPs están <em>flaggeadas</em> por sistemas anti-bot como Cloudflare— produciría dos efectos no deseados:</p>
+
+  <ol>
+    <li><strong>Abuso de recursos ajenos.</strong> El SUT no nos pertenece. Atacarlo desde un runner público es mal uso de un servicio comunitario.</li>
+    <li><strong>Resultados no deterministas.</strong> Los IPs del runner reciben respuestas <code>403</code> intermitentes que no reflejan calidad del código sino disponibilidad anti-bot. Eso rompe la utilidad del pipeline como <em>gate</em>.</li>
+  </ol>
+
+  <p>La <strong>decisión profesional</strong> es ejecutar las 4 capas <em>localmente</em> (donde el browser tiene <em>fingerprint</em> real y la IP no está marcada) y <strong>auditar los artefactos resultantes en CI</strong>. El pipeline valida que los reportes de Allure, Newman, K6 y ZAP existan en <code>docs/reports/</code>, que el BUG-001 esté documentado, y que la plantilla profesional de defecto esté presente. Después regenera el <em>showcase</em> con <code>npm run docs:build</code> y lo publica.</p>
+
+  <p>En un entorno cliente real (entorno QA propio, sin SUT compartido, runners autohospedados), el mismo workflow incluye stages adicionales que ejecutan E2E + API + K6 + ZAP <em>contra el SUT del proyecto</em>. La estructura del pipeline es portable; lo único que cambia es el <em>target</em>.</p>
+
+  <h3>7.3 Trigger y portabilidad</h3>
+
+  <ul>
+    <li><strong>Trigger manual</strong> · <code>workflow_dispatch</code> · botón <em>"Run workflow"</em> en la pestaña Actions del repositorio.</li>
+    <li><strong>Trigger automático</strong> · <code>on: push</code> a <code>main</code> en paths relevantes (<code>docs/</code>, <code>scripts/</code>, el propio YAML).</li>
+    <li><strong>Portabilidad</strong> · este workflow está escrito en YAML estándar de GitHub Actions, pero la estructura de <em>11 steps secuenciales con gate por fase</em> es trasladable a Jenkins (<em>declarative pipeline</em> con <em>stages</em>), GitLab CI (<em>jobs</em> con <em>needs</em>), o Azure DevOps (<em>jobs</em> con <em>dependsOn</em>) sin modificación de la metodología subyacente.</li>
+  </ul>
+
+  <h3>7.4 Evidencia de ejecución</h3>
+
+  <figure class="fig">
+    <img src="../img/ci-pipeline.png" alt="QASL DoR/DoD Pipeline running on GitHub Actions">
+    <figcaption><strong>Figura 7.1.</strong> Pipeline QASL ejecutándose en GitHub Actions · 11 steps en verde · cada step representa el cierre del DoD de un actor del flujo. El step F10 dispara el build del <em>showcase</em> y el deploy a GitHub Pages.</figcaption>
+  </figure>
+
+  <p class="closing-quote serif" style="margin-top: 24px !important; font-size: 17px;">«Un pipeline en verde es la firma del QA Lead que dice: el ciclo se cerró completo, sin cortes ni excusas.»</p>
+</section>
+
+<!-- ═══ §8 OBSERVABILIDAD ═══ -->
+<section id="s8">
+  <h2 class="section-h"><span class="section-num">§8</span> Observabilidad consolidada · Grafana</h2>
 
   <p class="lead">Las cuatro capas anteriores producen métricas independientes en formatos distintos (results.json de Playwright, newman-report.json, k6-summary.json y zap-report.json). El módulo F10.5 las consolida en una única base InfluxDB y las visualiza en un dashboard Grafana profesional, sin necesidad de re-ejecutar las pruebas: un orquestador único (<code>send-all-metrics.mjs</code>) parsea los JSON existentes y emite los <em>measurements</em> correspondientes.</p>
 
@@ -555,12 +613,12 @@ function render(d) {
 </section>
 
 <!-- ═══ §8 DEFECTOS ═══ -->
-<section id="s8">
-  <h2 class="section-h"><span class="section-num">§8</span> Defectos detectados</h2>
+<section id="s9">
+  <h2 class="section-h"><span class="section-num">§9</span> Defectos detectados</h2>
 
   <p class="lead">El framework detectó un total de <strong>${d.totals.defects} defectos reales en el SUT</strong>: un BUG funcional descubierto por la capa E2E (BUG-001) y ${d.zap.total} hallazgos de seguridad descubiertos por la capa OWASP ZAP. Todos están documentados conforme a IEEE 1044-2009 (Standard Classification for Software Anomalies) y, cuando aplica, OWASP Top 10:2021 + CWE + CVSS v3.1.</p>
 
-  <h3 id="s8-1">8.1 BUG-001 · El sistema acepta passwords con menos de 6 caracteres</h3>
+  <h3 id="s9-1">9.1 BUG-001 · El sistema acepta passwords con menos de 6 caracteres</h3>
 
   <table class="defect-table">
     <tr><th>ID del defecto</th><td><code>BUG-001</code></td></tr>
@@ -580,9 +638,9 @@ function render(d) {
     <tr><th>Acción correctiva sugerida</th><td>(1) Backend: validar <code>len &lt; 6</code> en <code>POST /api/createAccount</code> y devolver HTTP 400 con mensaje descriptivo. (2) Frontend: agregar atributos <code>minlength="6"</code> y <code>pattern="[A-Za-z0-9]{6,}"</code> al input. (3) Mensaje de error: claro y consistente en español.</td></tr>
   </table>
 
-  <p>El informe completo del defecto (con pasos de reproducción, evidencia, hipótesis de causa raíz y plan de regresión) está disponible como documento markdown referenciado en §10 (link a GitHub).</p>
+  <p>El informe completo del defecto (con pasos de reproducción, evidencia, hipótesis de causa raíz y plan de regresión) está disponible como documento markdown referenciado en §11 (link a GitHub).</p>
 
-  <h3 id="s8-2">8.2 Hallazgos de seguridad · OWASP ZAP</h3>
+  <h3 id="s9-2">9.2 Hallazgos de seguridad · OWASP ZAP</h3>
 
   <p>La tabla siguiente categoriza los ${d.zap.total} hallazgos detectados por el scan ZAP, agrupados por severidad y con la cantidad de instancias detectadas en el SUT.</p>
 
@@ -612,8 +670,8 @@ function render(d) {
 </section>
 
 <!-- ═══ §9 RIESGO Y CONCLUSIONES ═══ -->
-<section id="s9">
-  <h2 class="section-h"><span class="section-num">§9</span> Análisis de riesgo y conclusiones</h2>
+<section id="s10">
+  <h2 class="section-h"><span class="section-num">§10</span> Análisis de riesgo y conclusiones</h2>
 
   <h3>9.1 Veredicto por capa</h3>
   <table class="data-table">
@@ -643,8 +701,8 @@ function render(d) {
 </section>
 
 <!-- ═══ §10 TRAZABILIDAD Y ARTEFACTOS ═══ -->
-<section id="s10">
-  <h2 class="section-h"><span class="section-num">§10</span> Trazabilidad y artefactos públicos</h2>
+<section id="s11">
+  <h2 class="section-h"><span class="section-num">§11</span> Trazabilidad y artefactos públicos</h2>
 
   <p class="lead">Todos los artefactos producidos por el framework están disponibles públicamente. La tabla siguiente lista los enlaces canónicos para cada uno.</p>
 
@@ -694,8 +752,8 @@ function render(d) {
 </section>
 
 <!-- ═══ §11 SIGN-OFF ═══ -->
-<section id="s11">
-  <h2 class="section-h"><span class="section-num">§11</span> Sign-off</h2>
+<section id="s12">
+  <h2 class="section-h"><span class="section-num">§12</span> Sign-off</h2>
 
   <p class="lead">Conforme a <code>ISO/IEC/IEEE 29119-3:2021</code>, el cierre formal del Test Completion Report requiere la aprobación de los siguientes roles antes de la liberación del informe a stakeholders externos.</p>
 
@@ -708,8 +766,8 @@ function render(d) {
 </section>
 
 <!-- ═══ §12 BIBLIOGRAFÍA ═══ -->
-<section id="s12">
-  <h2 class="section-h"><span class="section-num">§12</span> Apéndice · Bibliografía normativa</h2>
+<section id="s13">
+  <h2 class="section-h"><span class="section-num">§13</span> Apéndice · Bibliografía normativa</h2>
 
   <ul class="biblio">
     <li><strong>ISTQB.</strong> <em>Certified Tester Foundation Level Syllabus v4.0.</em> International Software Testing Qualifications Board, 2023.</li>

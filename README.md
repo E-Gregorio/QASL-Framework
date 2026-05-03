@@ -1,5 +1,9 @@
 # QASL Framework
 
+[![QASL · DoR/DoD Pipeline](https://github.com/E-Gregorio/QASL-Framework/actions/workflows/qa-pipeline.yml/badge.svg)](https://github.com/E-Gregorio/QASL-Framework/actions/workflows/qa-pipeline.yml)
+[![Public Showcase](https://img.shields.io/badge/showcase-e--gregorio.github.io-2563eb)](https://e-gregorio.github.io/QASL-Framework/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 > **Q**uality **A**ssurance **S**hift-**L**eft
 > Calidad construida desde el requerimiento, no parchada desde el defecto.
 
